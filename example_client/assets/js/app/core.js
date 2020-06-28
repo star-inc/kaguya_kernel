@@ -9,28 +9,31 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import Login from './login.js';
+import Initialize from './init.js';
 import Contacts from './contacts.js';
 import About from './about.js';
 
 const routes = [{
     path: '/',
-    component: Login
-  },
-  {
+    component: Initialize
+},
+{
     path: '/contacts',
     component: Contacts
-  },
-  {
+},
+{
+    path: '/settings',
+    component: { template: '<div class="text-center">Settings</div>' }
+},
+{
     path: '/about',
     component: About
-  }
-];
+}];
 
 const router = new VueRouter({
-  routes
+    routes
 });
 
 const app = new Vue({
-  router
+    router,
 }).$mount('#app');

@@ -9,12 +9,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 package kaguya
 
 import (
+	"fmt"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewDataInterface() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+type DataInterface struct {
+	client *mongo
 }
 
-
+func NewDataInterface() {
+	dataInterface = new(DataInterface)
+	dataInterface.client, err := mongo.NewClient(
+		options.Client().ApplyURI(fmt.Sprintf("mongodb://%s", Config.DBhost))
+	)
+	DeBug("NewDataInterface", err);
+}
