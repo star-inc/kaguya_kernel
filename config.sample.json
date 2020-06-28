@@ -1,0 +1,4 @@
+{
+    "dbhost":"mongodb://localhost",
+    "dbname":"kaguya"
+}

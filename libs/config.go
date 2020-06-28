@@ -15,16 +15,19 @@ import (
 )
 
 type configStruct struct {
-	Name   string `json:"name"`
 	DBhost string `json:"dbhost"`
+	DBname   string `json:"dbname"`
 }
 
 // Config : Global Settings for butterfly from config.json
 var Config configStruct
 
+// ConfigPath : Where the config file placed.
+var ConfigPath string = "config.json"
+
 // ReadConfig : Load configure file to Config
-func ReadConfig(configPath string) {
-	jsonFile, err := os.Open(configPath)
+func ReadConfig() {
+	jsonFile, err := os.Open(ConfigPath)
 	DeBug("Get JSON config", err)
 	defer jsonFile.Close()
 	srcJSON, _ := ioutil.ReadAll(jsonFile)

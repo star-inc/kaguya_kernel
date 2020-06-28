@@ -13,14 +13,16 @@ import (
 	"log"
 	"net/http"
 
+	kaguya "./libs"
 	"github.com/gorilla/websocket"
 )
 
 func main() {
+	kaguya.ReadConfig()
 	upgrader := &websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
-	http.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println("upgrade:", err)
@@ -30,19 +32,7 @@ func main() {
 			log.Println("disconnect !!")
 			c.Close()
 		}()
-		for {
-			mtype, msg, err := c.ReadMessage()
-			if err != nil {
-				log.Println("read:", err)
-				break
-			}
-			log.Printf("receive: %s\n", msg)
-			err = c.WriteMessage(mtype, msg)
-			if err != nil {
-				log.Println("write:", err)
-				break
-			}
-		}
+		kaguya.HandleRequest(c)
 	})
 
 	fmt.Println("\n\tKaguya")

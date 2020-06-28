@@ -19,13 +19,12 @@ import (
 	"golang.org/x/net/html"
 )
 
-// HTTPGet :
+// HTTPGet : Get WWW resources from Internet
 func HTTPGet(url string, recovery int) string {
 	var output string
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	DeBug("GenRequest", err)
-	req.Header.Set("User-Agent", Config.UserAgent)
 	resp, err := client.Do(req)
 	if err == nil {
 		body, err := ioutil.ReadAll(resp.Body)

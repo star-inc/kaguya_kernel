@@ -15,3 +15,6 @@ kaguya.exe
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Config files
+config.json
