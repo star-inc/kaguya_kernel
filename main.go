@@ -25,11 +25,9 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println("upgrade:", err)
 			return
 		}
 		defer func() {
-			log.Println("disconnect !!")
 			c.Close()
 		}()
 		kaguya.HandleRequest(c)

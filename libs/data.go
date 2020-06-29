@@ -17,23 +17,47 @@ import (
 )
 
 type DataInterface struct {
-	client   *mongo.Client
-	database *mongo.Database
+	client       *mongo.Client
+	database     *mongo.Database
+	queryTimeout time.Duration
 }
 
 func NewDataInterface() *DataInterface {
 	var err error
 	dataInterface := new(DataInterface)
-	ctx, _ := context.WithTimeout(context.Background(), 100*time.Second)
+	dataInterface.queryTimeout = 50 * time.Second
+	ctx, _ := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	dataInterface.client, err = mongo.Connect(ctx, options.Client().ApplyURI(Config.DBhost))
 	DeBug("NewDataInterface", err)
 	dataInterface.database = dataInterface.client.Database(Config.DBname)
 	return dataInterface
 }
 
-func (dataInterface DataInterface) LogMessage(message []byte) {
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+func (dataInterface DataInterface) GetAccess(username string, password string) interface{} {
+	var result interface{}
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
-	_, err := dataInterface.database.Collection("kaguya").InsertOne(ctx, bson.M{"name": "message"})
+	filter := bson.M{"name": "pi"}
+	err := dataInterface.database.Collection("kaguya").FindOne(ctx, filter).Decode(&result)
+	DeBug("LogMessage", err)
+	return result
+}
+
+func (dataInterface DataInterface) RegisterUser(user User) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	data, _ := bson.Marshal(user)
+	_, err := dataInterface.database.Collection("users").InsertOne(ctx, data)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (dataInterface DataInterface) LogMessage(message []byte) {
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	data, _ := bson.Marshal(&Message{ContentType: 1, TargetType: 1, Origin: "", Target: "", Content: message})
+	_, err := dataInterface.database.Collection("messages").InsertOne(ctx, data)
 	DeBug("LogMessage", err)
 }

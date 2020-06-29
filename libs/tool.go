@@ -10,8 +10,8 @@ package kaguya
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -45,7 +45,7 @@ func HTTPGet(url string, recovery int) string {
 // DeBug : Print errors for debug and report
 func DeBug(where string, err error) bool {
 	if err != nil {
-		fmt.Printf("Butterfly Error #%s\nReason:\n%s\n\n", where, err)
+		log.Printf("Kaguya Error #%s\nReason:\n%s\n\n", where, err)
 		return false
 	}
 	return true

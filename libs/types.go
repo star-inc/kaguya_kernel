@@ -8,15 +8,28 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
+import (
+	"github.com/google/uuid"
+)
+
+const (
+	ContentType_Text = 0
+	TargetType_Contact = 0
+)
+
 type Message struct {
 	ContentType int
-	TargetType int
-	Origin string
-	Target string
-	Content []byte
+	TargetType  int
+	Origin      string
+	Target      string
+	Content     []byte
 }
 
 type User struct {
-	UserID string
+	UserID      string
 	DisplayName string
+}
+
+func NewUserInfo(displayName string) User {
+	return User{UserID: uuid.New().String(), DisplayName: displayName}
 }

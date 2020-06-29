@@ -9,19 +9,31 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 package kaguya
 
 import (
-	"log"
-
 	"github.com/gorilla/websocket"
 )
 
+type kaguyaRequest struct {
+	authToken string
+	action    string
+	data      interface{}
+}
+
+// HandleRequest :
 func HandleRequest(wsHandle *websocket.Conn) {
 	for {
+		data := NewDataInterface()
 		mtype, msg, err := wsHandle.ReadMessage()
 		DeBug("WS Read", err)
-		log.Printf("Received: %s\n", msg)
-		data := NewDataInterface()
-		data.LogMessage(msg)
-		err = wsHandle.WriteMessage(mtype, msg)
-		DeBug("WS Write", err)
+		switch mtype {
+		case 1:
+			go func() {
+				if msg != nil {
+					go data.LogMessage(msg)
+				}
+				err = wsHandle.WriteMessage(mtype, msg)
+				DeBug("WS Write", err)
+			}()
+			break
+		}
 	}
 }
