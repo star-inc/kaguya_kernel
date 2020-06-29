@@ -37,26 +37,6 @@
 	<h2>Kaguya ES Demo</h2>
 	<div id="app">
 		<div id="msg-container">
-			<div class="self">
-				<h3 class="name">Flandre:</h3>
-				<p>123</p>
-			</div>
-			<div class="another">
-				<h3 class="name">Abi:</h3>
-				<p>123</p>
-			</div>
-			<div class="self">
-				<h3 class="name">Flandre:</h3>
-				<p>123</p>
-			</div>
-			<div class="self">
-				<h3 class="name">Flandre:</h3>
-				<p>123</p>
-			</div>
-			<div class="self">
-				<h3 class="name">Flandre:</h3>
-				<p>123</p>
-			</div>
 		</div>
 		<div id="msg-input-box">
 			<input type="text" />
@@ -67,8 +47,12 @@
 			integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 		<script src="assets/js/compute/api.js"></script>
 		<script>
-        var client = new kaguyaAPI("wss://11145-beb16835-b845-47bf-b8dd-2e849fa40474.ws-us02.gitpod.io/");
-
+			var client = new kaguyaAPI(
+                "wss://localhost/"
+            );
+            client.setOnMessageHandle(function(msg){
+                $("#msg-container").append('<div class="another"><h3 class="name">System:</h3><p>'+msg.data+'</p></div>');
+            });
 		</script>
 </body>
 
