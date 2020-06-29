@@ -14,12 +14,7 @@ const API_VERSION = 1;
 function kaguyaAPI(API_HOST) {
     this.identity = "";
     this.client = new WebSocket(API_HOST);
-    this.client.on_message = function (message) {
-        if ("action" in message) {
-            this.prototype["r_" + message["actionType"] + "_" + message["action"]](message);
-        }
-    }
-    this.client.on_close = () => console.log("Closed");
+    this.client.onclose = () => console.log("Closed");
 }
 
 kaguyaAPI.prototype = {
@@ -37,15 +32,19 @@ kaguyaAPI.prototype = {
     },
 
     _uuid: function () {
-        var d = Date.now();
+        let d = Date.now();
         if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
             d += performance.now();
         }
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = (d + Math.random() * 16) % 16 | 0;
+            let r = (d + Math.random() * 16) % 16 | 0;
             d = Math.floor(d / 16);
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
+    },
+
+    setOnMessageHandle: function (func) {
+        this.client.onmessage = func
     },
 
     getAccess: function (userId, userPw) {
@@ -56,7 +55,11 @@ kaguyaAPI.prototype = {
         ));
     },
 
-    r_TalkService_Receive: function (message) {
-        console.log(message);
+    sendMessage: function () {
+        this.client.send(this._responseFactory(
+            "TalkService",
+            "sendMessage",
+            { identity: userId, password: userPw }
+        ));
     }
 }

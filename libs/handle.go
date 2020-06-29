@@ -30,18 +30,25 @@ func (handle *Handle) Start() {
 		err := handle.wsHandle.ReadJSON(&handle.request)
 		DeBug("WS Read", err)
 		if handle.request.Version < 1 {
-			handle.wsHandle.WriteJSON("Not supported")
+			handle.Response("core", "End of Support", nil)
 			return
 		}
-		if handle.request.AuthToken != "" {
-			go handle.HandleActions()
+		if handle.request.AuthToken != "" || handle.request.ActionType == "authService" {
+			go handle.HandleServices()
 		} else {
-			if handle.request.Action == "auth" {
-				handle.identify = handle.request.AuthToken
-				handle.wsHandle.WriteJSON("Authorized")
-			} else {
-				handle.wsHandle.WriteJSON("Not authorized")
-			}
+			go handle.Response("core", "Unauthorized", nil)
 		}
 	}
+}
+
+// Response :
+func (handle *Handle) Response(serviceCode string, actionCode string, data interface{}) {
+	handle.wsHandle.WriteJSON(
+		&KaguyaResponse{
+			ActionID:   handle.request.ActionID,
+			ActionType: serviceCode,
+			Action:     actionCode,
+			Data:       data,
+		},
+	)
 }
