@@ -13,9 +13,16 @@ import (
 )
 
 const (
-	ContentType_Text = 0
+	ContentType_Text   = 0
 	TargetType_Contact = 0
 )
+
+type KaguyaRequest struct {
+	AuthToken  string      `json:"authToken"`
+	ActionType string      `json:"actionType"`
+	Action     string      `json:"action"`
+	Data       interface{} `json:"data"`
+}
 
 type Message struct {
 	ContentType int

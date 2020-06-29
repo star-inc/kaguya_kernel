@@ -15,8 +15,9 @@ import (
 )
 
 type configStruct struct {
+	Port   int    `json:"port"`
 	DBhost string `json:"dbhost"`
-	DBname   string `json:"dbname"`
+	DBname string `json:"dbname"`
 }
 
 // Config : Global Settings for butterfly from config.json

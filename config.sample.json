@@ -1,4 +1,5 @@
 {
-    "dbhost":"mongodb://localhost",
-    "dbname":"kaguya"
+    "port": 10101,
+    "dbhost": "mongodb://localhost",
+    "dbname": "kaguya"
 }

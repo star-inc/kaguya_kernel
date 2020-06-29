@@ -12,26 +12,38 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type kaguyaRequest struct {
-	authToken string
-	action    string
-	data      interface{}
+type Handle struct {
+	identify string
+	wsHandle *websocket.Conn
 }
 
-// HandleRequest :
-func HandleRequest(wsHandle *websocket.Conn) {
+func NewHandleInterface(wsHandle *websocket.Conn) *Handle {
+	handle := new(Handle)
+	handle.wsHandle = wsHandle
+	return handle
+}
+
+// Start :
+func (handle *Handle) Start() {
 	for {
-		data := NewDataInterface()
-		mtype, msg, err := wsHandle.ReadMessage()
+		mtype, msg, err := handle.wsHandle.ReadMessage()
 		DeBug("WS Read", err)
 		switch mtype {
 		case 1:
 			go func() {
-				if msg != nil {
-					go data.LogMessage(msg)
+				if handle.identify != "" {
+					if msg != nil {
+						go handle.HandleActions(msg)
+					}
+				} else {
+					if string(msg) == "auth" {
+						handle.identify = "msg"
+						handle.wsHandle.WriteMessage(1, []byte("Authorizing"))
+						handle.wsHandle.WriteMessage(1, []byte("Authorized"))
+					} else {
+						handle.wsHandle.WriteMessage(1, []byte("Not authorized"))
+					}
 				}
-				err = wsHandle.WriteMessage(mtype, msg)
-				DeBug("WS Write", err)
 			}()
 			break
 		}
