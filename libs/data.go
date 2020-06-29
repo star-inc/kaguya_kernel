@@ -22,6 +22,11 @@ type DataInterface struct {
 	queryTimeout time.Duration
 }
 
+const (
+	Collection_Users = "users"
+	Collection_Messages = "messages"
+)
+
 func NewDataInterface() *DataInterface {
 	var err error
 	dataInterface := new(DataInterface)
@@ -38,7 +43,7 @@ func (dataInterface DataInterface) GetAccess(username string, password string) i
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
 	filter := bson.M{"name": "pi"}
-	err := dataInterface.database.Collection("kaguya").FindOne(ctx, filter).Decode(&result)
+	err := dataInterface.database.Collection(Collection_Users).FindOne(ctx, filter).Decode(&result)
 	DeBug("LogMessage", err)
 	return result
 }
@@ -47,7 +52,7 @@ func (dataInterface DataInterface) RegisterUser(user User) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
 	data, _ := bson.Marshal(user)
-	_, err := dataInterface.database.Collection("users").InsertOne(ctx, data)
+	_, err := dataInterface.database.Collection(Collection_Users).InsertOne(ctx, data)
 	if err != nil {
 		return false
 	}
@@ -58,6 +63,6 @@ func (dataInterface DataInterface) LogMessage(message []byte) {
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
 	data, _ := bson.Marshal(&Message{ContentType: 1, TargetType: 1, Origin: "", Target: "", Content: message})
-	_, err := dataInterface.database.Collection("messages").InsertOne(ctx, data)
+	_, err := dataInterface.database.Collection(Collection_Messages).InsertOne(ctx, data)
 	DeBug("LogMessage", err)
 }

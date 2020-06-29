@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Kaguya Demo</title>
+	<style>
+		#app {
+			width: 900px;
+			margin: 0 auto;
+		}
+
+		#msg-container {
+			min-width: 100px;
+			height: 300px;
+			border-style: solid;
+			border-width: 1px;
+			margin: 10px auto;
+			padding: 10px 10px 10px 10px;
+			overflow: scroll;
+		}
+
+		#msg-container .self {
+			text-align: right;
+		}
+
+		#msg-container .another {
+			text-align: left;
+		}
+
+		#msg-input-box {
+			float: right;
+		}
+	</style>
+</head>
+
+<body>
+	<h2>Kaguya ES Demo</h2>
+	<div id="app">
+		<div id="msg-container">
+			<div class="self">
+				<h3 class="name">Flandre:</h3>
+				<p>123</p>
+			</div>
+			<div class="another">
+				<h3 class="name">Abi:</h3>
+				<p>123</p>
+			</div>
+			<div class="self">
+				<h3 class="name">Flandre:</h3>
+				<p>123</p>
+			</div>
+			<div class="self">
+				<h3 class="name">Flandre:</h3>
+				<p>123</p>
+			</div>
+			<div class="self">
+				<h3 class="name">Flandre:</h3>
+				<p>123</p>
+			</div>
+		</div>
+		<div id="msg-input-box">
+			<input type="text" />
+			<input type="submit" />
+        </div>
+		</div>
+		<script src="https://code.jquery.com/jquery-3.5.1.js"
+			integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+		<script src="assets/js/compute/api.js"></script>
+		<script>
+        var client = new kaguyaAPI("wss://11145-beb16835-b845-47bf-b8dd-2e849fa40474.ws-us02.gitpod.io/");
+
+		</script>
+</body>
+
+</html>

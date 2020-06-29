@@ -9,27 +9,54 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-const API_HOST = "wss://localhost";
+const API_VERSION = 1;
 
-function kaguyaAPI() {
+function kaguyaAPI(API_HOST) {
+    this.identity = "";
     this.client = new WebSocket(API_HOST);
     this.client.on_message = function (message) {
         if ("action" in message) {
-            this.prototype["r_" + message["action"]];
+            this.prototype["r_" + message["actionType"] + "_" + message["action"]](message);
         }
     }
     this.client.on_close = () => console.log("Closed");
 }
 
 kaguyaAPI.prototype = {
-    getAccess: function (userId, userPw) {
-        this.client.send(JSON.stringify({
-            identity: userId,
-            password: userPw
-        }));
+    _responseFactory: function (
+        actionType, action, data
+    ) {
+        return JSON.stringify({
+            version: API_VERSION,
+            actionID: this._uuid(),
+            authToken: this.identity,
+            actionType: actionType,
+            action: action,
+            data: data ? data : {}
+        })
     },
 
-    r_ReceivedMessage: function (){
+    _uuid: function () {
+        var d = Date.now();
+        if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+            d += performance.now();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = (d + Math.random() * 16) % 16 | 0;
+            d = Math.floor(d / 16);
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    },
 
+    getAccess: function (userId, userPw) {
+        this.client.send(this._responseFactory(
+            "authService",
+            "getAccess",
+            { identity: userId, password: userPw }
+        ));
+    },
+
+    r_TalkService_Receive: function (message) {
+        console.log(message);
     }
 }

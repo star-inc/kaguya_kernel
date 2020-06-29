@@ -12,8 +12,11 @@ func GetAccess(username string, password string) bool {
 	return true
 }
 
-func RegisterUser(username string, password string) bool {
+func RegisterUser(identity string, password string) bool {
 	data := NewDataInterface()
-	user := NewUserInfo(username)
+	var user User
+	user.DisplayName = ""
+	user.Identity = identity
+	user.Password = password
 	return 	data.RegisterUser(user)
 }

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	kaguya "./libs"
 	"github.com/gorilla/websocket"
@@ -35,6 +36,7 @@ func main() {
 		if err != nil {
 			return
 		}
+		c.SetReadDeadline(time.Now().Add(time.Duration(50) * time.Second))
 		defer func() {
 			c.Close()
 		}()

@@ -8,35 +8,37 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-import (
-	"github.com/google/uuid"
-)
-
 const (
 	ContentType_Text   = 0
 	TargetType_Contact = 0
 )
 
 type KaguyaRequest struct {
+	Version    int         `json:"version"`
+	ActionID   string      `json:"actionID"`
 	AuthToken  string      `json:"authToken"`
 	ActionType string      `json:"actionType"`
 	Action     string      `json:"action"`
 	Data       interface{} `json:"data"`
 }
 
+type KaguyaResponse struct {
+	ActionID   string      `json:"actionID"`
+	ActionType string      `json:"actionType"`
+	Action     string      `json:"action"`
+	Data       interface{} `json:"data"`
+}
+
 type Message struct {
-	ContentType int
-	TargetType  int
-	Origin      string
-	Target      string
-	Content     []byte
+	ContentType int    `json:"contentType"`
+	TargetType  int    `json:"targetType"`
+	Origin      string `json:"origin"`
+	Target      string `json:"target"`
+	Content     []byte `json:"content"`
 }
 
 type User struct {
-	UserID      string
-	DisplayName string
-}
-
-func NewUserInfo(displayName string) User {
-	return User{UserID: uuid.New().String(), DisplayName: displayName}
+	DisplayName string `json:"displayName"`
+	Identity    string `json:"identity"`
+	Password    string `json:"password"`
 }

@@ -8,15 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-import (
-	"encoding/json"
-)
-
-func (handle *Handle) HandleActions(srcJSON []byte) {
-	request := new(KaguyaRequest)
-	err := json.Unmarshal(srcJSON, request)
-	DeBug("Decode JSON", err)
-	handle.wsHandle.WriteMessage(1, []byte(request.Action))
+func (handle *Handle) HandleActions() {
 }
 
 func (handle *Handle) TalkService() {

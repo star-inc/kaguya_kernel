@@ -14,6 +14,7 @@ import (
 
 type Handle struct {
 	identify string
+	request  KaguyaRequest
 	wsHandle *websocket.Conn
 }
 
@@ -26,26 +27,21 @@ func NewHandleInterface(wsHandle *websocket.Conn) *Handle {
 // Start :
 func (handle *Handle) Start() {
 	for {
-		mtype, msg, err := handle.wsHandle.ReadMessage()
+		err := handle.wsHandle.ReadJSON(&handle.request)
 		DeBug("WS Read", err)
-		switch mtype {
-		case 1:
-			go func() {
-				if handle.identify != "" {
-					if msg != nil {
-						go handle.HandleActions(msg)
-					}
-				} else {
-					if string(msg) == "auth" {
-						handle.identify = "msg"
-						handle.wsHandle.WriteMessage(1, []byte("Authorizing"))
-						handle.wsHandle.WriteMessage(1, []byte("Authorized"))
-					} else {
-						handle.wsHandle.WriteMessage(1, []byte("Not authorized"))
-					}
-				}
-			}()
-			break
+		if handle.request.Version < 1 {
+			handle.wsHandle.WriteJSON("Not supported")
+			return
+		}
+		if handle.request.AuthToken != "" {
+			go handle.HandleActions()
+		} else {
+			if handle.request.Action == "auth" {
+				handle.identify = handle.request.AuthToken
+				handle.wsHandle.WriteJSON("Authorized")
+			} else {
+				handle.wsHandle.WriteJSON("Not authorized")
+			}
 		}
 	}
 }
