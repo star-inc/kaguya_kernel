@@ -16,16 +16,18 @@ import (
 )
 
 type Handle struct {
-	identify      string
+	identity      string
 	request       KaguyaRequest
 	wsHandle      *websocket.Conn
 	dataInterface *DataInterface
+	startedPoll   bool
 }
 
 func NewHandleInterface(wsHandle *websocket.Conn) *Handle {
 	handle := new(Handle)
 	handle.wsHandle = wsHandle
 	handle.dataInterface = NewDataInterface()
+	handle.startedPoll = false
 	return handle
 }
 
@@ -38,8 +40,15 @@ func (handle *Handle) Start() {
 			handle.Response(false, "core", "End of Support", nil)
 			return
 		}
-		if handle.request.AuthToken != "" || handle.request.ActionType == "authService" {
-			go handle.HandleServices()
+		if handle.request.ActionType == "authService" {
+			go handle.QueryServices()
+		} else if handle.request.AuthToken != "" {
+			handle.VerfiyAccess(handle.request.AuthToken)
+			go handle.QueryServices()
+			if !handle.startedPoll {
+				go handle.PollServices()
+				handle.startedPoll = true
+			}
 		} else {
 			go handle.Response(false, "core", "Unauthorized", nil)
 		}

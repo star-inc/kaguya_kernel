@@ -8,18 +8,18 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-func (handle *Handle) HandleServices() {
+func (handle *Handle) QueryServices() {
 	switch handle.request.ActionType {
 	case "authService":
-		handle.AuthService()
+		handle.authService()
 		break
 	case "talkService":
-		handle.TalkService()
+		handle.talkService()
 		break
 	}
 }
 
-func (handle *Handle) AuthService() {
+func (handle *Handle) authService() {
 	switch handle.request.Action {
 	case "registerUser":
 		account := handle.request.Data.(map[string]interface{})
@@ -34,7 +34,7 @@ func (handle *Handle) AuthService() {
 	}
 }
 
-func (handle *Handle) TalkService() {
+func (handle *Handle) talkService() {
 	switch handle.request.Action {
 	case "sendMessage":
 		TalkService_SendMessage(handle)

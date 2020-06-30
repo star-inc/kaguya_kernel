@@ -24,6 +24,7 @@ type DataInterface struct {
 }
 
 const (
+	Collection_Access   = "accesses"
 	Collection_Users    = "users"
 	Collection_Messages = "messages"
 )
@@ -45,6 +46,26 @@ func (dataInterface DataInterface) GetAccess(username string, password string) i
 	defer cancel()
 	filter := bson.M{"username": username, "password": password}
 	_ = dataInterface.database.Collection(Collection_Users).FindOne(ctx, filter).Decode(&result)
+	return result
+}
+
+func (dataInterface DataInterface) RegisterAccess(identity string, authToken string) interface{} {
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	data := bson.M{"identity": identity, "authToken": authToken}
+	_, err := dataInterface.database.Collection(Collection_Access).InsertOne(ctx, data)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (dataInterface DataInterface) VerfiyAccess(authToken string) interface{} {
+	var result interface{}
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	filter := bson.M{"authToken": authToken}
+	_ = dataInterface.database.Collection(Collection_Access).FindOne(ctx, filter).Decode(&result)
 	return result
 }
 

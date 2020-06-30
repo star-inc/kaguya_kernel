@@ -10,8 +10,11 @@ package kaguya
 
 import (
 	"crypto/sha512"
+	"encoding/base64"
+	"fmt"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (handle *Handle) GetAccess(username string, password string) []byte {
@@ -20,9 +23,22 @@ func (handle *Handle) GetAccess(username string, password string) []byte {
 		tokenSeed := uuid.New().String()
 		tokenHandle := sha512.New()
 		tokenHandle.Write([]byte(tokenSeed))
-		return tokenHandle.Sum(nil)
+		authToken := tokenHandle.Sum(nil)
+		func(authorization interface{}, authToken []byte) {
+			queryResult := authorization.(primitive.D)
+			encodedAuthToken := base64.StdEncoding.EncodeToString(authToken)
+			handle.dataInterface.RegisterAccess(queryResult.Map()["identity"].(string), encodedAuthToken)
+		}(authorization, authToken)
+		return authToken
 	}
 	return []byte{}
+}
+
+func (handle *Handle) VerfiyAccess(authToken string) {
+	data := NewDataInterface()
+	verified := data.VerfiyAccess(authToken).(primitive.D)
+	handle.identity = verified.Map()["identity"].(string)
+	fmt.Println(handle.identity)
 }
 
 func (handle *Handle) RegisterUser(displayName string, username string, password string) bool {

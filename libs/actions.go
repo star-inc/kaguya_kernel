@@ -15,6 +15,7 @@ func TalkService_SendMessage(handle *Handle) {
 	output.TargetType = int(msg["targetType"].(float64))
 	output.Target = msg["target"].(string)
 	output.Content = []byte(msg["content"].(string))
+	output.Origin = handle.identity
 	handle.dataInterface.LogMessage(output)
 	handle.Response(false, handle.request.ActionType, handle.request.Action, output)
 }
