@@ -21,8 +21,14 @@ func (handle *Handle) HandleServices() {
 
 func (handle *Handle) AuthService() {
 	switch handle.request.Action {
+	case "registerUser":
+		account := handle.request.Data.(map[string]interface{})
+		data := handle.RegisterUser(account["displayName"].(string), account["username"].(string), account["password"].(string))
+		handle.Response(false, handle.request.ActionType, handle.request.Action, data)
+		break
 	case "getAccess":
-		data := GetAccess(handle.request.Data)
+		id := handle.request.Data.(map[string]interface{})
+		data := handle.GetAccess(id["username"].(string), id["password"].(string))
 		handle.Response(false, handle.request.ActionType, handle.request.Action, data)
 		break
 	}

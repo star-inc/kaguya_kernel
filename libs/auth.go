@@ -10,12 +10,13 @@ package kaguya
 
 import (
 	"crypto/sha512"
+
 	"github.com/google/uuid"
 )
 
-func GetAccess(data interface{}) []byte {
-	id := (data).(map[string]interface{})
-	if id["identity"] == "demo" && id["password"] == "demo" {
+func (handle *Handle) GetAccess(username string, password string) []byte {
+	authorization := handle.dataInterface.GetAccess(username, password)
+	if authorization != nil {
 		tokenSeed := uuid.New().String()
 		tokenHandle := sha512.New()
 		tokenHandle.Write([]byte(tokenSeed))
@@ -24,11 +25,12 @@ func GetAccess(data interface{}) []byte {
 	return []byte{}
 }
 
-func RegisterUser(displayName string, identity string, password string) bool {
+func (handle *Handle) RegisterUser(displayName string, username string, password string) bool {
 	data := NewDataInterface()
 	var user User
+	user.Identity = uuid.New().String()
 	user.DisplayName = displayName
-	user.Identity = identity
+	user.Username = username
 	user.Password = password
 	return data.RegisterUser(user)
 }

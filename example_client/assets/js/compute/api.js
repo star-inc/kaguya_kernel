@@ -51,11 +51,24 @@ kaguyaAPI.prototype = {
         this.client.onmessage = func;
     },
 
+    registerUser: function (displayName, username, password) {
+        let apiStmt = this._responseFactory(
+            "authService",
+            "registerUser", {
+                displayName: displayName,
+                username: username,
+                password: password
+            }
+        );
+        this.client.send(apiStmt.data);
+        return apiStmt.id;
+    },
+
     getAccess: function (userId, userPw) {
         let apiStmt = this._responseFactory(
             "authService",
             "getAccess", {
-                identity: userId,
+                username: userId,
                 password: userPw
             }
         );

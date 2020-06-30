@@ -31,15 +31,16 @@ type KaguyaResponse struct {
 }
 
 type Message struct {
-	ContentType int
-	TargetType  int
-	Origin      string
-	Target      string
-	Content     []byte
+	ContentType int    `json:"contentType"`
+	TargetType  int    `json:"targetType"`
+	Origin      string `json:"origin"`
+	Target      string `json:"target"`
+	Content     []byte `json:"content"`
 }
 
 type User struct {
-	DisplayName string
-	Identity    string
-	Password    string
+	Identity    string `json:"identity"`
+	DisplayName string `json:"displayName"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
 }

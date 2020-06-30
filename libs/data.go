@@ -43,9 +43,8 @@ func (dataInterface DataInterface) GetAccess(username string, password string) i
 	var result interface{}
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
-	filter := bson.M{"name": "pi"}
-	err := dataInterface.database.Collection(Collection_Users).FindOne(ctx, filter).Decode(&result)
-	DeBug("LogMessage", err)
+	filter := bson.M{"username": username, "password": password}
+	_ = dataInterface.database.Collection(Collection_Users).FindOne(ctx, filter).Decode(&result)
 	return result
 }
 

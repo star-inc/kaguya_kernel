@@ -55,17 +55,34 @@
 
 		client.setOnMessageHandle(function (msg) {
 			msgData = JSON.parse(msg.data);
-			let msgOrigin = actions.includes(msgData.actionID) ? "self" : "another";
-			$("#msg-container").append('<div class="' + msgOrigin +
-				'"><h3 class="name">System:</h3><p>' + msg.data +
-				'</p></div>');
+			switch (msgData.actionType) {
+				case "authService":
+					switch (msgData.action) {
+						case "getAccess":
+							client.identity = msgData.data;
+							$("#msg-container").html('');
+							if (client.identity != "") {
+								$("#msg-input-box-submit").attr("disabled", false);
+							} else {
+								$("#msg-input-box-submit").attr("disabled", true);
+							}
+							break;
+					}
+					break;
+				case "talkService":
+					let msgOrigin = actions.includes(msgData.actionID) ? "self" : "another";
+					$("#msg-container").append('<div class="' + msgOrigin +
+						'"><h3 class="name">System:</h3><p>' + atob(msgData.data.content) +
+						'</p></div>');
+					break;
+			}
 		});
 
 		$("#msg-input-box").submit(
 			function (e) {
 				e.preventDefault();
 				let actionID = client.sendTextMessage(0, "", $("#msg-input-box-data").val());
-				actions.push(actionID)
+				actions.push(actionID);
 				$("#msg-input-box-data").val("");
 				$("#msg-container").animate({
 					scrollTop: $("#msg-container").prop('scrollHeight')
@@ -73,15 +90,11 @@
 			}
 		);
 
-		var loginButton = function () {
-			client.identity = "auth";
-			$("#msg-container").html('');
-			$("#msg-input-box-submit").removeAttr("disabled");
-		};
+		var loginButton = () => client.getAccess("demo", "demo");
 
 		$(function () {
 			if (client.identity != "") {
-				$("#msg-input-box-submit").removeAttr("disabled");
+				$("#msg-input-box-submit").attr("disabled", false);
 			} else {
 				$("#msg-container").html('<button onclick="loginButton()">Login</button>');
 			}
