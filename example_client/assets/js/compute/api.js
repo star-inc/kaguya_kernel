@@ -21,14 +21,18 @@ kaguyaAPI.prototype = {
     _responseFactory: function (
         actionType, action, data
     ) {
-        return JSON.stringify({
-            version: API_VERSION,
-            actionID: this._uuid(),
-            authToken: this.identity,
-            actionType: actionType,
-            action: action,
-            data: data ? data : {}
-        })
+        let actionID = this._uuid();
+        return {
+            id: actionID,
+            data: JSON.stringify({
+                version: API_VERSION,
+                actionID: actionID,
+                authToken: this.identity,
+                actionType: actionType,
+                action: action,
+                data: data ? data : {}
+            })
+        }
     },
 
     _uuid: function () {
@@ -44,22 +48,32 @@ kaguyaAPI.prototype = {
     },
 
     setOnMessageHandle: function (func) {
-        this.client.onmessage = func
+        this.client.onmessage = func;
     },
 
     getAccess: function (userId, userPw) {
-        this.client.send(this._responseFactory(
+        let apiStmt = this._responseFactory(
             "authService",
-            "getAccess",
-            { identity: userId, password: userPw }
-        ));
+            "getAccess", {
+                identity: userId,
+                password: userPw
+            }
+        );
+        this.client.send(apiStmt.data);
+        return apiStmt.id;
     },
 
-    sendMessage: function () {
-        this.client.send(this._responseFactory(
-            "TalkService",
-            "sendMessage",
-            { identity: userId, password: userPw }
-        ));
+    sendTextMessage: function (targetType, target, message) {
+        let apiStmt = this._responseFactory(
+            "talkService",
+            "sendMessage", {
+                contentType: 0,
+                targetType: targetType,
+                target: target,
+                content: message
+            }
+        );
+        this.client.send(apiStmt.data);
+        return apiStmt.id;
     }
 }

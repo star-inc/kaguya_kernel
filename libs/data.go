@@ -10,10 +10,11 @@ package kaguya
 
 import (
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 type DataInterface struct {
@@ -23,7 +24,7 @@ type DataInterface struct {
 }
 
 const (
-	Collection_Users = "users"
+	Collection_Users    = "users"
 	Collection_Messages = "messages"
 )
 
@@ -59,10 +60,10 @@ func (dataInterface DataInterface) RegisterUser(user User) bool {
 	return true
 }
 
-func (dataInterface DataInterface) LogMessage(message []byte) {
+func (dataInterface DataInterface) LogMessage(message *Message) {
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()
-	data, _ := bson.Marshal(&Message{ContentType: 1, TargetType: 1, Origin: "", Target: "", Content: message})
+	data, _ := bson.Marshal(&message)
 	_, err := dataInterface.database.Collection(Collection_Messages).InsertOne(ctx, data)
 	DeBug("LogMessage", err)
 }

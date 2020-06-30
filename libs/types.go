@@ -23,6 +23,7 @@ type KaguyaRequest struct {
 }
 
 type KaguyaResponse struct {
+	Time       int64       `json:"time"`
 	ActionID   string      `json:"actionID"`
 	ActionType string      `json:"actionType"`
 	Action     string      `json:"action"`
@@ -30,15 +31,15 @@ type KaguyaResponse struct {
 }
 
 type Message struct {
-	ContentType int    `json:"contentType"`
-	TargetType  int    `json:"targetType"`
-	Origin      string `json:"origin"`
-	Target      string `json:"target"`
-	Content     []byte `json:"content"`
+	ContentType int
+	TargetType  int
+	Origin      string
+	Target      string
+	Content     []byte
 }
 
 type User struct {
-	DisplayName string `json:"displayName"`
-	Identity    string `json:"identity"`
-	Password    string `json:"password"`
+	DisplayName string
+	Identity    string
+	Password    string
 }

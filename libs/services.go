@@ -20,14 +20,18 @@ func (handle *Handle) HandleServices() {
 }
 
 func (handle *Handle) AuthService() {
-	switch handle.request.Action{
+	switch handle.request.Action {
 	case "getAccess":
 		data := GetAccess(handle.request.Data)
-		handle.Response(handle.request.ActionType, handle.request.Action, data)
+		handle.Response(false, handle.request.ActionType, handle.request.Action, data)
 		break
 	}
 }
 
 func (handle *Handle) TalkService() {
-
+	switch handle.request.Action {
+	case "sendMessage":
+		TalkService_SendMessage(handle)
+		break
+	}
 }
