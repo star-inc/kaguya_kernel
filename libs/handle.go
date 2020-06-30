@@ -44,10 +44,14 @@ func (handle *Handle) Start() {
 			go handle.QueryServices()
 		} else if handle.request.AuthToken != "" {
 			handle.VerfiyAccess(handle.request.AuthToken)
-			go handle.QueryServices()
-			if !handle.startedPoll {
-				go handle.PollServices()
-				handle.startedPoll = true
+			if handle.identity != "" {
+				go handle.QueryServices()
+				if !handle.startedPoll {
+					go handle.PollServices()
+					handle.startedPoll = true
+				}
+			} else {
+				go handle.Response(false, "core", "Unauthorized", nil)
 			}
 		} else {
 			go handle.Response(false, "core", "Unauthorized", nil)

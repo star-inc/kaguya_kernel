@@ -39,6 +39,7 @@
 		<div id="msg-container">
 		</div>
 		<form id="msg-input-box">
+			<input id="msg-input-box-target" type="text" />
 			<input id="msg-input-box-data" type="text" />
 			<input id="msg-input-box-submit" type="submit" disabled="disabled" />
 		</form>
@@ -81,7 +82,8 @@
 		$("#msg-input-box").submit(
 			function (e) {
 				e.preventDefault();
-				let actionID = client.sendTextMessage(0, "", $("#msg-input-box-data").val());
+				let actionID = client.sendTextMessage(0, $("#msg-input-box-target").val(), $("#msg-input-box-data")
+			.val());
 				actions.push(actionID);
 				$("#msg-input-box-data").val("");
 				$("#msg-container").animate({

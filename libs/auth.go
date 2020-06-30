@@ -11,7 +11,6 @@ package kaguya
 import (
 	"crypto/sha512"
 	"encoding/base64"
-	"fmt"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -36,9 +35,13 @@ func (handle *Handle) GetAccess(username string, password string) []byte {
 
 func (handle *Handle) VerfiyAccess(authToken string) {
 	data := NewDataInterface()
-	verified := data.VerfiyAccess(authToken).(primitive.D)
-	handle.identity = verified.Map()["identity"].(string)
-	fmt.Println(handle.identity)
+	verified := data.VerfiyAccess(authToken)
+	if verified == nil {
+		handle.identity = ""
+		return
+	}
+	verifiedData := verified.(primitive.D)
+	handle.identity = verifiedData.Map()["identity"].(string)
 }
 
 func (handle *Handle) RegisterUser(displayName string, username string, password string) bool {

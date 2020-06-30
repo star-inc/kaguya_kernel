@@ -80,6 +80,18 @@ func (dataInterface DataInterface) RegisterUser(user User) bool {
 	return true
 }
 
+func (dataInterface DataInterface) CheckUserExisted(identity string) bool {
+	var result interface{}
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	filter := bson.M{"identity": identity}
+	_ = dataInterface.database.Collection(Collection_Users).FindOne(ctx, filter).Decode(&result)
+	if result != nil {
+		return true
+	}
+	return false
+}
+
 func (dataInterface DataInterface) LogMessage(message *Message) {
 	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
 	defer cancel()

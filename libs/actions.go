@@ -10,10 +10,15 @@ package kaguya
 
 func TalkService_SendMessage(handle *Handle) {
 	msg := (handle.request.Data).(map[string]interface{})
+	target := msg["target"].(string)
+	if !handle.dataInterface.CheckUserExisted(target) {
+		handle.Response(false, handle.request.ActionType, handle.request.Action, nil)
+		return
+	}
 	output := new(Message)
 	output.ContentType = int(msg["contentType"].(float64))
 	output.TargetType = int(msg["targetType"].(float64))
-	output.Target = msg["target"].(string)
+	output.Target = target
 	output.Content = []byte(msg["content"].(string))
 	output.Origin = handle.identity
 	handle.dataInterface.LogMessage(output)
