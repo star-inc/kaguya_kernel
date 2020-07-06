@@ -61,8 +61,8 @@
 					switch (msgData.action) {
 						case "getAccess":
 							client.identity = msgData.data;
-							$("#msg-container").html('');
 							if (client.identity != "") {
+								$("#msg-container").html('');
 								$("#msg-input-box-submit").attr("disabled", false);
 							} else {
 								$("#msg-input-box-submit").attr("disabled", true);
@@ -92,13 +92,19 @@
 			}
 		);
 
-		var loginButton = () => client.getAccess("demo", "demo");
-
 		$(function () {
 			if (client.identity != "") {
 				$("#msg-input-box-submit").attr("disabled", false);
 			} else {
-				$("#msg-container").html('<button onclick="loginButton()">Login</button>');
+				$("#msg-container").html(
+					'<form id="login-box"><input id="login-id" type="text" /><input id="login-pw" type="text" /><input id="login-box-submit" type="submit" /></form>'
+				);
+				$("#login-box").submit(
+					function (e) {
+						e.preventDefault();
+						client.getAccess($("#login-id").val(), $("#login-pw").val());
+					}
+				);
 			}
 		});
 	</script>

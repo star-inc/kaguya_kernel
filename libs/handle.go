@@ -37,7 +37,7 @@ func (handle *Handle) Start() {
 		err := handle.wsHandle.ReadJSON(&handle.request)
 		DeBug("WS Read", err)
 		if handle.request.Version < 1 {
-			handle.Response(false, "core", "End of Support", nil)
+			handle.ErrorRaise(false, "core", "version", "End of Support")
 			return
 		}
 		if handle.request.ActionType == "authService" {
@@ -51,10 +51,10 @@ func (handle *Handle) Start() {
 					handle.startedPoll = true
 				}
 			} else {
-				go handle.Response(false, "core", "Unauthorized", nil)
+				go handle.ErrorRaise(false, "core", "verify", "Unauthorized")
 			}
 		} else {
-			go handle.Response(false, "core", "Unauthorized", nil)
+			go handle.ErrorRaise(false, "core", "verify", "Unauthorized")
 		}
 	}
 }
@@ -77,4 +77,8 @@ func (handle *Handle) Response(initiative bool, serviceCode string, actionCode s
 			Data:       data,
 		},
 	)
+}
+
+func (handle *Handle) ErrorRaise(initiative bool, serviceCode string, actionCode string, message string) {
+	handle.Response(initiative, serviceCode, actionCode, &KaguyaErrorRaise{Error: message})
 }

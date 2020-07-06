@@ -10,6 +10,7 @@ package kaguya
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -98,4 +99,15 @@ func (dataInterface DataInterface) LogMessage(message *Message) {
 	data, _ := bson.Marshal(&message)
 	_, err := dataInterface.database.Collection(Collection_Messages).InsertOne(ctx, data)
 	DeBug("LogMessage", err)
+}
+
+func (dataInterface DataInterface) GetMessageBox(identity string) interface{} {
+	var result interface{}
+	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	defer cancel()
+	filter := bson.M{"$or": []bson.M{bson.M{"target": identity}, bson.M{"origin": identity}}}
+	cursor, _ := dataInterface.database.Collection(Collection_Messages).Find(ctx, filter)
+	_ = cursor.All(ctx, &result)
+	fmt.Println(result)
+	return result
 }

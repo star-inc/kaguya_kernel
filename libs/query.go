@@ -39,5 +39,8 @@ func (handle *Handle) talkService() {
 	case "sendMessage":
 		TalkService_SendMessage(handle)
 		break
+	case "syncMessage":
+		TalkService_LoadMessage(handle)
+		break
 	}
 }

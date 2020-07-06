@@ -30,6 +30,10 @@ type KaguyaResponse struct {
 	Data       interface{} `json:"data"`
 }
 
+type KaguyaErrorRaise struct {
+	Error string `json:"error"`
+}
+
 type Message struct {
 	ContentType int    `json:"contentType"`
 	TargetType  int    `json:"targetType"`

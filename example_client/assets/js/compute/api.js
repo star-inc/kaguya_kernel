@@ -76,6 +76,15 @@ kaguyaAPI.prototype = {
         return apiStmt.id;
     },
 
+    syncMessage: function () {
+        let apiStmt = this._responseFactory(
+            "talkService",
+            "syncMessage", {}
+        );
+        this.client.send(apiStmt.data);
+        return apiStmt.id;
+    },
+
     sendTextMessage: function (targetType, target, message) {
         let apiStmt = this._responseFactory(
             "talkService",
