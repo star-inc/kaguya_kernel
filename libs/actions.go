@@ -8,16 +8,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-func TalkService_SendMessage(handle *Handle) {
-	msg := (handle.request.Data).(map[string]interface{})
+func TalkService_SendMessage(Handler *Handler) {
+	msg := (Handler.request.Data).(map[string]interface{})
 	target := msg["target"].(string)
 	message := []byte(msg["content"].(string))
-	if !handle.dataInterface.CheckUserExisted(target) {
-		handle.ErrorRaise(false, handle.request.ActionType, handle.request.Action, "Target not exist")
+	if !Handler.dataInterface.CheckUserExisted(target) {
+		Handler.ErrorRaise(false, Handler.request.ActionType, Handler.request.Action, "Target not exist")
 		return
 	}
 	if string(message) == "" {
-		handle.ErrorRaise(false, handle.request.ActionType, handle.request.Action, "Content is empty")
+		Handler.ErrorRaise(false, Handler.request.ActionType, Handler.request.Action, "Content is empty")
 		return
 	}
 	output := new(Message)
@@ -25,26 +25,26 @@ func TalkService_SendMessage(handle *Handle) {
 	output.TargetType = int(msg["targetType"].(float64))
 	output.Target = target
 	output.Content = message
-	output.Origin = handle.identity
-	handle.dataInterface.LogMessage(output)
-	handle.Response(false, handle.request.ActionType, handle.request.Action, output)
+	output.Origin = Handler.identity
+	Handler.dataInterface.LogMessage(output)
+	Handler.Response(false, Handler.request.ActionType, Handler.request.Action, output)
 }
 
-func TalkService_LoadMessage(handle *Handle) {
+func TalkService_LoadMessage(Handler *Handler) {
 	output := []*Message{}
-	messages := handle.dataInterface.GetMessageBox(handle.identity)
+	messages := Handler.dataInterface.GetMessageBox(Handler.identity)
 	if messages != nil {
 		output = messages.([]*Message)
 	}
-	handle.Response(true, handle.request.ActionType, handle.request.Action, output)
+	Handler.Response(true, Handler.request.ActionType, Handler.request.Action, output)
 }
 
-func TalkService_ReceiveMessage(handle *Handle) {
-	msg := (handle.request.Data).(map[string]interface{})
+func TalkService_ReceiveMessage(Handler *Handler) {
+	msg := (Handler.request.Data).(map[string]interface{})
 	output := new(Message)
 	output.ContentType = int(msg["contentType"].(float64))
 	output.TargetType = int(msg["targetType"].(float64))
 	output.Target = msg["target"].(string)
 	output.Content = []byte(msg["content"].(string))
-	handle.Response(true, handle.request.ActionType, handle.request.Action, output)
+	Handler.Response(true, Handler.request.ActionType, Handler.request.Action, output)
 }

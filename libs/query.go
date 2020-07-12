@@ -8,39 +8,39 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-func (handle *Handle) QueryServices() {
-	switch handle.request.ActionType {
+func (Handler *Handler) QueryServices() {
+	switch Handler.request.ActionType {
 	case "authService":
-		handle.authService()
+		Handler.authService()
 		break
 	case "talkService":
-		handle.talkService()
+		Handler.talkService()
 		break
 	}
 }
 
-func (handle *Handle) authService() {
-	switch handle.request.Action {
+func (Handler *Handler) authService() {
+	switch Handler.request.Action {
 	case "registerUser":
-		account := handle.request.Data.(map[string]interface{})
-		data := handle.RegisterUser(account["displayName"].(string), account["username"].(string), account["password"].(string))
-		handle.Response(false, handle.request.ActionType, handle.request.Action, data)
+		account := Handler.request.Data.(map[string]interface{})
+		data := Handler.RegisterUser(account["displayName"].(string), account["username"].(string), account["password"].(string))
+		Handler.Response(false, Handler.request.ActionType, Handler.request.Action, data)
 		break
 	case "getAccess":
-		id := handle.request.Data.(map[string]interface{})
-		data := handle.GetAccess(id["username"].(string), id["password"].(string))
-		handle.Response(false, handle.request.ActionType, handle.request.Action, data)
+		id := Handler.request.Data.(map[string]interface{})
+		data := Handler.GetAccess(id["username"].(string), id["password"].(string))
+		Handler.Response(false, Handler.request.ActionType, Handler.request.Action, data)
 		break
 	}
 }
 
-func (handle *Handle) talkService() {
-	switch handle.request.Action {
+func (Handler *Handler) talkService() {
+	switch Handler.request.Action {
 	case "sendMessage":
-		TalkService_SendMessage(handle)
+		TalkService_SendMessage(Handler)
 		break
 	case "syncMessage":
-		TalkService_LoadMessage(handle)
+		TalkService_LoadMessage(Handler)
 		break
 	}
 }

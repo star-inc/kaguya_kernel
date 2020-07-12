@@ -16,8 +16,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (handle *Handle) GetAccess(username string, password string) []byte {
-	authorization := handle.dataInterface.GetAccess(username, password)
+func (Handler *Handler) GetAccess(username string, password string) []byte {
+	authorization := Handler.dataInterface.GetAccess(username, password)
 	if authorization != nil {
 		tokenSeed := uuid.New().String()
 		tokenHandle := sha512.New()
@@ -26,25 +26,25 @@ func (handle *Handle) GetAccess(username string, password string) []byte {
 		func(authorization interface{}, authToken []byte) {
 			queryResult := authorization.(primitive.D)
 			encodedAuthToken := base64.StdEncoding.EncodeToString(authToken)
-			handle.dataInterface.RegisterAccess(queryResult.Map()["identity"].(string), encodedAuthToken)
+			Handler.dataInterface.RegisterAccess(queryResult.Map()["identity"].(string), encodedAuthToken)
 		}(authorization, authToken)
 		return authToken
 	}
 	return []byte{}
 }
 
-func (handle *Handle) VerfiyAccess(authToken string) {
+func (Handler *Handler) VerfiyAccess(authToken string) {
 	data := NewDataInterface()
 	verified := data.VerfiyAccess(authToken)
 	if verified == nil {
-		handle.identity = ""
+		Handler.identity = ""
 		return
 	}
 	verifiedData := verified.(primitive.D)
-	handle.identity = verifiedData.Map()["identity"].(string)
+	Handler.identity = verifiedData.Map()["identity"].(string)
 }
 
-func (handle *Handle) RegisterUser(displayName string, username string, password string) bool {
+func (Handler *Handler) RegisterUser(displayName string, username string, password string) bool {
 	data := NewDataInterface()
 	var user User
 	user.Identity = uuid.New().String()

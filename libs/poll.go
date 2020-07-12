@@ -8,8 +8,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 package kaguya
 
-func (handle *Handle) PollServices() {
+func (Handler *Handler) PollServices() {
 	for {
-		//handle.Response(true, handle.request.ActionType, handle.request.Action, "TEST")
+		//Handler.Response(true, Handler.request.ActionType, Handler.request.Action, "TEST")
 	}
 }

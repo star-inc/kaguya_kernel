@@ -15,60 +15,61 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Handle struct {
+type Handler struct {
 	identity      string
+	userIdentity  string
 	request       KaguyaRequest
 	wsHandle      *websocket.Conn
 	dataInterface *DataInterface
 	startedPoll   bool
 }
 
-func NewHandleInterface(wsHandle *websocket.Conn) *Handle {
-	handle := new(Handle)
-	handle.wsHandle = wsHandle
-	handle.dataInterface = NewDataInterface()
-	handle.startedPoll = false
-	return handle
+func NewHandleInterface(wsHandle *websocket.Conn) *Handler {
+	Handler := new(Handler)
+	Handler.wsHandle = wsHandle
+	Handler.dataInterface = NewDataInterface()
+	Handler.startedPoll = false
+	return Handler
 }
 
 // Start :
-func (handle *Handle) Start() {
+func (Handler *Handler) Start() {
 	for {
-		err := handle.wsHandle.ReadJSON(&handle.request)
+		err := Handler.wsHandle.ReadJSON(&Handler.request)
 		DeBug("WS Read", err)
-		if handle.request.Version < 1 {
-			handle.ErrorRaise(false, "core", "version", "End of Support")
+		if Handler.request.Version < 1 {
+			Handler.ErrorRaise(false, "core", "version", "End of Support")
 			return
 		}
-		if handle.request.ActionType == "authService" {
-			go handle.QueryServices()
-		} else if handle.request.AuthToken != "" {
-			handle.VerfiyAccess(handle.request.AuthToken)
-			if handle.identity != "" {
-				go handle.QueryServices()
-				if !handle.startedPoll {
-					go handle.PollServices()
-					handle.startedPoll = true
+		if Handler.request.ActionType == "authService" {
+			go Handler.QueryServices()
+		} else if Handler.request.AuthToken != "" {
+			Handler.VerfiyAccess(Handler.request.AuthToken)
+			if Handler.identity != "" {
+				go Handler.QueryServices()
+				if !Handler.startedPoll {
+					go Handler.PollServices()
+					Handler.startedPoll = true
 				}
 			} else {
-				go handle.ErrorRaise(false, "core", "verify", "Unauthorized")
+				go Handler.ErrorRaise(false, "core", "verify", "Unauthorized")
 			}
 		} else {
-			go handle.ErrorRaise(false, "core", "verify", "Unauthorized")
+			go Handler.ErrorRaise(false, "core", "verify", "Unauthorized")
 		}
 	}
 }
 
 // Response :
-func (handle *Handle) Response(initiative bool, serviceCode string, actionCode string, data interface{}) {
+func (Handler *Handler) Response(initiative bool, serviceCode string, actionCode string, data interface{}) {
 	var actionID string
 	now := time.Now().Unix()
 	if initiative {
 		actionID = uuid.New().String()
 	} else {
-		actionID = handle.request.ActionID
+		actionID = Handler.request.ActionID
 	}
-	handle.wsHandle.WriteJSON(
+	Handler.wsHandle.WriteJSON(
 		&KaguyaResponse{
 			Time:       now,
 			ActionID:   actionID,
@@ -79,6 +80,6 @@ func (handle *Handle) Response(initiative bool, serviceCode string, actionCode s
 	)
 }
 
-func (handle *Handle) ErrorRaise(initiative bool, serviceCode string, actionCode string, message string) {
-	handle.Response(initiative, serviceCode, actionCode, &KaguyaErrorRaise{Error: message})
+func (Handler *Handler) ErrorRaise(initiative bool, serviceCode string, actionCode string, message string) {
+	Handler.Response(initiative, serviceCode, actionCode, &KaguyaErrorRaise{Error: message})
 }
