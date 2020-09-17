@@ -3,7 +3,7 @@
 cat <<EOF
 Kaguya
  ---
-Opensource websocket chat server for IM.
+The opensource instant messaging framework.
 
 (c)2020 Star Inc.
 EOF
