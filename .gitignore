@@ -18,3 +18,6 @@ kaguya.exe
 
 # Config files
 config.json
+
+# GoLand
+.idea/
