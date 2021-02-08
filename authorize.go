@@ -21,7 +21,7 @@ type Authorize struct {
 	User *User
 }
 
-func NewAuthorizeHandler() *Authorize {
+func NewAuthorize(authorization []byte) *Authorize {
 	handler := new(Authorize)
 	return handler
 }

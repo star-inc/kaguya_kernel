@@ -1,5 +1,5 @@
 /*
-Package KaguyaKernel : The kernel for Kaguya
+Package Kernel : The kernel for Kaguya
 
     Copyright 2021 Star Inc.(https://starinc.xyz)
 
@@ -18,10 +18,7 @@ Package KaguyaKernel : The kernel for Kaguya
 package talk
 
 import (
-	"fmt"
-	"github.com/star-inc/kaguya_kernel"
-	"gopkg.in/olahol/melody.v1"
-	"reflect"
+	Kernel "github.com/star-inc/kaguya_kernel"
 	"strings"
 )
 
@@ -31,60 +28,49 @@ const (
 )
 
 type Service struct {
-	data      *DataInterface
-	authorize *KaguyaKernel.Authorize
-	session   *KaguyaKernel.ResponseHandler
+	Kernel.Service
+	data *Data
 }
 
-func NewServiceInterface(session *melody.Session) ServiceInterface {
-	Handler := new(Service)
-	Handler.data = NewDataInterface()
-	Handler.authorize = KaguyaKernel.NewAuthorizeHandler()
-	Handler.session = KaguyaKernel.NewResponseHandler(session)
-	return Handler
+func NewServiceInterface() ServiceInterface {
+	service := new(Service)
+	service.data = NewData()
+	return service
 }
 
-func (handler *Service) Run(request KaguyaKernel.Request) {
-	fooType := reflect.TypeOf(Service{})
-	for i := 0; i < fooType.NumMethod(); i++ {
-		method := fooType.Method(i)
-		fmt.Println(method.Name)
-	}
+func (service *Service) fetchMessage() {
+	messages := service.data.FetchMessage(service.GetGuard().User.Identity)
+	service.GetSession().Response(messages.([]*Message))
 }
 
-func (handler *Service) fetchMessage() {
-	messages := handler.data.FetchMessage(handler.authorize.User.Identity)
-	handler.session.Response(messages.([]*Message))
+func (service *Service) syncMessageBox() {
+	messages := service.data.SyncMessageBox(service.GetGuard().User.Identity)
+	service.GetSession().Response(messages.([]*Message))
 }
 
-func (handler *Service) syncMessageBox() {
-	messages := handler.data.SyncMessageBox(handler.authorize.User.Identity)
-	handler.session.Response(messages.([]*Message))
-}
-
-func (handler *Service) getMessageBox(request KaguyaKernel.Request) {
-	requestData := (request.Data).(map[string]interface{})
-	messages := handler.data.GetMessageBox(
-		handler.authorize.User.Identity,
-		requestData["target"].(string),
+func (service *Service) getMessageBox(request Kernel.Request) {
+	message := (request.Data).(Message)
+	messages := service.data.GetMessageBox(
+		service.GetGuard().User.Identity,
+		message.Target,
 	)
-	handler.session.Response(messages.([]*Message))
+	service.GetSession().Response(messages.([]*Message))
 }
 
-func (handler *Service) getMessage(request KaguyaKernel.Request) {
-	handler.session.Response((request.Data).(Message))
+func (service *Service) getMessage(request Kernel.Request) {
+	service.GetSession().Response((request.Data).(Message))
 }
 
-func (handler *Service) sendMessage(request KaguyaKernel.Request) {
-	requestData := (request.Data).(Message)
-	if len(strings.Trim(string(requestData.Content), " ")) == 0 {
-		handler.session.ErrorRaise(ErrorEmptyContent)
+func (service *Service) sendMessage(request Kernel.Request) {
+	message := (request.Data).(Message)
+	if len(strings.Trim(string(message.Content), " ")) == 0 {
+		service.GetSession().RaiseError(ErrorEmptyContent)
 		return
 	}
-	if !handler.authorize.CheckUserExisted(requestData.Target) {
-		handler.session.ErrorRaise(TargetNotExists)
+	if !service.GetGuard().CheckUserExisted(message.Target) {
+		service.GetSession().RaiseError(TargetNotExists)
 		return
 	}
-	handler.data.SaveMessage(requestData)
-	handler.session.Response(requestData)
+	service.data.SaveMessage(message)
+	service.GetSession().Response(message)
 }

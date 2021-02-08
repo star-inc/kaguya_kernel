@@ -31,29 +31,29 @@ const (
 	ErrorResponseWriting      = "Response_writing_error"
 )
 
-type ResponseHandler struct {
+type Session struct {
 	session *melody.Session
 }
 
-func NewResponseHandler(session *melody.Session) *ResponseHandler {
-	handler := new(ResponseHandler)
+func NewSession(session *melody.Session) *Session {
+	handler := new(Session)
 	handler.session = session
 	return handler
 }
 
-func (handler *ResponseHandler) Response(data interface{}) {
-	responseContainer := new(Response)
-	responseContainer.Timestamp = time.Now().Unix()
-	responseContainer.Data = data
+func (handler *Session) Response(data interface{}) {
+	response := new(Response)
+	response.Data = data
+	response.Timestamp = time.Now().UnixNano()
 	hashString, err := json.Marshal(data)
 	if err != nil {
-		handler.ErrorRaise(ErrorGenerateSignature)
+		handler.RaiseError(ErrorGenerateSignature)
 		return
 	}
-	responseContainer.Signature = sha256.Sum256(hashString)
+	response.Signature = sha256.Sum256(hashString)
 	dataString, err := json.Marshal(data)
 	if err != nil {
-		handler.ErrorRaise(ErrorJSONEncodingResponse)
+		handler.RaiseError(ErrorJSONEncodingResponse)
 		return
 	}
 	err = handler.session.Write(dataString)
@@ -63,6 +63,9 @@ func (handler *ResponseHandler) Response(data interface{}) {
 	}
 }
 
-func (handler *ResponseHandler) ErrorRaise(message string) {
-	handler.Response(&ErrorRaise{Error: message})
+func (handler *Session) RaiseError(message string) {
+	handler.Response(&ErrorReport{
+		Timestamp: time.Now().UnixNano(),
+		Error:     message,
+	})
 }

@@ -17,8 +17,6 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-type ServiceInterface interface{}
-
 type Request struct {
 	Type      string      `json:"type"`
 	Data      interface{} `json:"data"`
@@ -31,8 +29,9 @@ type Response struct {
 	Signature [32]byte    `json:"signature"`
 }
 
-type ErrorRaise struct {
-	Error string `json:"error"`
+type ErrorReport struct {
+	Timestamp int64  `json:"timestamp"`
+	Error     string `json:"error"`
 }
 
 type User struct {

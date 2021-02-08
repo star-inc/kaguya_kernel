@@ -17,24 +17,30 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-import (
-	"encoding/json"
-	"gopkg.in/olahol/melody.v1"
-	"reflect"
-)
+type Service struct {
+	authorize *Authorize
+	session   *Session
+}
 
-func Run(service *ServiceInterface) *melody.Melody {
-	worker := melody.New()
-	handler := reflect.ValueOf(service)
-	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
-		session := NewSession(socketSession)
-		handler.MethodByName("SetSession").Call([]reflect.Value{reflect.ValueOf(session)})
-		request := new(Request)
-		err := json.Unmarshal(message, &request)
-		if err != nil {
-			panic(err)
-		}
-		handler.MethodByName(request.Type).Call([]reflect.Value{reflect.ValueOf(request)})
-	})
-	return worker
+type ServiceInterface interface {
+	GetGuard() *Authorize
+	SetGuard(authorization []byte)
+	GetSession() *Session
+	SetSession(session *Session)
+}
+
+func (service *Service) GetGuard() *Authorize {
+	return service.authorize
+}
+
+func (service *Service) SetGuard(authorization []byte) {
+	service.authorize = NewAuthorize(authorization)
+}
+
+func (service *Service) GetSession() *Session {
+	return service.session
+}
+
+func (service *Service) SetSession(session *Session) {
+	service.session = session
 }

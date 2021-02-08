@@ -1,14 +1,14 @@
 package talk
 
-import KaguyaKernel "github.com/star-inc/kaguya_kernel"
+import Kernel "github.com/star-inc/kaguya_kernel"
 
 type ServiceInterface interface {
-	KaguyaKernel.ServiceInterface
+	Kernel.ServiceInterface
 	fetchMessage()
 	syncMessageBox()
-	getMessageBox(KaguyaKernel.Request)
-	getMessage(KaguyaKernel.Request)
-	sendMessage(KaguyaKernel.Request)
+	getMessageBox(Kernel.Request)
+	getMessage(Kernel.Request)
+	sendMessage(Kernel.Request)
 }
 
 type Message struct {

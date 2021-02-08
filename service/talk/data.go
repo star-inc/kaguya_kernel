@@ -1,5 +1,5 @@
 /*
-Package KaguyaKernel : The kernel for Kaguya
+Package Kernel : The kernel for Kaguya
 
     Copyright 2021 Star Inc.(https://starinc.xyz)
 
@@ -20,7 +20,7 @@ package talk
 import (
 	"context"
 	"fmt"
-	KaguyaKernel "github.com/star-inc/kaguya_kernel"
+	Kernel "github.com/star-inc/kaguya_kernel"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,7 +28,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DataInterface struct {
+type Data struct {
 	client       *mongo.Client
 	database     *mongo.Database
 	queryTimeout time.Duration
@@ -36,68 +36,68 @@ type DataInterface struct {
 
 const MessagesCollection = "messages"
 
-func NewDataInterface() *DataInterface {
+func NewData() *Data {
 	var err error
-	dataInterface := new(DataInterface)
-	dataInterface.queryTimeout = 50 * time.Second
-	ctx, _ := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
-	dataInterface.client, err = mongo.Connect(ctx, options.Client().ApplyURI(KaguyaKernel.Config.Database.Host))
+	data := new(Data)
+	data.queryTimeout = 50 * time.Second
+	ctx, _ := context.WithTimeout(context.Background(), data.queryTimeout)
+	data.client, err = mongo.Connect(ctx, options.Client().ApplyURI(Kernel.Config.Database.Host))
 	if err != nil {
 		panic(err)
 	}
-	dataInterface.database = dataInterface.client.Database(KaguyaKernel.Config.Database.Name)
-	return dataInterface
+	data.database = data.client.Database(Kernel.Config.Database.Name)
+	return data
 }
 
-func (dataInterface DataInterface) FetchMessage(identity string) interface{} {
+func (data Data) FetchMessage(identity string) interface{} {
 	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
 	defer cancel()
 	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := dataInterface.database.Collection(MessagesCollection).Find(ctx, filter)
+	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
 	_ = cursor.All(ctx, &result)
 	fmt.Println(result)
 	return result
 }
 
-func (dataInterface DataInterface) SyncMessageBox(identity string) interface{} {
+func (data Data) SyncMessageBox(identity string) interface{} {
 	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
 	defer cancel()
 	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := dataInterface.database.Collection(MessagesCollection).Find(ctx, filter)
+	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
 	_ = cursor.All(ctx, &result)
 	fmt.Println(result)
 	return result
 }
 
-func (dataInterface DataInterface) GetMessageBox(identity string, target string) interface{} {
+func (data Data) GetMessageBox(identity string, target string) interface{} {
 	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
 	defer cancel()
 	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := dataInterface.database.Collection(MessagesCollection).Find(ctx, filter)
+	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
 	_ = cursor.All(ctx, &result)
 	fmt.Println(result)
 	return result
 }
 
-func (dataInterface DataInterface) GetMessage(identity string) interface{} {
+func (data Data) GetMessage(identity string) interface{} {
 	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
 	defer cancel()
 	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := dataInterface.database.Collection(MessagesCollection).Find(ctx, filter)
+	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
 	_ = cursor.All(ctx, &result)
 	fmt.Println(result)
 	return result
 }
 
-func (dataInterface DataInterface) SaveMessage(message Message) {
-	ctx, cancel := context.WithTimeout(context.Background(), dataInterface.queryTimeout)
+func (data Data) SaveMessage(message Message) {
+	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
 	defer cancel()
-	data, _ := bson.Marshal(&message)
-	_, err := dataInterface.database.Collection(MessagesCollection).InsertOne(ctx, data)
+	one, _ := bson.Marshal(&message)
+	_, err := data.database.Collection(MessagesCollection).InsertOne(ctx, one)
 	if err != nil {
 		panic(err)
 	}
