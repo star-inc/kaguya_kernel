@@ -1,12 +1,6 @@
-# Kaguya Kernel
+/*
+Package KaguyaKernel : The kernel for Kaguya
 
-The opensource instant messaging framework.
-
-![logo](logo.svg)
-
-## License
-
-```license
     Copyright 2021 Star Inc.(https://starinc.xyz)
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,4 +14,26 @@ The opensource instant messaging framework.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-```
+*/
+package KaguyaKernel
+
+type Request struct {
+	Data      interface{} `json:"data"`
+	Timestamp int64       `json:"timestamp"`
+}
+
+type Response struct {
+	Data      interface{} `json:"data"`
+	Timestamp int64       `json:"timestamp"`
+	Signature [32]byte    `json:"signature"`
+}
+
+type ErrorRaise struct {
+	Error string `json:"error"`
+}
+
+type User struct {
+	Identity    string `json:"identity"`
+	DisplayName string `json:"displayName"`
+	Username    string `json:"username"`
+}
