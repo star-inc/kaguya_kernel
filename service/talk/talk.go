@@ -18,8 +18,10 @@ Package KaguyaKernel : The kernel for Kaguya
 package talk
 
 import (
+	"fmt"
 	"github.com/star-inc/kaguya_kernel"
 	"gopkg.in/olahol/melody.v1"
+	"reflect"
 	"strings"
 )
 
@@ -34,7 +36,7 @@ type Service struct {
 	session   *KaguyaKernel.ResponseHandler
 }
 
-func NewTalkServiceHandler(session *melody.Session) *Service {
+func NewServiceInterface(session *melody.Session) ServiceInterface {
 	Handler := new(Service)
 	Handler.data = NewDataInterface()
 	Handler.authorize = KaguyaKernel.NewAuthorizeHandler()
@@ -42,17 +44,25 @@ func NewTalkServiceHandler(session *melody.Session) *Service {
 	return Handler
 }
 
-func (handler *Service) FetchMessage() {
+func (handler *Service) Run(request KaguyaKernel.Request) {
+	fooType := reflect.TypeOf(Service{})
+	for i := 0; i < fooType.NumMethod(); i++ {
+		method := fooType.Method(i)
+		fmt.Println(method.Name)
+	}
+}
+
+func (handler *Service) fetchMessage() {
 	messages := handler.data.FetchMessage(handler.authorize.User.Identity)
 	handler.session.Response(messages.([]*Message))
 }
 
-func (handler *Service) SyncMessageBox() {
+func (handler *Service) syncMessageBox() {
 	messages := handler.data.SyncMessageBox(handler.authorize.User.Identity)
 	handler.session.Response(messages.([]*Message))
 }
 
-func (handler *Service) GetMessageBox(request KaguyaKernel.Request) {
+func (handler *Service) getMessageBox(request KaguyaKernel.Request) {
 	requestData := (request.Data).(map[string]interface{})
 	messages := handler.data.GetMessageBox(
 		handler.authorize.User.Identity,
@@ -61,11 +71,11 @@ func (handler *Service) GetMessageBox(request KaguyaKernel.Request) {
 	handler.session.Response(messages.([]*Message))
 }
 
-func (handler *Service) GetMessage(request KaguyaKernel.Request) {
+func (handler *Service) getMessage(request KaguyaKernel.Request) {
 	handler.session.Response((request.Data).(Message))
 }
 
-func (handler *Service) SendMessage(request KaguyaKernel.Request) {
+func (handler *Service) sendMessage(request KaguyaKernel.Request) {
 	requestData := (request.Data).(Message)
 	if len(strings.Trim(string(requestData.Content), " ")) == 0 {
 		handler.session.ErrorRaise(ErrorEmptyContent)

@@ -17,26 +17,15 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-type ServiceInterface interface{}
+import (
+	"gopkg.in/olahol/melody.v1"
+	"reflect"
+)
 
-type Request struct {
-	Type      string      `json:"type"`
-	Data      interface{} `json:"data"`
-	Timestamp int64       `json:"timestamp"`
-}
-
-type Response struct {
-	Data      interface{} `json:"data"`
-	Timestamp int64       `json:"timestamp"`
-	Signature [32]byte    `json:"signature"`
-}
-
-type ErrorRaise struct {
-	Error string `json:"error"`
-}
-
-type User struct {
-	Identity    string `json:"identity"`
-	DisplayName string `json:"displayName"`
-	Username    string `json:"username"`
+func Run(service *ServiceInterface, request Request) *melody.Melody {
+	worker := melody.New()
+	worker.HandleMessage(func(s *melody.Session, msg []byte) {
+		reflect.ValueOf(service).MethodByName(request.Type).Call([]reflect.Value{})
+	})
+	return worker
 }
