@@ -4,8 +4,6 @@
 *.dll
 *.so
 *.dylib
-KaguyaKernel
-KaguyaKernel.exe
 
 # Test binary, built with `go test -c`
 *.test
@@ -15,9 +13,6 @@ KaguyaKernel.exe
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
-# Config files
-config.json
 
 # GoLand
 .idea/
