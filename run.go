@@ -23,17 +23,16 @@ import (
 	"reflect"
 )
 
-func Run(service *ServiceInterface) *melody.Melody {
+func Run(service *Service) *melody.Melody {
 	worker := melody.New()
 	handler := reflect.ValueOf(service)
 	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
-		session := NewSession(socketSession)
-		handler.MethodByName("SetSession").Call([]reflect.Value{reflect.ValueOf(session)})
 		request := new(Request)
 		err := json.Unmarshal(message, &request)
 		if err != nil {
 			panic(err)
 		}
+		service.SetSession(NewSession(socketSession))
 		handler.MethodByName(request.Type).Call([]reflect.Value{reflect.ValueOf(request)})
 	})
 	return worker
