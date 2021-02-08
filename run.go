@@ -23,7 +23,7 @@ import (
 	"reflect"
 )
 
-func Run(service *Service) *melody.Melody {
+func Run(service ServiceInterface) *melody.Melody {
 	worker := melody.New()
 	handler := reflect.ValueOf(service)
 	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
