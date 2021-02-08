@@ -17,15 +17,7 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-type Authorize struct {
-	User *User
-}
-
-func NewAuthorize(authorization []byte) *Authorize {
-	handler := new(Authorize)
-	return handler
-}
-
-func (handler *Authorize) CheckUserExisted(identity string) bool {
-	return true
+type AuthorizeInterface interface {
+	Me() *User
+	CheckUserExists(identity string) bool
 }

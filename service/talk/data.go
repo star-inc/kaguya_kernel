@@ -18,87 +18,122 @@ Package Kernel : The kernel for Kaguya
 package talk
 
 import (
-	"context"
-	"fmt"
+	"github.com/google/uuid"
 	Kernel "github.com/star-inc/kaguya_kernel"
+	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"log"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Data struct {
-	client       *mongo.Client
-	database     *mongo.Database
-	queryTimeout time.Duration
+	session   *Rethink.Session
+	database  Rethink.Term
+	tableName string
 }
 
-const MessagesCollection = "messages"
-
-func NewData() *Data {
+func newData(config Kernel.RethinkConfig, tableName string) *Data {
 	var err error
 	data := new(Data)
-	data.queryTimeout = 50 * time.Second
-	ctx, _ := context.WithTimeout(context.Background(), data.queryTimeout)
-	data.client, err = mongo.Connect(ctx, options.Client().ApplyURI(Kernel.Config.Database.Host))
+	data.session, err = Rethink.Connect(config.ConnectConfig)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
-	data.database = data.client.Database(Kernel.Config.Database.Name)
+	data.database = Rethink.DB(config.DatabaseName)
+	data.tableName = tableName
 	return data
 }
 
-func (data Data) FetchMessage(identity string) interface{} {
-	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
-	defer cancel()
-	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
-	_ = cursor.All(ctx, &result)
-	fmt.Println(result)
-	return result
+func newDatabaseMessage(message *Message) *DatabaseMessage {
+	dbMessage := new(DatabaseMessage)
+	dbMessage.UUID = uuid.New().String()
+	dbMessage.Timestamp = time.Now().UnixNano()
+	dbMessage.Message = message
+	return dbMessage
 }
 
-func (data Data) SyncMessageBox(identity string) interface{} {
-	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
-	defer cancel()
-	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
-	_ = cursor.All(ctx, &result)
-	fmt.Println(result)
-	return result
-}
-
-func (data Data) GetMessageBox(identity string, target string) interface{} {
-	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
-	defer cancel()
-	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
-	_ = cursor.All(ctx, &result)
-	fmt.Println(result)
-	return result
-}
-
-func (data Data) GetMessage(identity string) interface{} {
-	var result interface{}
-	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
-	defer cancel()
-	filter := bson.M{"$or": []bson.M{{"target": identity}, {"origin": identity}}}
-	cursor, _ := data.database.Collection(MessagesCollection).Find(ctx, filter)
-	_ = cursor.All(ctx, &result)
-	fmt.Println(result)
-	return result
-}
-
-func (data Data) SaveMessage(message Message) {
-	ctx, cancel := context.WithTimeout(context.Background(), data.queryTimeout)
-	defer cancel()
-	one, _ := bson.Marshal(&message)
-	_, err := data.database.Collection(MessagesCollection).InsertOne(ctx, one)
+func (data Data) fetchMessage(service *Service) {
+	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	message := new(Message)
+	for cursor.Next(&message) {
+		service.GetSession().Response(message)
+	}
+	if err := cursor.Err(); err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
+}
+
+func (data Data) syncMessageBox(identity string) *[]DatabaseMessage {
+	messages := new([]DatabaseMessage)
+	cursor, err := data.database.Table(data.tableName).
+		GetAllByIndex("origin", identity).
+		GetAllByIndex("target", identity).
+		OrderBy(Rethink.Asc("timestamp")).
+		Run(data.session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	err = cursor.All(messages)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return messages
+}
+
+func (data Data) getMessageBox(identity string, target string) *[]DatabaseMessage {
+	message := new([]DatabaseMessage)
+	cursor, err := data.database.Table(data.tableName).
+		GetAllByIndex([]string{"origin", "target"}, []string{identity, target}).
+		GetAllByIndex([]string{"origin", "target"}, []string{target, identity}).
+		Max("timestamp").
+		OrderBy(Rethink.Asc("timestamp")).
+		Run(data.session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	err = cursor.All(&message)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return message
+}
+
+func (data Data) getMessage(messageID string) *DatabaseMessage {
+	message := new(DatabaseMessage)
+	cursor, err := data.database.Table(data.tableName).Get(messageID).Run(data.session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	err = cursor.One(&message)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return message
+}
+
+func (data Data) saveMessage(message *Message) {
+	err := data.database.Table(data.tableName).
+		Insert(newDatabaseMessage(message)).
+		Exec(data.session)
+	if err != nil {
+		log.Fatalln(err)
 	}
 }

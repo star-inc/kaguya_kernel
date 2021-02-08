@@ -17,33 +17,9 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
-)
+import Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 
-type configStruct struct {
-	Database *databaseConfig `json:"database"`
-}
-
-type databaseConfig struct {
-	Host string `json:"host"`
-	Name string `json:"name"`
-}
-
-// Config : Global Settings for butterfly from config.json
-var Config configStruct
-
-// ConfigPath : Where the config file placed.
-var ConfigPath = "config.json"
-
-// ReadConfig : Load configure file to Config
-func ReadConfig() {
-	jsonFile, err := os.Open(ConfigPath)
-	DeBug("Get JSON config", err)
-	defer jsonFile.Close()
-	srcJSON, _ := ioutil.ReadAll(jsonFile)
-	err = json.Unmarshal(srcJSON, &Config)
-	DeBug("Load JSON Initialization", err)
+type RethinkConfig struct {
+	ConnectConfig Rethink.ConnectOpts
+	DatabaseName  string
 }

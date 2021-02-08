@@ -32,39 +32,39 @@ const (
 )
 
 type Session struct {
-	session *melody.Session
+	socketSession *melody.Session
 }
 
-func NewSession(session *melody.Session) *Session {
-	handler := new(Session)
-	handler.session = session
-	return handler
+func NewSession(socketSession *melody.Session) *Session {
+	session := new(Session)
+	session.socketSession = socketSession
+	return session
 }
 
-func (handler *Session) Response(data interface{}) {
+func (session *Session) Response(data interface{}) {
 	response := new(Response)
 	response.Data = data
 	response.Timestamp = time.Now().UnixNano()
 	hashString, err := json.Marshal(data)
 	if err != nil {
-		handler.RaiseError(ErrorGenerateSignature)
+		session.RaiseError(ErrorGenerateSignature)
 		return
 	}
 	response.Signature = sha256.Sum256(hashString)
 	dataString, err := json.Marshal(data)
 	if err != nil {
-		handler.RaiseError(ErrorJSONEncodingResponse)
+		session.RaiseError(ErrorJSONEncodingResponse)
 		return
 	}
-	err = handler.session.Write(dataString)
+	err = session.socketSession.Write(dataString)
 	if err != nil {
 		log.Panicln(ErrorResponseWriting)
 		return
 	}
 }
 
-func (handler *Session) RaiseError(message string) {
-	handler.Response(&ErrorReport{
+func (session *Session) RaiseError(message string) {
+	session.Response(&ErrorReport{
 		Timestamp: time.Now().UnixNano(),
 		Error:     message,
 	})

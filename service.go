@@ -18,23 +18,24 @@ Package KaguyaKernel : The kernel for Kaguya
 package KaguyaKernel
 
 type Service struct {
-	authorize *Authorize
+	authorize AuthorizeInterface
 	session   *Session
 }
 
 type ServiceInterface interface {
-	GetGuard() *Authorize
-	SetGuard(authorization []byte)
+	Fetch()
+	GetGuard() AuthorizeInterface
+	SetGuard(authorization AuthorizeInterface)
 	GetSession() *Session
 	SetSession(session *Session)
 }
 
-func (service *Service) GetGuard() *Authorize {
+func (service *Service) GetGuard() AuthorizeInterface {
 	return service.authorize
 }
 
-func (service *Service) SetGuard(authorization []byte) {
-	service.authorize = NewAuthorize(authorization)
+func (service *Service) SetGuard(authorization AuthorizeInterface) {
+	service.authorize = authorization
 }
 
 func (service *Service) GetSession() *Session {

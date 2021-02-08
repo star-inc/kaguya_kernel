@@ -35,7 +35,6 @@ type ErrorReport struct {
 }
 
 type User struct {
-	Identity    string `json:"identity"`
 	DisplayName string `json:"displayName"`
-	Username    string `json:"username"`
+	Identity    string `json:"identity"`
 }

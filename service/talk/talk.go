@@ -25,6 +25,7 @@ import (
 const (
 	ErrorEmptyContent = "Content is empty"
 	TargetNotExists   = "Target not exist"
+	Forbidden         = "Forbidden"
 )
 
 type Service struct {
@@ -32,45 +33,49 @@ type Service struct {
 	data *Data
 }
 
-func NewServiceInterface() ServiceInterface {
+func NewServiceInterface(dbConfig Kernel.RethinkConfig, dbTable string) ServiceInterface {
 	service := new(Service)
-	service.data = NewData()
+	service.data = newData(dbConfig, dbTable)
 	return service
 }
 
-func (service *Service) fetchMessage() {
-	messages := service.data.FetchMessage(service.GetGuard().User.Identity)
-	service.GetSession().Response(messages.([]*Message))
+func (service *Service) Fetch() {
+	service.data.fetchMessage(service)
 }
 
 func (service *Service) syncMessageBox() {
-	messages := service.data.SyncMessageBox(service.GetGuard().User.Identity)
-	service.GetSession().Response(messages.([]*Message))
+	messages := service.data.syncMessageBox(service.GetGuard().Me().Identity)
+	service.GetSession().Response(messages)
 }
 
 func (service *Service) getMessageBox(request Kernel.Request) {
-	message := (request.Data).(Message)
-	messages := service.data.GetMessageBox(
-		service.GetGuard().User.Identity,
-		message.Target,
+	messages := service.data.getMessageBox(
+		service.GetGuard().Me().Identity,
+		(request.Data).(string),
 	)
-	service.GetSession().Response(messages.([]*Message))
+	service.GetSession().Response(messages)
 }
 
 func (service *Service) getMessage(request Kernel.Request) {
-	service.GetSession().Response((request.Data).(Message))
+	dbMessage := service.data.getMessage((request.Data).(string))
+	message := dbMessage.Message
+	identity := service.GetGuard().Me().Identity
+	if message.Target != identity && message.Origin != identity {
+		service.GetSession().RaiseError(Forbidden)
+	}
+	service.GetSession().Response(dbMessage)
 }
 
 func (service *Service) sendMessage(request Kernel.Request) {
-	message := (request.Data).(Message)
+	message := (request.Data).(*Message)
 	if len(strings.Trim(string(message.Content), " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)
 		return
 	}
-	if !service.GetGuard().CheckUserExisted(message.Target) {
+	if !service.GetGuard().CheckUserExists(message.Target) {
 		service.GetSession().RaiseError(TargetNotExists)
 		return
 	}
-	service.data.SaveMessage(message)
+	service.data.saveMessage(message)
 	service.GetSession().Response(message)
 }
