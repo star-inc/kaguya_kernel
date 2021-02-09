@@ -11,15 +11,14 @@ type ServiceInterface interface {
 }
 
 type Message struct {
-	ContentType int    `rethinkdb:"content_type" json:"contentType"`
-	TargetType  int    `rethinkdb:"target_type" json:"targetType"`
 	Origin      string `rethinkdb:"origin" json:"origin"`
 	Target      string `rethinkdb:"target" json:"target"`
 	Content     string `rethinkdb:"content" json:"content"`
+	ContentType int    `rethinkdb:"contentType" json:"contentType"`
 }
 
 type DatabaseMessage struct {
 	UUID        string   `rethinkdb:"id,omitempty" json:"uuid"`
 	Message     *Message `rethinkdb:"message" json:"message"`
-	CreatedTime int64    `rethinkdb:"created_time" json:"created_time"`
+	CreatedTime int64    `rethinkdb:"createdTime" json:"createdTime"`
 }
