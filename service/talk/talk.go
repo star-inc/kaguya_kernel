@@ -26,17 +26,24 @@ import (
 
 const (
 	ErrorEmptyContent   = "Content is empty"
+	ErrorInvalidContent = "Content is invalid"
 	ErrorOriginNotEmpty = "Origin is not empty"
 )
 
 type Service struct {
 	Kernel.Service
-	data *Data
+	data             *Data
+	contentValidator func(contentType int, content string) bool
 }
 
-func NewServiceInterface(dbConfig Kernel.RethinkConfig, tableName string) ServiceInterface {
+func NewServiceInterface(
+	dbConfig Kernel.RethinkConfig,
+	tableName string,
+	contentValidator func(int, string) bool,
+) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, tableName)
+	service.contentValidator = contentValidator
 	return service
 }
 
@@ -71,6 +78,10 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	}
 	if len(strings.Trim(message.Content, " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)
+		return
+	}
+	if !service.contentValidator(message.ContentType, message.Content) {
+		service.GetSession().RaiseError(ErrorInvalidContent)
 		return
 	}
 	if message.Origin != "" {
