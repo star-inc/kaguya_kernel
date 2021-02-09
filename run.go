@@ -24,6 +24,8 @@ import (
 	"reflect"
 )
 
+const ErrorJSONDecodingRequest = "JSON_decoding_request_error"
+
 func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
 	worker := melody.New()
 	worker.HandleConnect(func(socketSession *melody.Session) {
@@ -45,7 +47,8 @@ func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
 		request := new(Request)
 		err := json.Unmarshal(message, request)
 		if err != nil {
-			panic(err)
+			service.GetSession().RaiseError(ErrorJSONDecodingRequest)
+			return
 		}
 		method := reflect.ValueOf(service).MethodByName(request.Type)
 		if method.IsValid() {
