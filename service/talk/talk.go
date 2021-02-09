@@ -18,7 +18,9 @@ Package Kernel : The kernel for Kaguya
 package talk
 
 import (
+	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
+	"log"
 	"strings"
 )
 
@@ -67,7 +69,11 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 }
 
 func (service *Service) SendMessage(request *Kernel.Request) {
-	message := (request.Data).(*Message)
+	message := new(Message)
+	err := mapstructure.Decode(request.Data, message)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if len(strings.Trim(string(message.Content), " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)
 		return
