@@ -48,7 +48,7 @@ func (service *Service) SyncMessageBox() {
 	service.GetSession().Response(messages)
 }
 
-func (service *Service) GetMessageBox(request Kernel.Request) {
+func (service *Service) GetMessageBox(request *Kernel.Request) {
 	messages := service.data.getMessageBox(
 		service.GetGuard().Me().Identity,
 		(request.Data).(string),
@@ -56,7 +56,7 @@ func (service *Service) GetMessageBox(request Kernel.Request) {
 	service.GetSession().Response(messages)
 }
 
-func (service *Service) GetMessage(request Kernel.Request) {
+func (service *Service) GetMessage(request *Kernel.Request) {
 	dbMessage := service.data.getMessage((request.Data).(string))
 	message := dbMessage.Message
 	identity := service.GetGuard().Me().Identity
@@ -66,7 +66,7 @@ func (service *Service) GetMessage(request Kernel.Request) {
 	service.GetSession().Response(dbMessage)
 }
 
-func (service *Service) SendMessage(request Kernel.Request) {
+func (service *Service) SendMessage(request *Kernel.Request) {
 	message := (request.Data).(*Message)
 	if len(strings.Trim(string(message.Content), " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)
