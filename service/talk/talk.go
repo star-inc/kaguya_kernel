@@ -25,9 +25,9 @@ import (
 )
 
 const (
-	ErrorEmptyContent   = "Content is empty"
-	ErrorInvalidContent = "Content is invalid"
-	ErrorOriginNotEmpty = "Origin is not empty"
+	ErrorEmptyContent   = "Content_is_empty"
+	ErrorInvalidContent = "Content_is_invalid"
+	ErrorOriginNotEmpty = "Origin_is_not_empty"
 )
 
 type Service struct {

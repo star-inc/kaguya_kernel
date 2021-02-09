@@ -24,7 +24,10 @@ import (
 	"reflect"
 )
 
-const ErrorJSONDecodingRequest = "JSON_decoding_request_error"
+const (
+	ErrorJSONDecodingRequest = "JSON_decoding_request_error"
+	ErrorInvalidRequestType  = "Request_type_is_invalid"
+)
 
 func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
 	worker := melody.New()
@@ -51,6 +54,10 @@ func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
 			return
 		}
 		method := reflect.ValueOf(service).MethodByName(request.Type)
+		if !service.CheckRequestType(method) {
+			service.GetSession().RaiseError(ErrorInvalidRequestType)
+			return
+		}
 		if method.IsValid() {
 			method.Call([]reflect.Value{reflect.ValueOf(request)})
 		}
