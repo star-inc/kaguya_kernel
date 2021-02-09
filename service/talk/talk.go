@@ -18,6 +18,7 @@ Package Kernel : The kernel for Kaguya
 package talk
 
 import (
+	"encoding/json"
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	"log"
@@ -60,7 +61,12 @@ func (service *Service) GetMessageBox(request *Kernel.Request) {
 
 func (service *Service) GetMessage(request *Kernel.Request) {
 	dbMessage := service.data.getMessage((request.Data).(string))
-	message := dbMessage.Message
+	message := new(Message)
+	err := json.Unmarshal(dbMessage.Message, message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	identity := service.GetGuard().Me().Identity
 	if message.Target != identity && message.Origin != identity {
 		service.GetSession().RaiseError(Forbidden)
