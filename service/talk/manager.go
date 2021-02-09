@@ -27,16 +27,16 @@ type Manager struct {
 	Data
 }
 
-func NewManager(config Kernel.RethinkConfig, tableName string) *Data {
+func NewManager(config Kernel.RethinkConfig, tableName string) *Manager {
 	var err error
-	data := new(Data)
-	data.session, err = Rethink.Connect(config.ConnectConfig)
+	manager := new(Manager)
+	manager.session, err = Rethink.Connect(config.ConnectConfig)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	data.database = Rethink.DB(config.DatabaseName)
-	data.tableName = tableName
-	return data
+	manager.database = Rethink.DB(config.DatabaseName)
+	manager.tableName = tableName
+	return manager
 }
 
 func (manager *Manager) Check() bool {
