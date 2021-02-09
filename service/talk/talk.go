@@ -43,7 +43,10 @@ func NewServiceInterface(dbConfig Kernel.RethinkConfig, dbTable string) ServiceI
 }
 
 func (service *Service) Fetch() {
-	service.data.fetchMessage(service)
+	service.data.fetchMessage(
+		service.GetGuard().Me().Identity,
+		service.GetSession(),
+	)
 }
 
 func (service *Service) SyncMessageBox() {
