@@ -23,11 +23,11 @@ import (
 	"log"
 )
 
-type Manage struct {
+type Manager struct {
 	Data
 }
 
-func NewManage(config Kernel.RethinkConfig, tableName string) *Data {
+func NewManager(config Kernel.RethinkConfig, tableName string) *Data {
 	var err error
 	data := new(Data)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
@@ -39,10 +39,10 @@ func NewManage(config Kernel.RethinkConfig, tableName string) *Data {
 	return data
 }
 
-func (manage *Manage) Check() bool {
-	cursor, err := manage.database.TableList().
-		Contains(manage.tableName).
-		Run(manage.session)
+func (manager *Manager) Check() bool {
+	cursor, err := manager.database.TableList().
+		Contains(manager.tableName).
+		Run(manager.session)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -54,24 +54,24 @@ func (manage *Manage) Check() bool {
 	return status
 }
 
-func (manage *Manage) Create() bool {
-	err := manage.database.TableCreate(
-		manage.tableName,
+func (manager *Manager) Create() bool {
+	err := manager.database.TableCreate(
+		manager.tableName,
 		Rethink.TableCreateOpts{PrimaryKey: "id"},
 	).
 		IndexCreate("origin").
 		IndexCreate("createdTime").
-		Exec(manage.session)
+		Exec(manager.session)
 	if err != nil {
 		return false
 	}
 	return true
 }
 
-func (manage *Manage) Drop() bool {
-	err := manage.database.
-		TableDrop(manage.tableName).
-		Exec(manage.session)
+func (manager *Manager) Drop() bool {
+	err := manager.database.
+		TableDrop(manager.tableName).
+		Exec(manager.session)
 	if err != nil {
 		return false
 	}
