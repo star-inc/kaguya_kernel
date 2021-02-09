@@ -1,5 +1,5 @@
 /*
-Package KaguyaKernel : The kernel for Kaguya
+Package KaguyaKernel: The kernel for Kaguya
 
     Copyright 2021 Star Inc.(https://starinc.xyz)
 
