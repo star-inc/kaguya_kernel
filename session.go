@@ -51,12 +51,12 @@ func (session *Session) Response(data interface{}) {
 		return
 	}
 	response.Signature = sha256.Sum256(hashString)
-	dataString, err := json.Marshal(data)
+	responseString, err := json.Marshal(response)
 	if err != nil {
 		session.RaiseError(ErrorJSONEncodingResponse)
 		return
 	}
-	err = session.socketSession.Write(dataString)
+	err = session.socketSession.Write(responseString)
 	if err != nil {
 		log.Println(ErrorSessionClosed)
 		return
