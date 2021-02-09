@@ -65,9 +65,9 @@ func (data Data) fetchMessage(service *Service) {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	message := new(DatabaseMessage)
-	for cursor.Next(message) {
-		service.GetSession().Response(message)
+	var row interface{}
+	for cursor.Next(&row) {
+		service.GetSession().Response(row)
 	}
 	if err := cursor.Err(); err != nil {
 		service.GetSession().RaiseError(err.Error())
