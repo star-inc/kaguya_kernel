@@ -19,7 +19,7 @@ type Message struct {
 }
 
 type DatabaseMessage struct {
-	UUID      string `rethinkdb:"id,omitempty"`
-	Message   []byte `rethinkdb:"message"`
-	Timestamp int64  `rethinkdb:"timestamp"`
+	UUID        string `rethinkdb:"id,omitempty" json:"uuid"`
+	Message     []byte `rethinkdb:"message" json:"message"`
+	CreatedTime int64  `rethinkdb:"created_time" json:"created_time"`
 }

@@ -51,7 +51,7 @@ func newDatabaseMessage(rawMessage *Message) (*DatabaseMessage, error) {
 	}
 	dbMessage := new(DatabaseMessage)
 	dbMessage.UUID = uuid.New().String()
-	dbMessage.Timestamp = time.Now().UnixNano()
+	dbMessage.CreatedTime = time.Now().UnixNano()
 	dbMessage.Message = messageString
 	return dbMessage, nil
 }
