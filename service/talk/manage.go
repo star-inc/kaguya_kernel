@@ -39,7 +39,22 @@ func NewManage(config Kernel.RethinkConfig, tableName string) *Data {
 	return data
 }
 
-func (manage *Manage) Create(string) bool {
+func (manage *Manage) Check() bool {
+	cursor, err := manage.database.TableList().
+		Contains(manage.tableName).
+		Run(manage.session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var status bool
+	err = cursor.One(&status)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return status
+}
+
+func (manage *Manage) Create() bool {
 	err := manage.database.TableCreate(
 		manage.tableName,
 		Rethink.TableCreateOpts{PrimaryKey: "id"},
@@ -53,8 +68,10 @@ func (manage *Manage) Create(string) bool {
 	return true
 }
 
-func (manage *Manage) Drop(string) bool {
-	err := manage.database.TableDrop(manage.tableName).Exec(manage.session)
+func (manage *Manage) Drop() bool {
+	err := manage.database.
+		TableDrop(manage.tableName).
+		Exec(manage.session)
 	if err != nil {
 		return false
 	}
