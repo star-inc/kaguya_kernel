@@ -29,7 +29,6 @@ const (
 	ErrorJSONEncodingResponse = "JSON_encoding_response_error"
 	ErrorGenerateSignature    = "Generate_signature_error"
 	ErrorResponseWriting      = "Response_writing_error"
-	ErrorResponseTryWriting   = "Response_try_writing_error"
 )
 
 type Session struct {
@@ -60,9 +59,6 @@ func (session *Session) Response(data interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println(err)
-		}
-		if err = session.socketSession.Write(dataString); err != nil {
-			log.Println(ErrorResponseTryWriting)
 		}
 	}()
 	err = session.socketSession.Write(dataString)
