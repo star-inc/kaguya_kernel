@@ -26,8 +26,8 @@ import (
 
 const (
 	ErrorEmptyContent = "Content is empty"
-	OriginNotExists   = "Origin doesn't exist"
 	TargetNotExists   = "Target doesn't exist"
+	OriginNotEmpty    = "Origin is not empty"
 	Forbidden         = "Forbidden"
 )
 
@@ -80,10 +80,11 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		service.GetSession().RaiseError(ErrorEmptyContent)
 		return
 	}
-	if !service.GetGuard().CheckUserExists(message.Origin) {
-		service.GetSession().RaiseError(OriginNotExists)
+	if message.Origin != "" {
+		service.GetSession().RaiseError(OriginNotEmpty)
 		return
 	}
+	message.Origin = service.GetGuard().Me().Identity
 	if !service.GetGuard().CheckUserExists(message.Target) {
 		service.GetSession().RaiseError(TargetNotExists)
 		return
