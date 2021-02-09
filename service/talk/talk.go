@@ -72,9 +72,10 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(Message)
 	err := mapstructure.Decode(request.Data, message)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
-	if len(strings.Trim(string(message.Content), " ")) == 0 {
+	if len(strings.Trim(message.Content, " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)
 		return
 	}

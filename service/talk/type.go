@@ -15,7 +15,7 @@ type Message struct {
 	TargetType  int    `json:"targetType"`
 	Origin      string `json:"origin"`
 	Target      string `json:"target"`
-	Content     []byte `json:"content"`
+	Content     string `json:"content"`
 }
 
 type DatabaseMessage struct {
