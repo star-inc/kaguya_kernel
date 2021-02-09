@@ -20,13 +20,25 @@ package KaguyaKernel
 import (
 	"encoding/json"
 	"gopkg.in/olahol/melody.v1"
+	"log"
 	"reflect"
 )
 
-func Run(service ServiceInterface) *melody.Melody {
+func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
 	worker := melody.New()
 	worker.HandleConnect(func(socketSession *melody.Session) {
 		service.SetSession(NewSession(socketSession))
+		service.SetGuard(guard)
+		if !service.CheckPermission() {
+			defer func() {
+				err := socketSession.Close()
+				if err != nil {
+					log.Println(err)
+				}
+			}()
+			service.GetSession().RaiseError(ErrorForbidden)
+			return
+		}
 		go service.Fetch()
 	})
 	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {

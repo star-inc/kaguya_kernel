@@ -24,6 +24,7 @@ type Service struct {
 
 type ServiceInterface interface {
 	Fetch()
+	CheckPermission() bool
 	GetGuard() AuthorizeInterface
 	SetGuard(authorization AuthorizeInterface)
 	GetSession() *Session

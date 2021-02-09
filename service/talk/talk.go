@@ -25,10 +25,8 @@ import (
 )
 
 const (
-	ErrorEmptyContent = "Content is empty"
-	TargetNotExists   = "Target doesn't exist"
-	OriginNotEmpty    = "Origin is not empty"
-	Forbidden         = "Forbidden"
+	ErrorEmptyContent   = "Content is empty"
+	ErrorOriginNotEmpty = "Origin is not empty"
 )
 
 type Service struct {
@@ -36,17 +34,21 @@ type Service struct {
 	data *Data
 }
 
-func NewServiceInterface(dbConfig Kernel.RethinkConfig, dbTable string) ServiceInterface {
+func NewServiceInterface(dbConfig Kernel.RethinkConfig, tableName string) ServiceInterface {
 	service := new(Service)
-	service.data = newData(dbConfig, dbTable)
+	service.data = newData(dbConfig, tableName)
 	return service
 }
 
+func (service *Service) CheckPermission() bool {
+	if !service.GetGuard().CheckTablePermission(service.data.tableName) {
+		return false
+	}
+	return true
+}
+
 func (service *Service) Fetch() {
-	service.data.fetchMessage(
-		service.GetGuard().Me().Identity,
-		service.GetSession(),
-	)
+	service.data.fetchMessage(service.GetSession())
 }
 
 func (service *Service) SyncMessageBox() {
@@ -64,11 +66,6 @@ func (service *Service) GetMessageBox(request *Kernel.Request) {
 
 func (service *Service) GetMessage(request *Kernel.Request) {
 	dbMessage := service.data.getMessage((request.Data).(string))
-	message := dbMessage.Message
-	identity := service.GetGuard().Me().Identity
-	if message.Target != identity && message.Origin != identity {
-		service.GetSession().RaiseError(Forbidden)
-	}
 	service.GetSession().Response(dbMessage)
 }
 
@@ -84,13 +81,9 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		return
 	}
 	if message.Origin != "" {
-		service.GetSession().RaiseError(OriginNotEmpty)
+		service.GetSession().RaiseError(ErrorOriginNotEmpty)
 		return
 	}
 	message.Origin = service.GetGuard().Me().Identity
-	if !service.GetGuard().CheckUserExists(message.Target) {
-		service.GetSession().RaiseError(TargetNotExists)
-		return
-	}
 	service.data.saveMessage(message)
 }

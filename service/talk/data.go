@@ -51,12 +51,8 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 	return dbMessage
 }
 
-func (data Data) fetchMessage(identity string, session *Kernel.Session) {
-	cursor, err := data.database.Table(data.tableName).
-		GetAllByIndex("origin", identity).
-		GetAllByIndex("target", identity).
-		Changes().
-		Run(data.session)
+func (data Data) fetchMessage(session *Kernel.Session) {
+	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
 	if err != nil {
 		log.Fatalln(err)
 	}

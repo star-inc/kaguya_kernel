@@ -12,7 +12,6 @@ type ServiceInterface interface {
 
 type Message struct {
 	Origin      string `rethinkdb:"origin" json:"origin"`
-	Target      string `rethinkdb:"target" json:"target"`
 	Content     string `rethinkdb:"content" json:"content"`
 	ContentType int    `rethinkdb:"contentType" json:"contentType"`
 }
