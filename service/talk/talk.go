@@ -84,5 +84,4 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		return
 	}
 	service.data.saveMessage(message)
-	service.GetSession().Response(message)
 }

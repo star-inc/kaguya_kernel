@@ -26,7 +26,7 @@ type Request struct {
 type Response struct {
 	Data      interface{} `json:"data"`
 	Timestamp int64       `json:"timestamp"`
-	Signature [32]byte    `json:"signature"`
+	Signature string      `json:"signature"`
 }
 
 type ErrorReport struct {

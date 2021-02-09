@@ -20,6 +20,7 @@ package KaguyaKernel
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"gopkg.in/olahol/melody.v1"
 	"log"
 	"time"
@@ -50,7 +51,8 @@ func (session *Session) Response(data interface{}) {
 		session.RaiseError(ErrorGenerateSignature)
 		return
 	}
-	response.Signature = sha256.Sum256(hashString)
+	signature := sha256.Sum256(hashString)
+	response.Signature = fmt.Sprintf("%x", signature)
 	responseString, err := json.Marshal(response)
 	if err != nil {
 		session.RaiseError(ErrorJSONEncodingResponse)
