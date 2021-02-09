@@ -21,5 +21,5 @@ const ErrorForbidden = "Forbidden"
 
 type AuthorizeInterface interface {
 	Me() *User
-	CheckTablePermission(tableName string) bool
+	Permission(target string) bool
 }

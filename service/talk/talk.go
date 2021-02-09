@@ -41,7 +41,7 @@ func NewServiceInterface(dbConfig Kernel.RethinkConfig, tableName string) Servic
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().CheckTablePermission(service.data.tableName) {
+	if !service.GetGuard().Permission(service.data.tableName) {
 		return false
 	}
 	return true
