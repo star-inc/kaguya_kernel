@@ -60,7 +60,7 @@ func (data Data) fetchMessage(service *Service) {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	message := new(Message)
+	message := new(DatabaseMessage)
 	for cursor.Next(&message) {
 		service.GetSession().Response(message)
 	}
