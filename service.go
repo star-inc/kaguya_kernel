@@ -17,12 +17,9 @@ Package KaguyaKernel : The kernel for Kaguya
 */
 package KaguyaKernel
 
-import "reflect"
-
 type Service struct {
 	authorize AuthorizeInterface
 	session   *Session
-	Map       reflect.Value
 }
 
 type ServiceInterface interface {
@@ -31,8 +28,6 @@ type ServiceInterface interface {
 	SetGuard(authorization AuthorizeInterface)
 	GetSession() *Session
 	SetSession(session *Session)
-	GetMap() reflect.Value
-	SetMap(i interface{})
 }
 
 func (service *Service) GetGuard() AuthorizeInterface {
@@ -49,12 +44,4 @@ func (service *Service) GetSession() *Session {
 
 func (service *Service) SetSession(session *Session) {
 	service.session = session
-}
-
-func (service *Service) GetMap() reflect.Value {
-	return service.Map
-}
-
-func (service *Service) SetMap(i interface{}) {
-	service.Map = reflect.ValueOf(i)
 }

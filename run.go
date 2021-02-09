@@ -35,9 +35,10 @@ func Run(service ServiceInterface) *melody.Melody {
 		if err != nil {
 			panic(err)
 		}
-		service.GetMap().
-			MethodByName(request.Type).
-			Call([]reflect.Value{reflect.ValueOf(request)})
+		method := reflect.ValueOf(service).MethodByName(request.Type)
+		if method.IsValid() {
+			method.Call([]reflect.Value{reflect.ValueOf(request)})
+		}
 	})
 	return worker
 }

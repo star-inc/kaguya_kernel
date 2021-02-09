@@ -36,7 +36,6 @@ type Service struct {
 func NewServiceInterface(dbConfig Kernel.RethinkConfig, dbTable string) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, dbTable)
-	service.SetMap(service)
 	return service
 }
 
@@ -44,12 +43,12 @@ func (service *Service) Fetch() {
 	service.data.fetchMessage(service)
 }
 
-func (service *Service) syncMessageBox() {
+func (service *Service) SyncMessageBox() {
 	messages := service.data.syncMessageBox(service.GetGuard().Me().Identity)
 	service.GetSession().Response(messages)
 }
 
-func (service *Service) getMessageBox(request Kernel.Request) {
+func (service *Service) GetMessageBox(request Kernel.Request) {
 	messages := service.data.getMessageBox(
 		service.GetGuard().Me().Identity,
 		(request.Data).(string),
@@ -57,7 +56,7 @@ func (service *Service) getMessageBox(request Kernel.Request) {
 	service.GetSession().Response(messages)
 }
 
-func (service *Service) getMessage(request Kernel.Request) {
+func (service *Service) GetMessage(request Kernel.Request) {
 	dbMessage := service.data.getMessage((request.Data).(string))
 	message := dbMessage.Message
 	identity := service.GetGuard().Me().Identity
@@ -67,7 +66,7 @@ func (service *Service) getMessage(request Kernel.Request) {
 	service.GetSession().Response(dbMessage)
 }
 
-func (service *Service) sendMessage(request Kernel.Request) {
+func (service *Service) SendMessage(request Kernel.Request) {
 	message := (request.Data).(*Message)
 	if len(strings.Trim(string(message.Content), " ")) == 0 {
 		service.GetSession().RaiseError(ErrorEmptyContent)

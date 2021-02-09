@@ -4,10 +4,10 @@ import Kernel "github.com/star-inc/kaguya_kernel"
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
-	syncMessageBox()
-	getMessageBox(Kernel.Request)
-	getMessage(Kernel.Request)
-	sendMessage(Kernel.Request)
+	SyncMessageBox()
+	GetMessageBox(Kernel.Request)
+	GetMessage(Kernel.Request)
+	SendMessage(Kernel.Request)
 }
 
 type Message struct {
