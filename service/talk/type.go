@@ -4,8 +4,7 @@ import Kernel "github.com/star-inc/kaguya_kernel"
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
-	SyncMessageBox()
-	GetMessageBox(*Kernel.Request)
+	GetHistoryMessages(*Kernel.Request)
 	GetMessage(*Kernel.Request)
 	SendMessage(*Kernel.Request)
 }

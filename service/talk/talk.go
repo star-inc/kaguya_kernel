@@ -51,16 +51,9 @@ func (service *Service) Fetch() {
 	service.data.fetchMessage(service.GetSession())
 }
 
-func (service *Service) SyncMessageBox() {
-	messages := service.data.syncMessageBox(service.GetGuard().Me().Identity)
-	service.GetSession().Response(messages)
-}
-
-func (service *Service) GetMessageBox(request *Kernel.Request) {
-	messages := service.data.getMessageBox(
-		service.GetGuard().Me().Identity,
-		(request.Data).(string),
-	)
+func (service *Service) GetHistoryMessages(request *Kernel.Request) {
+	data := request.Data.(map[string]int)
+	messages := service.data.getHistoryMessages(data["timestamp"], data["count"])
 	service.GetSession().Response(messages)
 }
 

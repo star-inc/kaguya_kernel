@@ -69,12 +69,12 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 	}
 }
 
-func (data Data) syncMessageBox(identity string) *[]DatabaseMessage {
+func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
 	messages := new([]DatabaseMessage)
 	cursor, err := data.database.Table(data.tableName).
-		GetAllByIndex("origin", identity).
-		GetAllByIndex("target", identity).
-		OrderBy(Rethink.Asc("timestamp")).
+		OrderBy(Rethink.Asc("createdTime")).
+		Filter(Rethink.Row.Field("createdTime").Le(timestamp)).
+		Limit(count).
 		Run(data.session)
 	if err != nil {
 		log.Fatalln(err)
@@ -88,28 +88,6 @@ func (data Data) syncMessageBox(identity string) *[]DatabaseMessage {
 		log.Fatalln(err)
 	}
 	return messages
-}
-
-func (data Data) getMessageBox(identity string, target string) *[]DatabaseMessage {
-	message := new([]DatabaseMessage)
-	cursor, err := data.database.Table(data.tableName).
-		GetAllByIndex([]string{"origin", "target"}, []string{identity, target}).
-		GetAllByIndex([]string{"origin", "target"}, []string{target, identity}).
-		Max("timestamp").
-		OrderBy(Rethink.Asc("timestamp")).
-		Run(data.session)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
-	err = cursor.All(message)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return message
 }
 
 func (data Data) getMessage(messageID string) *DatabaseMessage {
