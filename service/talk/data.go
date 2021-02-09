@@ -61,7 +61,7 @@ func (data Data) fetchMessage(service *Service) {
 		log.Println(err)
 	}()
 	message := new(DatabaseMessage)
-	for cursor.Next(&message) {
+	for cursor.Next(message) {
 		service.GetSession().Response(message)
 	}
 	if err := cursor.Err(); err != nil {
@@ -105,7 +105,7 @@ func (data Data) getMessageBox(identity string, target string) *[]DatabaseMessag
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	err = cursor.All(&message)
+	err = cursor.All(message)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -122,7 +122,7 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	err = cursor.One(&message)
+	err = cursor.One(message)
 	if err != nil {
 		log.Fatalln(err)
 	}

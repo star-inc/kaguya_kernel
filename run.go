@@ -31,7 +31,7 @@ func Run(service ServiceInterface) *melody.Melody {
 	})
 	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
 		request := new(Request)
-		err := json.Unmarshal(message, &request)
+		err := json.Unmarshal(message, request)
 		if err != nil {
 			panic(err)
 		}
