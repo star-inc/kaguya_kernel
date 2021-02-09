@@ -36,6 +36,7 @@ type Service struct {
 func NewServiceInterface(dbConfig Kernel.RethinkConfig, dbTable string) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, dbTable)
+	service.SetMap(service)
 	return service
 }
 

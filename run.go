@@ -25,7 +25,6 @@ import (
 
 func Run(service ServiceInterface) *melody.Melody {
 	worker := melody.New()
-	handler := reflect.ValueOf(service)
 	worker.HandleConnect(func(socketSession *melody.Session) {
 		service.SetSession(NewSession(socketSession))
 		go service.Fetch()
@@ -36,7 +35,9 @@ func Run(service ServiceInterface) *melody.Melody {
 		if err != nil {
 			panic(err)
 		}
-		handler.MethodByName(request.Type).Call([]reflect.Value{reflect.ValueOf(request)})
+		service.GetMap().
+			MethodByName(request.Type).
+			Call([]reflect.Value{reflect.ValueOf(request)})
 	})
 	return worker
 }
