@@ -18,6 +18,7 @@ Package Kernel : The kernel for Kaguya
 package talk
 
 import (
+	"encoding/json"
 	"github.com/google/uuid"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
@@ -43,12 +44,16 @@ func newData(config Kernel.RethinkConfig, tableName string) *Data {
 	return data
 }
 
-func newDatabaseMessage(message *Message) *DatabaseMessage {
+func newDatabaseMessage(rawMessage *Message) (*DatabaseMessage, error) {
+	messageString, err := json.Marshal(rawMessage)
+	if err != nil {
+		return nil, err
+	}
 	dbMessage := new(DatabaseMessage)
 	dbMessage.UUID = uuid.New().String()
 	dbMessage.Timestamp = time.Now().UnixNano()
-	dbMessage.Message = message
-	return dbMessage
+	dbMessage.Message = messageString
+	return dbMessage, nil
 }
 
 func (data Data) fetchMessage(service *Service) {
@@ -129,10 +134,13 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 	return message
 }
 
-func (data Data) saveMessage(message *Message) {
-	err := data.database.Table(data.tableName).
-		Insert(newDatabaseMessage(message)).
-		Exec(data.session)
+func (data Data) saveMessage(rawMessage *Message) {
+	message, err := newDatabaseMessage(rawMessage)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = data.database.Table(data.tableName).Insert(message).Exec(data.session)
 	if err != nil {
 		log.Fatalln(err)
 	}
