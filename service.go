@@ -53,5 +53,8 @@ func (service *Service) SetSession(session *Session) {
 }
 
 func (service *Service) CheckRequestType(method reflect.Value) bool {
+	if reflect.TypeOf(method.Interface()) != reflect.TypeOf(func(*Request) {}) {
+		return false
+	}
 	return true
 }
