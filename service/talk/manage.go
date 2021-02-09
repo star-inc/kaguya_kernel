@@ -40,7 +40,13 @@ func NewManage(config Kernel.RethinkConfig, tableName string) *Data {
 }
 
 func (manage *Manage) Create(string) bool {
-	err := manage.database.TableCreate(manage.tableName).Exec(manage.session)
+	err := manage.database.TableCreate(
+		manage.tableName,
+		Rethink.TableCreateOpts{PrimaryKey: "id"},
+	).
+		IndexCreate("origin").
+		IndexCreate("createdTime").
+		Exec(manage.session)
 	if err != nil {
 		return false
 	}
