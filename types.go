@@ -33,8 +33,3 @@ type ErrorReport struct {
 	Timestamp int64  `json:"timestamp"`
 	Error     string `json:"error"`
 }
-
-type User struct {
-	DisplayName string `json:"displayName"`
-	Identity    string `json:"identity"`
-}

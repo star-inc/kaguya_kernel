@@ -77,6 +77,6 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		service.GetSession().RaiseError(ErrorOriginNotEmpty)
 		return
 	}
-	message.Origin = service.GetGuard().Me().Identity
+	message.Origin = service.GetGuard().Me()
 	service.data.saveMessage(message)
 }

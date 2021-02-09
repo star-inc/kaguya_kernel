@@ -20,6 +20,6 @@ package KaguyaKernel
 const ErrorForbidden = "Forbidden"
 
 type AuthorizeInterface interface {
-	Me() *User
+	Me() string
 	Permission(target string) bool
 }
