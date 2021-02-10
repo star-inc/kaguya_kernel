@@ -4,8 +4,6 @@
 *.dll
 *.so
 *.dylib
-kaguya
-kaguya.exe
 
 # Test binary, built with `go test -c`
 *.test
@@ -15,9 +13,6 @@ kaguya.exe
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
-# Config files
-config.json
 
 # GoLand
 .idea/

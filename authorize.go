@@ -1,7 +1,7 @@
 /*
-Package kaguya : The library for kaguya
+Package KaguyaKernel: The kernel for Kaguya
 
-    Copyright 2020 Star Inc.(https://starinc.xyz)
+    Copyright 2021 Star Inc.(https://starinc.xyz)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@ Package kaguya : The library for kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package kaguya
+package KaguyaKernel
 
-func (Handler *Handler) PollServices() {
-	for {
-		//Handler.Response(true, Handler.request.ActionType, Handler.request.Action, "TEST")
-	}
+const ErrorForbidden = "Forbidden"
+
+type AuthorizeInterface interface {
+	Me() string
+	Permission(target string) bool
 }
