@@ -32,7 +32,7 @@ func NewManager(config Kernel.RethinkConfig, tableName string) *Manager {
 	manager := new(Manager)
 	manager.session, err = Rethink.Connect(config.ConnectConfig)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	manager.database = Rethink.DB(config.DatabaseName)
 	manager.tableName = tableName
@@ -44,12 +44,12 @@ func (manager *Manager) Check() bool {
 		Contains(manager.tableName).
 		Run(manager.session)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	var status bool
 	err = cursor.One(&status)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	return status
 }

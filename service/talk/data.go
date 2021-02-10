@@ -36,7 +36,7 @@ func newData(config Kernel.RethinkConfig, tableName string) *Data {
 	data := new(Data)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	data.database = Rethink.DB(config.DatabaseName)
 	data.tableName = tableName
@@ -54,7 +54,7 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 func (data Data) fetchMessage(session *Kernel.Session) {
 	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	defer func() {
 		err := cursor.Close()
@@ -77,7 +77,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 		Limit(count).
 		Run(data.session)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	defer func() {
 		err := cursor.Close()
@@ -85,7 +85,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 	}()
 	err = cursor.All(messages)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	return messages
 }
@@ -94,7 +94,7 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 	message := new(DatabaseMessage)
 	cursor, err := data.database.Table(data.tableName).Get(messageID).Run(data.session)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	defer func() {
 		err := cursor.Close()
@@ -102,7 +102,7 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 	}()
 	err = cursor.One(message)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	return message
 }
@@ -111,6 +111,6 @@ func (data Data) saveMessage(rawMessage *Message) {
 	message := newDatabaseMessage(rawMessage)
 	err := data.database.Table(data.tableName).Insert(message).Exec(data.session)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 }
