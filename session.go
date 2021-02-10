@@ -34,26 +34,37 @@ const (
 
 type Session struct {
 	socketSession *melody.Session
+	requestSalt   string
 }
 
-func NewSession(socketSession *melody.Session) *Session {
+func NewSession(socketSession *melody.Session, requestSalt string) *Session {
 	session := new(Session)
 	session.socketSession = socketSession
+	session.requestSalt = requestSalt
 	return session
 }
 
 func (session *Session) Response(data interface{}) {
-	response := new(Response)
-	response.Data = data
-	response.Timestamp = time.Now().UnixNano()
-	hashString, err := json.Marshal(data)
+	// Generate Signature
+	// The json package always orders keys when marshalling, so it's safe.
+	// https://stackoverflow.com/questions/18668652/how-to-produce-json-with-sorted-keys-in-go
+	signature := new(Signature)
+	signature.Data = data
+	signature.Salt = session.requestSalt
+	signature.Timestamp = time.Now().UnixNano()
+	rawSignatureString, err := json.Marshal(signature)
 	if err != nil {
 		session.RaiseError(ErrorGenerateSignature)
 		return
 	}
-	signature := sha256.Sum256(hashString)
-	response.Signature = fmt.Sprintf("%x", signature)
+	signatureString := sha256.Sum256(rawSignatureString)
+	// Generate Response
+	response := new(Response)
+	response.Data = signature.Data
+	response.Timestamp = signature.Timestamp
+	response.Signature = fmt.Sprintf("%x", signatureString)
 	responseString, err := json.Marshal(response)
+	// Write
 	if err != nil {
 		session.RaiseError(ErrorJSONEncodingResponse)
 		return

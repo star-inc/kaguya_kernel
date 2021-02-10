@@ -29,10 +29,10 @@ const (
 	ErrorInvalidRequestType  = "Request_type_is_invalid"
 )
 
-func Run(service ServiceInterface, guard AuthorizeInterface) *melody.Melody {
+func Run(service ServiceInterface, guard AuthorizeInterface, requestSalt string) *melody.Melody {
 	worker := melody.New()
 	worker.HandleConnect(func(socketSession *melody.Session) {
-		service.SetSession(NewSession(socketSession))
+		service.SetSession(NewSession(socketSession, requestSalt))
 		service.SetGuard(guard)
 		if !service.CheckPermission() {
 			defer func() {
