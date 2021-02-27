@@ -73,7 +73,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 	messages := new([]DatabaseMessage)
 	cursor, err := data.database.Table(data.tableName).
 		OrderBy(Rethink.Asc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Le(timestamp)).
+		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
 		Limit(count).
 		Run(data.session)
 	if err != nil {
