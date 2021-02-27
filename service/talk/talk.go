@@ -59,8 +59,8 @@ func (service *Service) Fetch() {
 }
 
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
-	data := request.Data.(map[string]int)
-	messages := service.data.getHistoryMessages(data["timestamp"], data["count"])
+	data := request.Data.(map[string]interface{})
+	messages := service.data.getHistoryMessages(data["timestamp"].(int), data["count"].(int))
 	service.GetSession().Response(messages)
 }
 
