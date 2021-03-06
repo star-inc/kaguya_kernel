@@ -92,5 +92,11 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		return
 	}
 	message.Origin = service.GetGuard().Me()
-	service.data.saveMessage(message)
+	service.data.insertMessage(message)
+}
+
+func (service *Service) CancelSendMessage(request *Kernel.Request) {
+	message := service.data.getMessage((request.Data).(string))
+	message.Canceled = true
+	service.data.updateMessage(message)
 }

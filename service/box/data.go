@@ -15,14 +15,12 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package talk
+package box
 
 import (
-	"github.com/google/uuid"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 	"log"
-	"time"
 )
 
 type Data struct {
@@ -43,15 +41,6 @@ func newData(config Kernel.RethinkConfig, tableName string) *Data {
 	return data
 }
 
-func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
-	dbMessage := new(DatabaseMessage)
-	dbMessage.UUID = uuid.New().String()
-	dbMessage.CreatedTime = time.Now().UnixNano()
-	dbMessage.Message = rawMessage
-	dbMessage.Canceled = false
-	return dbMessage
-}
-
 func (data Data) fetchMessage(session *Kernel.Session) {
 	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
 	if err != nil {
@@ -70,8 +59,8 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 	}
 }
 
-func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
-	messages := new([]DatabaseMessage)
+func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
+	messages := new([]Messagebox)
 	cursor, err := data.database.Table(data.tableName).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
@@ -91,9 +80,9 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 	return messages
 }
 
-func (data Data) getMessage(messageID string) *DatabaseMessage {
-	message := new(DatabaseMessage)
-	cursor, err := data.database.Table(data.tableName).Get(messageID).Run(data.session)
+func (data Data) getMessagebox(origin string) *Messagebox {
+	messagebox := new(Messagebox)
+	cursor, err := data.database.Table(data.tableName).Get(origin).Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -101,23 +90,22 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	err = cursor.One(message)
+	err = cursor.One(messagebox)
 	if err != nil {
 		log.Panicln(err)
 	}
-	return message
+	return messagebox
 }
 
-func (data Data) insertMessage(rawMessage *Message) {
-	message := newDatabaseMessage(rawMessage)
-	err := data.database.Table(data.tableName).Insert(message).Exec(data.session)
+func (data Data) replaceMessagebox(messagebox *Messagebox) {
+	err := data.database.Table(data.tableName).Replace(messagebox).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
 }
 
-func (data Data) updateMessage(message *DatabaseMessage) {
-	err := data.database.Table(data.tableName).Replace(message).Exec(data.session)
+func (data Data) deleteMessagebox(origin string) {
+	err := data.database.Table(data.tableName).Get(origin).Delete().Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}

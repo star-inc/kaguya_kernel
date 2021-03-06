@@ -18,5 +18,6 @@ type Message struct {
 type DatabaseMessage struct {
 	UUID        string   `rethinkdb:"id,omitempty" json:"uuid"`
 	Message     *Message `rethinkdb:"message" json:"message"`
+	Canceled    bool     `rethinkdb:"canceled" json:"canceled"`
 	CreatedTime int64    `rethinkdb:"createdTime" json:"createdTime"`
 }
