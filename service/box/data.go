@@ -80,9 +80,9 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
 	return messages
 }
 
-func (data Data) getMessagebox(origin string) *Messagebox {
+func (data Data) getMessagebox(target string) *Messagebox {
 	messagebox := new(Messagebox)
-	cursor, err := data.database.Table(data.tableName).Get(origin).Run(data.session)
+	cursor, err := data.database.Table(data.tableName).Get(target).Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -97,15 +97,15 @@ func (data Data) getMessagebox(origin string) *Messagebox {
 	return messagebox
 }
 
-func (data Data) replaceMessagebox(messagebox *Messagebox) {
-	err := data.database.Table(data.tableName).Replace(messagebox).Exec(data.session)
+func (data Data) replaceMessagebox(relationID string, messagebox *Messagebox) {
+	err := data.database.Table(relationID).Replace(messagebox).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
 }
 
-func (data Data) deleteMessagebox(origin string) {
-	err := data.database.Table(data.tableName).Get(origin).Delete().Exec(data.session)
+func (data Data) deleteMessagebox(target string) {
+	err := data.database.Table(data.tableName).Get(target).Delete().Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}

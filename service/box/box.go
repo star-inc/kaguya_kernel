@@ -50,12 +50,15 @@ func (service *Service) Fetch() {
 	service.data.fetchMessage(service.GetSession())
 }
 
-func (service *Service) MessageHandler(message *talk.DatabaseMessage) {
+func (service *Service) MessageHandler(tableName string, message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
+	messagebox.Target = tableName
 	messagebox.Origin = message.Message.Origin
 	messagebox.Metadata = service.metadataGenerator(message)
 	messagebox.CreatedTime = message.CreatedTime
-	service.data.replaceMessagebox(messagebox)
+	for _, relationID := range service.GetGuard().BoxRelation(tableName) {
+		service.data.replaceMessagebox(relationID, messagebox)
+	}
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {

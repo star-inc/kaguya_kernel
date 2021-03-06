@@ -57,8 +57,9 @@ func (manager *Manager) Check() bool {
 func (manager *Manager) Create() bool {
 	err := manager.database.TableCreate(
 		manager.tableName,
-		Rethink.TableCreateOpts{PrimaryKey: "origin"},
+		Rethink.TableCreateOpts{PrimaryKey: "target"},
 	).
+		IndexCreate("origin").
 		IndexCreate("createdTime").
 		Exec(manager.session)
 	if err != nil {

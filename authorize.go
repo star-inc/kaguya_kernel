@@ -22,4 +22,5 @@ const ErrorForbidden = "Forbidden"
 type AuthorizeInterface interface {
 	Me() string
 	Permission(target string) bool
+	BoxRelation(target string) []string
 }

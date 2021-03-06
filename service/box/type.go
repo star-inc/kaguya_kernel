@@ -24,11 +24,12 @@ import (
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
-	MessageHandler(*talk.DatabaseMessage)
+	MessageHandler(string, *talk.DatabaseMessage)
 	DeleteMessagebox(*Kernel.Request)
 }
 
 type Messagebox struct {
+	Target      string `rethinkdb:"target" json:"target"`
 	Origin      string `rethinkdb:"origin" json:"origin"`
 	Metadata    string `rethinkdb:"metadata" json:"metadata"`
 	CreatedTime int64  `rethinkdb:"createdTime" json:"createdTime"`
