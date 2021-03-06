@@ -17,10 +17,15 @@ Package KaguyaKernel: The kernel for Kaguya
 */
 package box
 
-import Kernel "github.com/star-inc/kaguya_kernel"
+import (
+	Kernel "github.com/star-inc/kaguya_kernel"
+	"github.com/star-inc/kaguya_kernel/service/talk"
+)
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
+	MessageHandler(*talk.DatabaseMessage)
+	DeleteMessagebox(*Kernel.Request)
 }
 
 type Messagebox struct {
