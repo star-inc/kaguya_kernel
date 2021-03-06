@@ -24,18 +24,18 @@ import (
 
 type Service struct {
 	Kernel.Service
-	data             *Data
-	contentValidator func(contentType int, content string) bool
+	data              *Data
+	metadataGenerator func(*talk.DatabaseMessage) string
 }
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
 	tableName string,
-	contentValidator func(int, string) bool,
+	metadataGenerator func(*talk.DatabaseMessage) string,
 ) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, tableName)
-	service.contentValidator = contentValidator
+	service.metadataGenerator = metadataGenerator
 	return service
 }
 
@@ -50,10 +50,10 @@ func (service *Service) Fetch() {
 	service.data.fetchMessage(service.GetSession())
 }
 
-func (service *Service) MessageHandler(metadata string, message *talk.DatabaseMessage) {
+func (service *Service) MessageHandler(message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
 	messagebox.Origin = message.Message.Origin
-	messagebox.Metadata = metadata
+	messagebox.Metadata = service.metadataGenerator(message)
 	messagebox.CreatedTime = message.CreatedTime
 	service.data.replaceMessagebox(messagebox)
 }

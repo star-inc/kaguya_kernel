@@ -33,17 +33,20 @@ const (
 type Service struct {
 	Kernel.Service
 	data             *Data
-	contentValidator func(contentType int, content string) bool
+	contentValidator func(int, string) bool
+	sendMessageHook  func(*DatabaseMessage)
 }
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
 	tableName string,
 	contentValidator func(int, string) bool,
+	sendMessageHook func(*DatabaseMessage),
 ) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, tableName)
 	service.contentValidator = contentValidator
+	service.sendMessageHook = sendMessageHook
 	return service
 }
 
@@ -92,7 +95,8 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		return
 	}
 	message.Origin = service.GetGuard().Me()
-	service.data.insertMessage(message)
+	savedMessage := service.data.insertMessage(message)
+	service.sendMessageHook(savedMessage)
 }
 
 func (service *Service) CancelSendMessage(request *Kernel.Request) {

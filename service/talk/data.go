@@ -108,12 +108,13 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 	return message
 }
 
-func (data Data) insertMessage(rawMessage *Message) {
+func (data Data) insertMessage(rawMessage *Message) *DatabaseMessage {
 	message := newDatabaseMessage(rawMessage)
 	err := data.database.Table(data.tableName).Insert(message).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
+	return message
 }
 
 func (data Data) updateMessage(message *DatabaseMessage) {
