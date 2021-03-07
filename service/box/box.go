@@ -25,16 +25,19 @@ import (
 type Service struct {
 	Kernel.Service
 	data              *Data
+	getRelation       func(string) []string
 	metadataGenerator func(*talk.DatabaseMessage) string
 }
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
 	tableName string,
+	getRelation func(string) []string,
 	metadataGenerator func(*talk.DatabaseMessage) string,
 ) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, tableName)
+	service.getRelation = getRelation
 	service.metadataGenerator = metadataGenerator
 	return service
 }
@@ -56,7 +59,7 @@ func (service *Service) MessageHandler(tableName string, message *talk.DatabaseM
 	messagebox.Origin = message.Message.Origin
 	messagebox.Metadata = service.metadataGenerator(message)
 	messagebox.CreatedTime = message.CreatedTime
-	for _, relationID := range service.GetGuard().BoxRelation(tableName) {
+	for _, relationID := range service.getRelation(tableName) {
 		service.data.replaceMessagebox(relationID, messagebox)
 	}
 }
