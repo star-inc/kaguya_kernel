@@ -52,7 +52,7 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 	return dbMessage
 }
 
-func (data Data) fetchMessage(session *Kernel.Session) {
+func (data *Data) fetchMessage(session *Kernel.Session) {
 	cursor, err := data.database.Table(data.chatRoomID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
@@ -70,7 +70,7 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 	}
 }
 
-func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
+func (data *Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
 	messages := new([]DatabaseMessage)
 	cursor, err := data.database.Table(data.chatRoomID).
 		OrderBy(Rethink.Asc("createdTime")).
@@ -91,7 +91,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 	return messages
 }
 
-func (data Data) getMessage(messageID string) *DatabaseMessage {
+func (data *Data) getMessage(messageID string) *DatabaseMessage {
 	message := new(DatabaseMessage)
 	cursor, err := data.database.Table(data.chatRoomID).Get(messageID).Run(data.session)
 	if err != nil {
@@ -108,7 +108,7 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 	return message
 }
 
-func (data Data) insertMessage(rawMessage *Message) *DatabaseMessage {
+func (data *Data) insertMessage(rawMessage *Message) *DatabaseMessage {
 	message := newDatabaseMessage(rawMessage)
 	err := data.database.Table(data.chatRoomID).Insert(message).Exec(data.session)
 	if err != nil {
@@ -117,7 +117,7 @@ func (data Data) insertMessage(rawMessage *Message) *DatabaseMessage {
 	return message
 }
 
-func (data Data) updateMessage(message *DatabaseMessage) {
+func (data *Data) updateMessage(message *DatabaseMessage) {
 	err := data.database.Table(data.chatRoomID).Replace(message).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)

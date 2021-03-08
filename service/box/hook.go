@@ -17,21 +17,52 @@ Package KaguyaKernel: The kernel for Kaguya
 */
 package box
 
-import "github.com/star-inc/kaguya_kernel/service/talk"
+import (
+	Kernel "github.com/star-inc/kaguya_kernel"
+	"github.com/star-inc/kaguya_kernel/service/talk"
+	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"log"
+)
 
-func MessageHook(
-	service *Service,
+type Hook struct {
+	Data
+	getRelation       func(string) []string
+	metadataGenerator func(*talk.DatabaseMessage) string
+}
+
+func NewHook(
+	config Kernel.RethinkConfig,
 	listenerID string,
-	message *talk.DatabaseMessage,
 	getRelation func(string) []string,
 	metadataGenerator func(*talk.DatabaseMessage) string,
-) {
+) *Hook {
+	var err error
+	hook := new(Hook)
+	hook.session, err = Rethink.Connect(config.ConnectConfig)
+	if err != nil {
+		log.Panicln(err)
+	}
+	hook.database = Rethink.DB(config.DatabaseName)
+	hook.listenerID = listenerID
+	hook.getRelation = getRelation
+	hook.metadataGenerator = metadataGenerator
+	return hook
+}
+
+func (hook *Hook) handler(message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
-	messagebox.Target = listenerID
+	messagebox.Target = hook.listenerID
 	messagebox.Origin = message.Message.Origin
-	messagebox.Metadata = metadataGenerator(message)
 	messagebox.CreatedTime = message.CreatedTime
-	for _, relationID := range getRelation(listenerID) {
-		service.data.replaceMessagebox(relationID, messagebox)
+	messagebox.Metadata = hook.metadataGenerator(message)
+	for _, relationID := range hook.getRelation(hook.listenerID) {
+		hook.replaceMessagebox(relationID, messagebox)
+	}
+}
+
+func (hook Hook) replaceMessagebox(relationID string, messagebox *Messagebox) {
+	err := hook.database.Table(relationID).Replace(messagebox).Exec(hook.session)
+	if err != nil {
+		log.Panicln(err)
 	}
 }

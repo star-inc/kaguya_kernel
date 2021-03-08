@@ -46,6 +46,15 @@ func (service *Service) Fetch() {
 	service.data.fetchMessage(service.GetSession())
 }
 
+func (service *Service) GetHistoryMessagebox(request *Kernel.Request) {
+	data := request.Data.(map[string]interface{})
+	messages := service.data.getHistoryMessagebox(
+		int(data["timestamp"].(float64)),
+		int(data["count"].(float64)),
+	)
+	service.GetSession().Response(messages)
+}
+
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	service.data.deleteMessagebox(request.Data.(string))
 }

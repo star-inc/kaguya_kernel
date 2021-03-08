@@ -41,7 +41,7 @@ func newData(config Kernel.RethinkConfig, listenerID string) *Data {
 	return data
 }
 
-func (data Data) fetchMessage(session *Kernel.Session) {
+func (data *Data) fetchMessage(session *Kernel.Session) {
 	cursor, err := data.database.Table(data.listenerID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
@@ -59,7 +59,7 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 	}
 }
 
-func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
+func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]Messagebox {
 	messages := new([]Messagebox)
 	cursor, err := data.database.Table(data.listenerID).
 		OrderBy(Rethink.Asc("createdTime")).
@@ -80,7 +80,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
 	return messages
 }
 
-func (data Data) getMessagebox(target string) *Messagebox {
+func (data *Data) getMessagebox(target string) *Messagebox {
 	messagebox := new(Messagebox)
 	cursor, err := data.database.Table(data.listenerID).Get(target).Run(data.session)
 	if err != nil {
@@ -97,14 +97,7 @@ func (data Data) getMessagebox(target string) *Messagebox {
 	return messagebox
 }
 
-func (data Data) replaceMessagebox(relationID string, messagebox *Messagebox) {
-	err := data.database.Table(relationID).Replace(messagebox).Exec(data.session)
-	if err != nil {
-		log.Panicln(err)
-	}
-}
-
-func (data Data) deleteMessagebox(target string) {
+func (data *Data) deleteMessagebox(target string) {
 	err := data.database.Table(data.listenerID).Get(target).Delete().Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
