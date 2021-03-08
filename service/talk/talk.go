@@ -39,19 +39,19 @@ type Service struct {
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
-	tableName string,
+	chatRoomID string,
 	contentValidator func(int, string) bool,
 	sendMessageHook func(*DatabaseMessage),
 ) ServiceInterface {
 	service := new(Service)
-	service.data = newData(dbConfig, tableName)
+	service.data = newData(dbConfig, chatRoomID)
 	service.contentValidator = contentValidator
 	service.sendMessageHook = sendMessageHook
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission(service.data.tableName) {
+	if !service.GetGuard().Permission(service.data.chatRoomID) {
 		return false
 	}
 	return true

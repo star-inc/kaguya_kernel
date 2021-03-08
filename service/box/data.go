@@ -24,12 +24,12 @@ import (
 )
 
 type Data struct {
-	session   *Rethink.Session
-	database  Rethink.Term
-	tableName string
+	session    *Rethink.Session
+	database   Rethink.Term
+	listenerID string
 }
 
-func newData(config Kernel.RethinkConfig, tableName string) *Data {
+func newData(config Kernel.RethinkConfig, listenerID string) *Data {
 	var err error
 	data := new(Data)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
@@ -37,12 +37,12 @@ func newData(config Kernel.RethinkConfig, tableName string) *Data {
 		log.Panicln(err)
 	}
 	data.database = Rethink.DB(config.DatabaseName)
-	data.tableName = tableName
+	data.listenerID = listenerID
 	return data
 }
 
 func (data Data) fetchMessage(session *Kernel.Session) {
-	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
+	cursor, err := data.database.Table(data.listenerID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -61,7 +61,7 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 
 func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
 	messages := new([]Messagebox)
-	cursor, err := data.database.Table(data.tableName).
+	cursor, err := data.database.Table(data.listenerID).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
 		Limit(count).
@@ -82,7 +82,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]Messagebox {
 
 func (data Data) getMessagebox(target string) *Messagebox {
 	messagebox := new(Messagebox)
-	cursor, err := data.database.Table(data.tableName).Get(target).Run(data.session)
+	cursor, err := data.database.Table(data.listenerID).Get(target).Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -105,7 +105,7 @@ func (data Data) replaceMessagebox(relationID string, messagebox *Messagebox) {
 }
 
 func (data Data) deleteMessagebox(target string) {
-	err := data.database.Table(data.tableName).Get(target).Delete().Exec(data.session)
+	err := data.database.Table(data.listenerID).Get(target).Delete().Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}

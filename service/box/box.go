@@ -19,31 +19,24 @@ package box
 
 import (
 	Kernel "github.com/star-inc/kaguya_kernel"
-	"github.com/star-inc/kaguya_kernel/service/talk"
 )
 
 type Service struct {
 	Kernel.Service
-	data              *Data
-	getRelation       func(string) []string
-	metadataGenerator func(*talk.DatabaseMessage) string
+	data *Data
 }
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
-	tableName string,
-	getRelation func(string) []string,
-	metadataGenerator func(*talk.DatabaseMessage) string,
+	listenerID string,
 ) ServiceInterface {
 	service := new(Service)
-	service.data = newData(dbConfig, tableName)
-	service.getRelation = getRelation
-	service.metadataGenerator = metadataGenerator
+	service.data = newData(dbConfig, listenerID)
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission(service.data.tableName) {
+	if !service.GetGuard().Permission(service.data.listenerID) {
 		return false
 	}
 	return true
@@ -51,17 +44,6 @@ func (service *Service) CheckPermission() bool {
 
 func (service *Service) Fetch() {
 	service.data.fetchMessage(service.GetSession())
-}
-
-func (service *Service) MessageHandler(tableName string, message *talk.DatabaseMessage) {
-	messagebox := new(Messagebox)
-	messagebox.Target = tableName
-	messagebox.Origin = message.Message.Origin
-	messagebox.Metadata = service.metadataGenerator(message)
-	messagebox.CreatedTime = message.CreatedTime
-	for _, relationID := range service.getRelation(tableName) {
-		service.data.replaceMessagebox(relationID, messagebox)
-	}
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {

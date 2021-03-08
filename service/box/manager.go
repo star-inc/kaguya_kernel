@@ -27,7 +27,7 @@ type Manager struct {
 	Data
 }
 
-func NewManager(config Kernel.RethinkConfig, tableName string) *Manager {
+func NewManager(config Kernel.RethinkConfig, listenerID string) *Manager {
 	var err error
 	manager := new(Manager)
 	manager.session, err = Rethink.Connect(config.ConnectConfig)
@@ -35,13 +35,13 @@ func NewManager(config Kernel.RethinkConfig, tableName string) *Manager {
 		log.Panicln(err)
 	}
 	manager.database = Rethink.DB(config.DatabaseName)
-	manager.tableName = tableName
+	manager.listenerID = listenerID
 	return manager
 }
 
 func (manager *Manager) Check() bool {
 	cursor, err := manager.database.TableList().
-		Contains(manager.tableName).
+		Contains(manager.listenerID).
 		Run(manager.session)
 	if err != nil {
 		log.Panicln(err)
@@ -56,7 +56,7 @@ func (manager *Manager) Check() bool {
 
 func (manager *Manager) Create() bool {
 	err := manager.database.TableCreate(
-		manager.tableName,
+		manager.listenerID,
 		Rethink.TableCreateOpts{PrimaryKey: "target"},
 	).
 		IndexCreate("origin").
@@ -70,7 +70,7 @@ func (manager *Manager) Create() bool {
 
 func (manager *Manager) Drop() bool {
 	err := manager.database.
-		TableDrop(manager.tableName).
+		TableDrop(manager.listenerID).
 		Exec(manager.session)
 	if err != nil {
 		return false

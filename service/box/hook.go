@@ -17,18 +17,21 @@ Package KaguyaKernel: The kernel for Kaguya
 */
 package box
 
-import (
-	Kernel "github.com/star-inc/kaguya_kernel"
-)
+import "github.com/star-inc/kaguya_kernel/service/talk"
 
-type ServiceInterface interface {
-	Kernel.ServiceInterface
-	DeleteMessagebox(*Kernel.Request)
-}
-
-type Messagebox struct {
-	Target      string `rethinkdb:"target" json:"target"`
-	Origin      string `rethinkdb:"origin" json:"origin"`
-	Metadata    string `rethinkdb:"metadata" json:"metadata"`
-	CreatedTime int64  `rethinkdb:"createdTime" json:"createdTime"`
+func MessageHook(
+	service *Service,
+	listenerID string,
+	message *talk.DatabaseMessage,
+	getRelation func(string) []string,
+	metadataGenerator func(*talk.DatabaseMessage) string,
+) {
+	messagebox := new(Messagebox)
+	messagebox.Target = listenerID
+	messagebox.Origin = message.Message.Origin
+	messagebox.Metadata = metadataGenerator(message)
+	messagebox.CreatedTime = message.CreatedTime
+	for _, relationID := range getRelation(listenerID) {
+		service.data.replaceMessagebox(relationID, messagebox)
+	}
 }

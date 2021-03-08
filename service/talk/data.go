@@ -26,12 +26,12 @@ import (
 )
 
 type Data struct {
-	session   *Rethink.Session
-	database  Rethink.Term
-	tableName string
+	session    *Rethink.Session
+	database   Rethink.Term
+	chatRoomID string
 }
 
-func newData(config Kernel.RethinkConfig, tableName string) *Data {
+func newData(config Kernel.RethinkConfig, chatRoomID string) *Data {
 	var err error
 	data := new(Data)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
@@ -39,7 +39,7 @@ func newData(config Kernel.RethinkConfig, tableName string) *Data {
 		log.Panicln(err)
 	}
 	data.database = Rethink.DB(config.DatabaseName)
-	data.tableName = tableName
+	data.chatRoomID = chatRoomID
 	return data
 }
 
@@ -53,7 +53,7 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 }
 
 func (data Data) fetchMessage(session *Kernel.Session) {
-	cursor, err := data.database.Table(data.tableName).Changes().Run(data.session)
+	cursor, err := data.database.Table(data.chatRoomID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -72,7 +72,7 @@ func (data Data) fetchMessage(session *Kernel.Session) {
 
 func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
 	messages := new([]DatabaseMessage)
-	cursor, err := data.database.Table(data.tableName).
+	cursor, err := data.database.Table(data.chatRoomID).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
 		Limit(count).
@@ -93,7 +93,7 @@ func (data Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage
 
 func (data Data) getMessage(messageID string) *DatabaseMessage {
 	message := new(DatabaseMessage)
-	cursor, err := data.database.Table(data.tableName).Get(messageID).Run(data.session)
+	cursor, err := data.database.Table(data.chatRoomID).Get(messageID).Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -110,7 +110,7 @@ func (data Data) getMessage(messageID string) *DatabaseMessage {
 
 func (data Data) insertMessage(rawMessage *Message) *DatabaseMessage {
 	message := newDatabaseMessage(rawMessage)
-	err := data.database.Table(data.tableName).Insert(message).Exec(data.session)
+	err := data.database.Table(data.chatRoomID).Insert(message).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -118,7 +118,7 @@ func (data Data) insertMessage(rawMessage *Message) *DatabaseMessage {
 }
 
 func (data Data) updateMessage(message *DatabaseMessage) {
-	err := data.database.Table(data.tableName).Replace(message).Exec(data.session)
+	err := data.database.Table(data.chatRoomID).Replace(message).Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
