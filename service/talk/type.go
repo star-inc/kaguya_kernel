@@ -7,6 +7,7 @@ type ServiceInterface interface {
 	GetHistoryMessages(*Kernel.Request)
 	GetMessage(*Kernel.Request)
 	SendMessage(*Kernel.Request)
+	CancelSentMessage(*Kernel.Request)
 }
 
 type Message struct {
