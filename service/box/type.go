@@ -23,6 +23,7 @@ import (
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
+	GetHistoryMessagebox(*Kernel.Request)
 	DeleteMessagebox(*Kernel.Request)
 }
 
