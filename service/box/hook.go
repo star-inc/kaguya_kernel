@@ -26,13 +26,14 @@ import (
 
 type Hook struct {
 	Data
+	chatRoomID        string
 	getRelation       func(string) []string
 	metadataGenerator func(*talk.DatabaseMessage) string
 }
 
 func NewHook(
 	config Kernel.RethinkConfig,
-	listenerID string,
+	chatRoomID string,
 	getRelation func(string) []string,
 	metadataGenerator func(*talk.DatabaseMessage) string,
 ) *Hook {
@@ -43,7 +44,7 @@ func NewHook(
 		log.Panicln(err)
 	}
 	hook.database = Rethink.DB(config.DatabaseName)
-	hook.listenerID = listenerID
+	hook.chatRoomID = chatRoomID
 	hook.getRelation = getRelation
 	hook.metadataGenerator = metadataGenerator
 	return hook
@@ -51,11 +52,11 @@ func NewHook(
 
 func (hook *Hook) handler(message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
-	messagebox.Target = hook.listenerID
+	messagebox.Target = hook.chatRoomID
 	messagebox.Origin = message.Message.Origin
 	messagebox.CreatedTime = message.CreatedTime
 	messagebox.Metadata = hook.metadataGenerator(message)
-	for _, relationID := range hook.getRelation(hook.listenerID) {
+	for _, relationID := range hook.getRelation(hook.chatRoomID) {
 		hook.replaceMessagebox(relationID, messagebox)
 	}
 }

@@ -18,10 +18,12 @@ Package KaguyaKernel: The kernel for Kaguya
 package talk
 
 import (
+	"fmt"
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	"log"
 	"strings"
+	"time"
 )
 
 const (
@@ -99,8 +101,9 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	service.sendMessageHook(savedMessage)
 }
 
-func (service *Service) CancelSendMessage(request *Kernel.Request) {
+func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	message := service.data.getMessage((request.Data).(string))
+	message.Message.Content = fmt.Sprint(time.Now().UnixNano())
 	message.Canceled = true
 	service.data.updateMessage(message)
 }
