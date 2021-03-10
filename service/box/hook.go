@@ -65,12 +65,14 @@ func (hook *Hook) Trigger(message *talk.DatabaseMessage) {
 			hook.messageboxNotFoundHandler(relationID) {
 			continue
 		}
-		hook.replaceMessagebox(relationID, messagebox)
+		hook.newMessagebox(relationID, messagebox)
 	}
 }
 
 func (hook Hook) checkMessagebox(relationID string) bool {
-	cursor, err := hook.database.TableList().Contains(relationID).Run(hook.session)
+	cursor, err := hook.database.TableList().
+		Contains(relationID).
+		Run(hook.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -82,8 +84,15 @@ func (hook Hook) checkMessagebox(relationID string) bool {
 	return status
 }
 
-func (hook Hook) replaceMessagebox(relationID string, messagebox *Messagebox) {
-	err := hook.database.Table(relationID).Replace(messagebox).Exec(hook.session)
+func (hook Hook) newMessagebox(relationID string, messagebox *Messagebox) {
+	err := hook.database.Table(relationID).
+		Insert(
+			messagebox,
+			Rethink.InsertOpts{
+				Conflict: "update",
+			},
+		).
+		Exec(hook.session)
 	if err != nil {
 		log.Panicln(err)
 	}
