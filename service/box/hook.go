@@ -63,7 +63,7 @@ func (hook *Hook) Trigger(message *talk.DatabaseMessage) {
 	for _, relationID := range hook.getRelation(hook.chatRoomID) {
 		if !hook.checkMessagebox(relationID) &&
 			hook.messageboxNotFoundHandler(relationID) {
-			return
+			continue
 		}
 		hook.replaceMessagebox(relationID, messagebox)
 	}
