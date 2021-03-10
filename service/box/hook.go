@@ -25,10 +25,12 @@ import (
 )
 
 type Hook struct {
-	Data
-	chatRoomID        string
-	getRelation       func(string) []string
-	metadataGenerator func(*talk.DatabaseMessage) string
+	session                   *Rethink.Session
+	database                  Rethink.Term
+	chatRoomID                string
+	getRelation               func(string) []string
+	metadataGenerator         func(*talk.DatabaseMessage) string
+	messageboxNotFoundHandler func(string) bool
 }
 
 func NewHook(
@@ -36,6 +38,7 @@ func NewHook(
 	chatRoomID string,
 	getRelation func(string) []string,
 	metadataGenerator func(*talk.DatabaseMessage) string,
+	messageboxNotFoundHandler func(string) bool,
 ) *Hook {
 	var err error
 	hook := new(Hook)
@@ -47,6 +50,7 @@ func NewHook(
 	hook.chatRoomID = chatRoomID
 	hook.getRelation = getRelation
 	hook.metadataGenerator = metadataGenerator
+	hook.messageboxNotFoundHandler = messageboxNotFoundHandler
 	return hook
 }
 
@@ -57,8 +61,25 @@ func (hook *Hook) Trigger(message *talk.DatabaseMessage) {
 	messagebox.CreatedTime = message.CreatedTime
 	messagebox.Metadata = hook.metadataGenerator(message)
 	for _, relationID := range hook.getRelation(hook.chatRoomID) {
+		if !hook.checkMessagebox(relationID) &&
+			hook.messageboxNotFoundHandler(relationID) {
+			return
+		}
 		hook.replaceMessagebox(relationID, messagebox)
 	}
+}
+
+func (hook Hook) checkMessagebox(relationID string) bool {
+	cursor, err := hook.database.TableList().Contains(relationID).Run(hook.session)
+	if err != nil {
+		log.Panicln(err)
+	}
+	var status bool
+	err = cursor.One(&status)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return status
 }
 
 func (hook Hook) replaceMessagebox(relationID string, messagebox *Messagebox) {
