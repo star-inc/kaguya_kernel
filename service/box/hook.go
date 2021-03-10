@@ -50,7 +50,7 @@ func NewHook(
 	return hook
 }
 
-func (hook *Hook) handler(message *talk.DatabaseMessage) {
+func (hook *Hook) Trigger(message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
 	messagebox.Target = hook.chatRoomID
 	messagebox.Origin = message.Message.Origin
