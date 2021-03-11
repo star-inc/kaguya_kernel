@@ -18,23 +18,23 @@ Package KaguyaKernel: The kernel for Kaguya
 package KaguyaKernel
 
 type Request struct {
-	Type string      `json:"type"`
 	Data interface{} `json:"data"`
+	Type string      `json:"type"`
 }
 
 type Response struct {
-	Timestamp int64       `json:"timestamp"`
 	Data      interface{} `json:"data"`
 	Signature string      `json:"signature"`
+	Timestamp int64       `json:"timestamp"`
 }
 
 type ErrorReport struct {
-	Timestamp int64  `json:"timestamp"`
 	Error     string `json:"error"`
+	Timestamp int64  `json:"timestamp"`
 }
 
 type Signature struct {
-	Timestamp int64       `json:"timestamp"`
 	Data      interface{} `json:"data"`
 	Salt      string      `json:"salt"`
+	Timestamp int64       `json:"timestamp"`
 }
