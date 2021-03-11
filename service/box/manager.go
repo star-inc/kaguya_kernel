@@ -15,7 +15,7 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package talk
+package box
 
 import (
 	Kernel "github.com/star-inc/kaguya_kernel"
@@ -27,7 +27,7 @@ type Manager struct {
 	Data
 }
 
-func NewManager(config Kernel.RethinkConfig, chatRoomID string) *Manager {
+func NewManager(config Kernel.RethinkConfig, listenerID string) *Manager {
 	var err error
 	manager := new(Manager)
 	manager.session, err = Rethink.Connect(config.ConnectConfig)
@@ -35,13 +35,13 @@ func NewManager(config Kernel.RethinkConfig, chatRoomID string) *Manager {
 		log.Panicln(err)
 	}
 	manager.database = Rethink.DB(config.DatabaseName)
-	manager.chatRoomID = chatRoomID
+	manager.listenerID = listenerID
 	return manager
 }
 
 func (manager *Manager) Check() bool {
 	cursor, err := manager.database.TableList().
-		Contains(manager.chatRoomID).
+		Contains(manager.listenerID).
 		Run(manager.session)
 	if err != nil {
 		log.Panicln(err)
@@ -56,8 +56,8 @@ func (manager *Manager) Check() bool {
 
 func (manager *Manager) Create() bool {
 	err := manager.database.TableCreate(
-		manager.chatRoomID,
-		Rethink.TableCreateOpts{PrimaryKey: "id"},
+		manager.listenerID,
+		Rethink.TableCreateOpts{PrimaryKey: "target"},
 	).
 		IndexCreate("origin").
 		IndexCreate("createdTime").
@@ -70,7 +70,7 @@ func (manager *Manager) Create() bool {
 
 func (manager *Manager) Drop() bool {
 	err := manager.database.
-		TableDrop(manager.chatRoomID).
+		TableDrop(manager.listenerID).
 		Exec(manager.session)
 	if err != nil {
 		return false

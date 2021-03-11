@@ -18,10 +18,12 @@ Package KaguyaKernel: The kernel for Kaguya
 package talk
 
 import (
+	"fmt"
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	"log"
 	"strings"
+	"time"
 )
 
 const (
@@ -33,22 +35,25 @@ const (
 type Service struct {
 	Kernel.Service
 	data             *Data
-	contentValidator func(contentType int, content string) bool
+	contentValidator func(int, string) bool
+	sendMessageHook  func(*DatabaseMessage)
 }
 
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
-	tableName string,
+	chatRoomID string,
 	contentValidator func(int, string) bool,
+	sendMessageHook func(*DatabaseMessage),
 ) ServiceInterface {
 	service := new(Service)
-	service.data = newData(dbConfig, tableName)
+	service.data = newData(dbConfig, chatRoomID)
 	service.contentValidator = contentValidator
+	service.sendMessageHook = sendMessageHook
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission(service.data.tableName) {
+	if !service.GetGuard().Permission(service.data.chatRoomID) {
 		return false
 	}
 	return true
@@ -59,8 +64,11 @@ func (service *Service) Fetch() {
 }
 
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
-	data := request.Data.(map[string]int)
-	messages := service.data.getHistoryMessages(data["timestamp"], data["count"])
+	data := request.Data.(map[string]interface{})
+	messages := service.data.getHistoryMessages(
+		int(data["timestamp"].(float64)),
+		int(data["count"].(float64)),
+	)
 	service.GetSession().Response(messages)
 }
 
@@ -89,5 +97,13 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 		return
 	}
 	message.Origin = service.GetGuard().Me()
-	service.data.saveMessage(message)
+	savedMessage := service.data.insertMessage(message)
+	service.sendMessageHook(savedMessage)
+}
+
+func (service *Service) CancelSentMessage(request *Kernel.Request) {
+	message := service.data.getMessage((request.Data).(string))
+	message.Message.Content = fmt.Sprint(time.Now().UnixNano())
+	message.Canceled = true
+	service.data.updateMessage(message)
 }

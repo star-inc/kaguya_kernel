@@ -15,23 +15,21 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package talk
+package box
 
 import (
-	"github.com/google/uuid"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 	"log"
-	"time"
 )
 
 type Data struct {
 	session    *Rethink.Session
 	database   Rethink.Term
-	chatRoomID string
+	listenerID string
 }
 
-func newData(config Kernel.RethinkConfig, chatRoomID string) *Data {
+func newData(config Kernel.RethinkConfig, listenerID string) *Data {
 	var err error
 	data := new(Data)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
@@ -39,21 +37,12 @@ func newData(config Kernel.RethinkConfig, chatRoomID string) *Data {
 		log.Panicln(err)
 	}
 	data.database = Rethink.DB(config.DatabaseName)
-	data.chatRoomID = chatRoomID
+	data.listenerID = listenerID
 	return data
 }
 
-func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
-	dbMessage := new(DatabaseMessage)
-	dbMessage.UUID = uuid.New().String()
-	dbMessage.CreatedTime = time.Now().UnixNano()
-	dbMessage.Message = rawMessage
-	dbMessage.Canceled = false
-	return dbMessage
-}
-
 func (data *Data) fetchMessage(session *Kernel.Session) {
-	cursor, err := data.database.Table(data.chatRoomID).Changes().Run(data.session)
+	cursor, err := data.database.Table(data.listenerID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -70,9 +59,9 @@ func (data *Data) fetchMessage(session *Kernel.Session) {
 	}
 }
 
-func (data *Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {
-	messages := new([]DatabaseMessage)
-	cursor, err := data.database.Table(data.chatRoomID).
+func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]Messagebox {
+	messages := new([]Messagebox)
+	cursor, err := data.database.Table(data.listenerID).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
 		Limit(count).
@@ -91,9 +80,9 @@ func (data *Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessag
 	return messages
 }
 
-func (data *Data) getMessage(messageID string) *DatabaseMessage {
-	message := new(DatabaseMessage)
-	cursor, err := data.database.Table(data.chatRoomID).Get(messageID).Run(data.session)
+func (data *Data) getMessagebox(target string) *Messagebox {
+	messagebox := new(Messagebox)
+	cursor, err := data.database.Table(data.listenerID).Get(target).Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -101,24 +90,15 @@ func (data *Data) getMessage(messageID string) *DatabaseMessage {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	err = cursor.One(message)
+	err = cursor.One(messagebox)
 	if err != nil {
 		log.Panicln(err)
 	}
-	return message
+	return messagebox
 }
 
-func (data *Data) insertMessage(rawMessage *Message) *DatabaseMessage {
-	message := newDatabaseMessage(rawMessage)
-	err := data.database.Table(data.chatRoomID).Insert(message).Exec(data.session)
-	if err != nil {
-		log.Panicln(err)
-	}
-	return message
-}
-
-func (data *Data) updateMessage(message *DatabaseMessage) {
-	err := data.database.Table(data.chatRoomID).Replace(message).Exec(data.session)
+func (data *Data) deleteMessagebox(target string) {
+	err := data.database.Table(data.listenerID).Get(target).Delete().Exec(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
