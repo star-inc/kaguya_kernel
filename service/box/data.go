@@ -63,7 +63,7 @@ func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]Messagebox {
 	messages := new([]Messagebox)
 	cursor, err := data.database.Table(data.listenerID).
 		OrderBy(Rethink.Desc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
+		Filter(Rethink.Row.Field("createdTime").Le(timestamp)).
 		Limit(count).
 		Run(data.session)
 	if err != nil {
