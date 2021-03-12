@@ -54,7 +54,7 @@ func (service *Service) GetHistoryMessagebox(request *Kernel.Request) {
 		int(data["count"].(float64)),
 	)
 	sort.Slice(messages, func(i, j int) bool {
-		return (messages)[i].CreatedTime < (messages)[j].CreatedTime
+		return (messages)[i].CreatedTime > (messages)[j].CreatedTime
 	})
 	service.GetSession().Response(messages)
 }
