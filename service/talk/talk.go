@@ -22,6 +22,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	"log"
+	"sort"
 	"strings"
 	"time"
 )
@@ -69,6 +70,9 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 		int(data["timestamp"].(float64)),
 		int(data["count"].(float64)),
 	)
+	sort.Slice(messages, func(i, j int) bool {
+		return (*messages)[i].CreatedTime < (*messages)[j].CreatedTime
+	})
 	service.GetSession().Response(messages)
 }
 

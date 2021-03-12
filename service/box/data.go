@@ -62,8 +62,8 @@ func (data *Data) fetchMessage(session *Kernel.Session) {
 func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]Messagebox {
 	messages := new([]Messagebox)
 	cursor, err := data.database.Table(data.listenerID).
-		OrderBy(Rethink.Asc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Ge(timestamp)).
+		OrderBy(Rethink.Desc("createdTime")).
+		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
 		Limit(count).
 		Run(data.session)
 	if err != nil {
