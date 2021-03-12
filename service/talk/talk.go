@@ -107,6 +107,9 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	message := service.data.getMessage((request.Data).(string))
+	if message.Message.Origin != service.GetGuard().Me() {
+		service.GetSession().RaiseError(Kernel.ErrorForbidden)
+	}
 	message.Message.Content = fmt.Sprint(time.Now().UnixNano())
 	message.Canceled = true
 	service.data.updateMessage(message)
