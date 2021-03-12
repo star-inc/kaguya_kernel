@@ -109,6 +109,7 @@ func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	message := service.data.getMessage((request.Data).(string))
 	if message.Message.Origin != service.GetGuard().Me() {
 		service.GetSession().RaiseError(Kernel.ErrorForbidden)
+		return
 	}
 	message.Message.Content = fmt.Sprint(time.Now().UnixNano())
 	message.Canceled = true
