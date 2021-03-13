@@ -74,7 +74,7 @@ func (data *Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessag
 	messages := new([]DatabaseMessage)
 	cursor, err := data.database.Table(data.chatRoomID).
 		OrderBy(Rethink.Desc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Le(timestamp)).
+		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
 		Limit(count).
 		Run(data.session)
 	if err != nil {
