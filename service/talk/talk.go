@@ -45,11 +45,13 @@ func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
 	chatRoomID string,
 	contentValidator func(int, string) bool,
+	readMessagesHook func(*DatabaseMessage),
 	sendMessageHook func(*DatabaseMessage),
 ) ServiceInterface {
 	service := new(Service)
 	service.data = newData(dbConfig, chatRoomID)
 	service.contentValidator = contentValidator
+	service.readMessagesHook = readMessagesHook
 	service.sendMessageHook = sendMessageHook
 	return service
 }
