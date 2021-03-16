@@ -52,7 +52,7 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 	return dbMessage
 }
 
-func (data *Data) fetchMessage(session *Kernel.Session) {
+func (data *Data) fetchMessage() *Rethink.Cursor {
 	cursor, err := data.database.Table(data.chatRoomID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)
@@ -61,13 +61,7 @@ func (data *Data) fetchMessage(session *Kernel.Session) {
 		err := cursor.Close()
 		log.Println(err)
 	}()
-	var row interface{}
-	for cursor.Next(&row) {
-		session.Response(row)
-	}
-	if err := cursor.Err(); err != nil {
-		session.RaiseError(err.Error())
-	}
+	return cursor
 }
 
 func (data *Data) getHistoryMessages(timestamp int, count int) *[]DatabaseMessage {

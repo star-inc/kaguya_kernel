@@ -44,7 +44,7 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch() {
-	service.data.fetchMessage(service.GetSession())
+	service.data.fetchMessagebox(service.GetSession())
 }
 
 func (service *Service) GetHistoryMessagebox(request *Kernel.Request) {

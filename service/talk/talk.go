@@ -37,6 +37,7 @@ type Service struct {
 	Kernel.Service
 	data             *Data
 	contentValidator func(int, string) bool
+	readMessagesHook func(*DatabaseMessage)
 	sendMessageHook  func(*DatabaseMessage)
 }
 
@@ -61,7 +62,18 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch() {
-	service.data.fetchMessage(service.GetSession())
+	cursor := service.data.fetchMessage()
+	var row interface{}
+	for cursor.Next(&row) {
+		service.GetSession().Response(row)
+		message := row.(map[string]interface{})
+		service.readMessagesHook(
+			message["new_val"].(*DatabaseMessage),
+		)
+	}
+	if err := cursor.Err(); err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
@@ -73,6 +85,9 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime < (messages)[j].CreatedTime
 	})
+	if messages != nil {
+		service.readMessagesHook(&messages[len(messages)-1])
+	}
 	service.GetSession().Response(messages)
 }
 

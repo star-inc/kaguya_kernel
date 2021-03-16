@@ -41,7 +41,7 @@ func newData(config Kernel.RethinkConfig, listenerID string) *Data {
 	return data
 }
 
-func (data *Data) fetchMessage(session *Kernel.Session) {
+func (data *Data) fetchMessagebox(session *Kernel.Session) {
 	cursor, err := data.database.Table(data.listenerID).Changes().Run(data.session)
 	if err != nil {
 		log.Panicln(err)

@@ -54,24 +54,37 @@ func NewHook(
 	return hook
 }
 
-func (hook *Hook) Trigger(message *talk.DatabaseMessage) {
+func (hook *Hook) MessageTrigger(message *talk.DatabaseMessage) {
 	messagebox := new(Messagebox)
 	messagebox.Target = hook.chatRoomID
 	messagebox.Origin = message.Message.Origin
 	messagebox.CreatedTime = message.CreatedTime
 	messagebox.Metadata = hook.metadataGenerator(message)
-	for _, relationID := range hook.getRelation(hook.chatRoomID) {
-		if !hook.checkMessagebox(relationID) &&
-			hook.messageboxNotFoundHandler(relationID) {
+	for _, relatedID := range hook.getRelation(hook.chatRoomID) {
+		if !hook.checkMessagebox(relatedID) &&
+			hook.messageboxNotFoundHandler(relatedID) {
 			continue
 		}
-		hook.newMessagebox(relationID, messagebox)
+		hook.newMessagebox(relatedID, messagebox)
 	}
 }
 
-func (hook Hook) checkMessagebox(relationID string) bool {
+func (hook *Hook) SeenTrigger(timestamp int64) {
+	messagebox := new(Messagebox)
+	messagebox.Target = hook.chatRoomID
+	messagebox.LastSeenTime = timestamp
+	for _, relatedID := range hook.getRelation(hook.chatRoomID) {
+		if !hook.checkMessagebox(relatedID) &&
+			hook.messageboxNotFoundHandler(relatedID) {
+			continue
+		}
+		hook.newMessagebox(relatedID, messagebox)
+	}
+}
+
+func (hook Hook) checkMessagebox(relatedID string) bool {
 	cursor, err := hook.database.TableList().
-		Contains(relationID).
+		Contains(relatedID).
 		Run(hook.session)
 	if err != nil {
 		log.Panicln(err)
@@ -84,8 +97,8 @@ func (hook Hook) checkMessagebox(relationID string) bool {
 	return status
 }
 
-func (hook Hook) newMessagebox(relationID string, messagebox *Messagebox) {
-	err := hook.database.Table(relationID).
+func (hook Hook) newMessagebox(relatedID string, messagebox *Messagebox) {
+	err := hook.database.Table(relatedID).
 		Insert(
 			messagebox,
 			Rethink.InsertOpts{

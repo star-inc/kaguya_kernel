@@ -28,8 +28,9 @@ type ServiceInterface interface {
 }
 
 type Messagebox struct {
-	CreatedTime int64  `rethinkdb:"createdTime" json:"createdTime"`
-	Metadata    string `rethinkdb:"metadata" json:"metadata"`
-	Origin      string `rethinkdb:"origin" json:"origin"`
-	Target      string `rethinkdb:"target" json:"target"`
+	CreatedTime  int64  `rethinkdb:"createdTime" json:"createdTime"`
+	LastSeenTime int64  `rethinkdb:"lastSeenTime" json:"lastSeenTime"`
+	Metadata     string `rethinkdb:"metadata" json:"metadata"`
+	Origin       string `rethinkdb:"origin" json:"origin"`
+	Target       string `rethinkdb:"target" json:"target"`
 }
