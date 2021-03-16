@@ -59,8 +59,8 @@ func (data *Data) fetchMessagebox(session *Kernel.Session) {
 	}
 }
 
-func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]Messagebox {
-	messages := new([]Messagebox)
+func (data *Data) getHistoryMessagebox(timestamp int, count int) *[]SyncedMessagebox {
+	messages := new([]SyncedMessagebox)
 	cursor, err := data.database.Table(data.listenerID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).

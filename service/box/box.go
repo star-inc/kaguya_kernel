@@ -25,14 +25,17 @@ import (
 type Service struct {
 	Kernel.Service
 	data *Data
+	seen *Seen
 }
 
 func NewServiceInterface(
-	dbConfig Kernel.RethinkConfig,
+	messageBoxConfig Kernel.RethinkConfig,
+	messageDbConfig Kernel.RethinkConfig,
 	listenerID string,
 ) ServiceInterface {
 	service := new(Service)
-	service.data = newData(dbConfig, listenerID)
+	service.data = newData(messageBoxConfig, listenerID)
+	service.seen = newSeen(messageDbConfig)
 	return service
 }
 
@@ -47,12 +50,18 @@ func (service *Service) Fetch() {
 	service.data.fetchMessagebox(service.GetSession())
 }
 
-func (service *Service) GetHistoryMessagebox(request *Kernel.Request) {
+func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	data := request.Data.(map[string]interface{})
 	messages := *service.data.getHistoryMessagebox(
 		int(data["timestamp"].(float64)),
 		int(data["count"].(float64)),
 	)
+	for _, message := range messages {
+		message.UnreadCount = service.seen.countUnreadMessages(
+			message.Target,
+			message.LastSeen,
+		)
+	}
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime > (messages)[j].CreatedTime
 	})
