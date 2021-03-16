@@ -69,10 +69,10 @@ func (hook *Hook) MessageTrigger(message *talk.DatabaseMessage) {
 	}
 }
 
-func (hook *Hook) SeenTrigger(timestamp int64) {
+func (hook *Hook) SeenTrigger(messageID string) {
 	messagebox := new(Messagebox)
 	messagebox.Target = hook.chatRoomID
-	messagebox.LastSeenTime = timestamp
+	messagebox.LastSeenMessageID = messageID
 	for _, relatedID := range hook.getRelation(hook.chatRoomID) {
 		if !hook.checkMessagebox(relatedID) &&
 			hook.messageboxNotFoundHandler(relatedID) {
