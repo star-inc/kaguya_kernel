@@ -27,7 +27,7 @@ type Seen struct {
 	Data
 }
 
-func newSeen(config Kernel.RethinkConfig) *Seen {
+func NewSeen(config Kernel.RethinkConfig) *Seen {
 	var err error
 	data := new(Seen)
 	data.session, err = Rethink.Connect(config.ConnectConfig)
@@ -38,7 +38,7 @@ func newSeen(config Kernel.RethinkConfig) *Seen {
 	return data
 }
 
-func (data *Seen) countUnreadMessages(chatRoomID string, timestamp int64) int {
+func (data *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
 	cursor, err := data.database.Table(chatRoomID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).

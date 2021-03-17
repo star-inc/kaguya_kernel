@@ -24,18 +24,18 @@ import (
 
 type Service struct {
 	Kernel.Service
-	data *Data
-	seen *Seen
+	data              *Data
+	extraDataAssigner func(*SyncedMessagebox)
 }
 
 func NewServiceInterface(
 	messageBoxConfig Kernel.RethinkConfig,
-	messageDbConfig Kernel.RethinkConfig,
+	extraDataAssigner func(*SyncedMessagebox),
 	listenerID string,
 ) ServiceInterface {
 	service := new(Service)
 	service.data = newData(messageBoxConfig, listenerID)
-	service.seen = newSeen(messageDbConfig)
+	service.extraDataAssigner = extraDataAssigner
 	return service
 }
 
@@ -52,15 +52,12 @@ func (service *Service) Fetch() {
 
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	data := request.Data.(map[string]interface{})
-	messages := *service.data.getHistoryMessagebox(
+	messages := service.data.getHistoryMessagebox(
 		int(data["timestamp"].(float64)),
 		int(data["count"].(float64)),
 	)
 	for _, message := range messages {
-		message.UnreadCount = service.seen.countUnreadMessages(
-			message.Target,
-			message.LastSeen,
-		)
+		service.extraDataAssigner(&message)
 	}
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime > (messages)[j].CreatedTime
