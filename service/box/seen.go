@@ -29,21 +29,21 @@ type Seen struct {
 
 func NewSeen(config Kernel.RethinkConfig) *Seen {
 	var err error
-	data := new(Seen)
-	data.session, err = Rethink.Connect(config.ConnectConfig)
+	seen := new(Seen)
+	seen.session, err = Rethink.Connect(config.ConnectConfig)
 	if err != nil {
 		log.Panicln(err)
 	}
-	data.database = Rethink.DB(config.DatabaseName)
-	return data
+	seen.database = Rethink.DB(config.DatabaseName)
+	return seen
 }
 
-func (data *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
-	cursor, err := data.database.Table(chatRoomID).
+func (seen *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
+	cursor, err := seen.database.Table(chatRoomID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
 		Count().
-		Run(data.session)
+		Run(seen.session)
 	if err != nil {
 		log.Panicln(err)
 	}
