@@ -41,7 +41,7 @@ func NewSeen(config Kernel.RethinkConfig) *Seen {
 func (seen *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
 	cursor, err := seen.database.Table(chatRoomID).
 		OrderBy(Rethink.Desc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
+		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
 		Count().
 		Run(seen.session)
 	if err != nil {
