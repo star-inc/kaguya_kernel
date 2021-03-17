@@ -29,7 +29,7 @@ type ServiceInterface interface {
 
 type SyncMessagebox struct {
 	Messagebox
-	Extradata interface{} `json:"extradata"`
+	ExtraData interface{} `json:"extradata"`
 }
 
 type Messagebox struct {
