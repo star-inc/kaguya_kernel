@@ -72,10 +72,14 @@ func (service *Service) Fetch() {
 	var row interface{}
 	for cursor.Next(&row) {
 		service.GetSession().Response(row)
-		message := row.(map[string]interface{})
-		service.readMessagesHook(
-			message["new_val"].(*DatabaseMessage),
-		)
+		row := row.(map[string]interface{})
+		message := new(DatabaseMessage)
+		err := mapstructure.Decode(row["new_val"], message)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		service.readMessagesHook(message)
 	}
 	if err := cursor.Err(); err != nil {
 		service.GetSession().RaiseError(err.Error())
