@@ -29,7 +29,7 @@ type Hook struct {
 	database                  Rethink.Term
 	chatRoomID                string
 	getRelation               func(string) []string
-	metadataGenerator         func(*talk.DatabaseMessage) string
+	metadataGenerator         func(*talk.DatabaseMessage) interface{}
 	messageboxNotFoundHandler func(string) bool
 }
 
@@ -37,7 +37,7 @@ func NewHook(
 	config Kernel.RethinkConfig,
 	chatRoomID string,
 	getRelation func(string) []string,
-	metadataGenerator func(*talk.DatabaseMessage) string,
+	metadataGenerator func(*talk.DatabaseMessage) interface{},
 	messageboxNotFoundHandler func(string) bool,
 ) *Hook {
 	var err error

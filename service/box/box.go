@@ -25,12 +25,12 @@ import (
 type Service struct {
 	Kernel.Service
 	data              *Data
-	extraDataAssigner func(*SyncedMessagebox)
+	extraDataAssigner func(Messagebox, *interface{})
 }
 
 func NewServiceInterface(
 	messageBoxConfig Kernel.RethinkConfig,
-	extraDataAssigner func(*SyncedMessagebox),
+	extraDataAssigner func(Messagebox, *interface{}),
 	listenerID string,
 ) ServiceInterface {
 	service := new(Service)
@@ -57,7 +57,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 		int(data["count"].(float64)),
 	)
 	for _, message := range messages {
-		service.extraDataAssigner(&message)
+		service.extraDataAssigner(message, &message.Extradata)
 	}
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime > (messages)[j].CreatedTime

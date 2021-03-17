@@ -28,14 +28,10 @@ type ServiceInterface interface {
 }
 
 type Messagebox struct {
-	CreatedTime int64  `rethinkdb:"createdTime" json:"createdTime"`
-	LastSeen    int64  `rethinkdb:"lastSeen" json:"lastSeen"`
-	Metadata    string `rethinkdb:"metadata" json:"metadata"`
-	Origin      string `rethinkdb:"origin" json:"origin"`
-	Target      string `rethinkdb:"target" json:"target"`
-}
-
-type SyncedMessagebox struct {
-	Messagebox
-	UnreadCount int `json:"unreadCount"`
+	CreatedTime int64       `rethinkdb:"createdTime" json:"createdTime"`
+	Extradata   interface{} `rethinkdb:"extradata" json:"extradata"`
+	LastSeen    int64       `rethinkdb:"lastSeen" json:"lastSeen"`
+	Metadata    interface{} `rethinkdb:"metadata" json:"metadata"`
+	Origin      string      `rethinkdb:"origin" json:"origin"`
+	Target      string      `rethinkdb:"target" json:"target"`
 }
