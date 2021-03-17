@@ -39,3 +39,8 @@ type Messagebox struct {
 	Origin      string      `rethinkdb:"origin" json:"origin"`
 	Target      string      `rethinkdb:"target" json:"target"`
 }
+
+type MessageboxForUpdateSeen struct {
+	LastSeen int64  `rethinkdb:"lastSeen" json:"lastSeen"`
+	Target   string `rethinkdb:"target" json:"target"`
+}

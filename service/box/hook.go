@@ -70,7 +70,7 @@ func (hook *Hook) MessageTrigger(message *talk.DatabaseMessage) {
 }
 
 func (hook *Hook) SeenTrigger(message *talk.DatabaseMessage) {
-	messagebox := new(Messagebox)
+	messagebox := new(MessageboxForUpdateSeen)
 	messagebox.Target = hook.chatRoomID
 	messagebox.LastSeen = message.CreatedTime
 	for _, relatedID := range hook.getRelation(hook.chatRoomID) {
@@ -78,7 +78,7 @@ func (hook *Hook) SeenTrigger(message *talk.DatabaseMessage) {
 			hook.messageboxNotFoundHandler(relatedID) {
 			continue
 		}
-		hook.newMessagebox(relatedID, messagebox)
+		hook.updateSeen(relatedID, messagebox)
 	}
 }
 
@@ -98,6 +98,20 @@ func (hook Hook) checkMessagebox(relatedID string) bool {
 }
 
 func (hook Hook) newMessagebox(relatedID string, messagebox *Messagebox) {
+	err := hook.database.Table(relatedID).
+		Insert(
+			messagebox,
+			Rethink.InsertOpts{
+				Conflict: "update",
+			},
+		).
+		Exec(hook.session)
+	if err != nil {
+		log.Panicln(err)
+	}
+}
+
+func (hook Hook) updateSeen(relatedID string, messagebox *MessageboxForUpdateSeen) {
 	err := hook.database.Table(relatedID).
 		Insert(
 			messagebox,
