@@ -25,12 +25,12 @@ import (
 type Service struct {
 	Kernel.Service
 	data                  *Data
-	syncExtraDataAssigner func(SyncMessagebox) *interface{}
+	syncExtraDataAssigner func(SyncMessagebox) interface{}
 }
 
 func NewServiceInterface(
 	messageBoxConfig Kernel.RethinkConfig,
-	syncExtraDataAssigner func(SyncMessagebox) *interface{},
+	syncExtraDataAssigner func(SyncMessagebox) interface{},
 	listenerID string,
 ) ServiceInterface {
 	service := new(Service)
