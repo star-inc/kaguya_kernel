@@ -52,15 +52,13 @@ func newDatabaseMessage(rawMessage *Message) *DatabaseMessage {
 	return dbMessage
 }
 
-func (data *Data) fetchMessage() *Rethink.Cursor {
-	cursor, err := data.database.Table(data.chatRoomID).Changes().Run(data.session)
+func (data *Data) getFetchCursor() *Rethink.Cursor {
+	cursor, err := data.database.Table(data.chatRoomID).
+		Changes().
+		Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
 	return cursor
 }
 

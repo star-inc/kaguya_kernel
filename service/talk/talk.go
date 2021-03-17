@@ -64,7 +64,11 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch() {
-	cursor := service.data.fetchMessage()
+	cursor := service.data.getFetchCursor()
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
 	var row interface{}
 	for cursor.Next(&row) {
 		service.GetSession().Response(row)

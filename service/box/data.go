@@ -41,22 +41,14 @@ func newData(config Kernel.RethinkConfig, listenerID string) *Data {
 	return data
 }
 
-func (data *Data) fetchMessagebox(session *Kernel.Session) {
-	cursor, err := data.database.Table(data.listenerID).Changes().Run(data.session)
+func (data *Data) getFetchCursor() *Rethink.Cursor {
+	cursor, err := data.database.Table(data.listenerID).
+		Changes().
+		Run(data.session)
 	if err != nil {
 		log.Panicln(err)
 	}
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
-	var row interface{}
-	for cursor.Next(&row) {
-		session.Response(row)
-	}
-	if err := cursor.Err(); err != nil {
-		session.RaiseError(err.Error())
-	}
+	return cursor
 }
 
 func (data *Data) getHistoryMessagebox(timestamp int, count int) []SyncMessagebox {

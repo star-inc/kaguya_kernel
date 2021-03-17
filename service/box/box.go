@@ -19,6 +19,7 @@ package box
 
 import (
 	Kernel "github.com/star-inc/kaguya_kernel"
+	"log"
 	"sort"
 )
 
@@ -47,7 +48,18 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch() {
-	service.data.fetchMessagebox(service.GetSession())
+	cursor := service.data.getFetchCursor()
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	var row interface{}
+	for cursor.Next(&row) {
+		service.GetSession().Response(row)
+	}
+	if err := cursor.Err(); err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
