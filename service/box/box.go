@@ -18,6 +18,7 @@ Package KaguyaKernel: The kernel for Kaguya
 package box
 
 import (
+	"context"
 	Kernel "github.com/star-inc/kaguya_kernel"
 	"log"
 	"sort"
@@ -47,7 +48,7 @@ func (service *Service) CheckPermission() bool {
 	return true
 }
 
-func (service *Service) Fetch() {
+func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.data.getFetchCursor()
 	defer func() {
 		err := cursor.Close()
@@ -55,7 +56,13 @@ func (service *Service) Fetch() {
 	}()
 	var row interface{}
 	for cursor.Next(&row) {
-		service.GetSession().Response(row)
+		select {
+		case <-ctx.Done():
+			log.Println("Stop Fetching")
+			return
+		default:
+			service.GetSession().Response(row)
+		}
 	}
 	if err := cursor.Err(); err != nil {
 		service.GetSession().RaiseError(err.Error())

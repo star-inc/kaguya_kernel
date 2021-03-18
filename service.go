@@ -18,6 +18,7 @@ Package KaguyaKernel: The kernel for Kaguya
 package KaguyaKernel
 
 import (
+	"context"
 	"reflect"
 )
 
@@ -27,7 +28,7 @@ type Service struct {
 }
 
 type ServiceInterface interface {
-	Fetch()
+	Fetch(context.Context)
 	CheckPermission() bool
 	GetGuard() AuthorizeInterface
 	SetGuard(authorization AuthorizeInterface)

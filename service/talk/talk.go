@@ -18,6 +18,7 @@ Package KaguyaKernel: The kernel for Kaguya
 package talk
 
 import (
+	"context"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
@@ -63,7 +64,7 @@ func (service *Service) CheckPermission() bool {
 	return true
 }
 
-func (service *Service) Fetch() {
+func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.data.getFetchCursor()
 	defer func() {
 		err := cursor.Close()
@@ -71,15 +72,21 @@ func (service *Service) Fetch() {
 	}()
 	var row interface{}
 	for cursor.Next(&row) {
-		service.GetSession().Response(row)
-		row := row.(map[string]interface{})
-		message := new(DatabaseMessage)
-		err := mapstructure.Decode(row["new_val"], message)
-		if err != nil {
-			log.Println(err)
+		select {
+		case <-ctx.Done():
+			log.Println("Stop Fetching")
 			return
+		default:
+			service.GetSession().Response(row)
+			row := row.(map[string]interface{})
+			message := new(DatabaseMessage)
+			err := mapstructure.Decode(row["new_val"], message)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			service.readMessagesHook(message)
 		}
-		service.readMessagesHook(message)
 	}
 	if err := cursor.Err(); err != nil {
 		service.GetSession().RaiseError(err.Error())

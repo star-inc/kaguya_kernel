@@ -18,6 +18,7 @@ Package KaguyaKernel: The kernel for Kaguya
 package KaguyaKernel
 
 import (
+	"context"
 	"encoding/json"
 	"gopkg.in/olahol/melody.v1"
 	"log"
@@ -31,6 +32,7 @@ const (
 
 func Run(service ServiceInterface, guard AuthorizeInterface, requestSalt string) *melody.Melody {
 	worker := melody.New()
+	ctx, cancel := context.WithCancel(context.Background())
 	worker.HandleConnect(func(socketSession *melody.Session) {
 		service.SetSession(NewSession(socketSession, requestSalt))
 		service.SetGuard(guard)
@@ -44,7 +46,7 @@ func Run(service ServiceInterface, guard AuthorizeInterface, requestSalt string)
 			service.GetSession().RaiseError(ErrorForbidden)
 			return
 		}
-		go service.Fetch()
+		go service.Fetch(ctx)
 	})
 	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
 		request := new(Request)
@@ -61,6 +63,9 @@ func Run(service ServiceInterface, guard AuthorizeInterface, requestSalt string)
 		if method.IsValid() {
 			method.Call([]reflect.Value{reflect.ValueOf(request)})
 		}
+	})
+	worker.HandleDisconnect(func(_ *melody.Session) {
+		cancel()
 	})
 	return worker
 }
