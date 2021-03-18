@@ -55,7 +55,7 @@ func NewHook(
 }
 
 func (hook *Hook) MessageTrigger(message *talk.DatabaseMessage) {
-	messagebox := new(Messagebox)
+	messagebox := new(MessageboxForNew)
 	messagebox.Target = hook.chatRoomID
 	messagebox.Origin = message.Message.Origin
 	messagebox.CreatedTime = message.CreatedTime
@@ -95,7 +95,7 @@ func (hook Hook) checkMessagebox(relatedID string) bool {
 	return status
 }
 
-func (hook Hook) newMessagebox(relatedID string, messagebox *Messagebox) {
+func (hook Hook) newMessagebox(relatedID string, messagebox *MessageboxForNew) {
 	err := hook.database.Table(relatedID).
 		Insert(
 			messagebox,
