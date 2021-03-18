@@ -68,8 +68,8 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 		int(data["timestamp"].(float64)),
 		int(data["count"].(float64)),
 	)
-	for _, message := range messages {
-		message.ExtraData = service.syncExtraDataAssigner(message)
+	for i, message := range messages {
+		messages[i].ExtraData = service.syncExtraDataAssigner(message)
 	}
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime > (messages)[j].CreatedTime
