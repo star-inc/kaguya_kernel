@@ -41,13 +41,13 @@ type Messagebox struct {
 }
 
 type MessageboxForNew struct {
-	CreatedTime int64       `rethinkdb:"createdTime" json:"createdTime"`
-	Metadata    interface{} `rethinkdb:"metadata" json:"metadata"`
-	Origin      string      `rethinkdb:"origin" json:"origin"`
-	Target      string      `rethinkdb:"target" json:"target"`
+	CreatedTime int64       `rethinkdb:"createdTime"`
+	Metadata    interface{} `rethinkdb:"metadata"`
+	Origin      string      `rethinkdb:"origin"`
+	Target      string      `rethinkdb:"target"`
 }
 
 type MessageboxForUpdateSeen struct {
-	LastSeen int64  `rethinkdb:"lastSeen" json:"lastSeen"`
-	Target   string `rethinkdb:"target" json:"target"`
+	LastSeen int64  `rethinkdb:"lastSeen"`
+	Target   string `rethinkdb:"target"`
 }
