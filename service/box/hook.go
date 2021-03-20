@@ -80,6 +80,25 @@ func (hook *Hook) SeenTrigger(relatedID string, message *talk.DatabaseMessage) {
 	hook.updateSeen(relatedID, messagebox)
 }
 
+func (hook *Hook) GetMessagebox(relatedID string, target string) *Messagebox {
+	messagebox := new(Messagebox)
+	cursor, err := hook.database.Table(relatedID).
+		Get(target).
+		Run(hook.session)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	err = cursor.One(messagebox)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return messagebox
+}
+
 func (hook Hook) checkMessagebox(relatedID string) bool {
 	cursor, err := hook.database.TableList().
 		Contains(relatedID).
