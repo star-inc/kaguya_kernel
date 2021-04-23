@@ -18,7 +18,10 @@ Package KaguyaKernel: The kernel for Kaguya
 package KaguyaKernel
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"gopkg.in/olahol/melody.v1"
@@ -45,11 +48,18 @@ func NewSession(socketSession *melody.Session, requestSalt string) *Session {
 }
 
 func (session *Session) Response(data interface{}) {
+	// Export as a GZip string with base64
+	dataString, err := json.Marshal(data)
+	if err != nil {
+		session.RaiseError(ErrorJSONEncodingResponse)
+		return
+	}
+	exportData := compress(dataString)
 	// Generate Signature
-	// The json package always orders keys when marshalling, so it's safe.
-	// https://stackoverflow.com/questions/18668652/how-to-produce-json-with-sorted-keys-in-go
+	// Due to the data has been turned into a string,
+	// there will be no JSON ordering problem while doing the verification.
 	signature := new(Signature)
-	signature.Data = data
+	signature.Data = exportData
 	signature.Salt = session.requestSalt
 	signature.Timestamp = time.Now().UnixNano()
 	rawSignatureString, err := json.Marshal(signature)
@@ -60,7 +70,7 @@ func (session *Session) Response(data interface{}) {
 	signatureString := sha256.Sum256(rawSignatureString)
 	// Generate Response
 	response := new(Response)
-	response.Data = signature.Data
+	response.Data = exportData
 	response.Timestamp = signature.Timestamp
 	response.Signature = fmt.Sprintf("%x", signatureString)
 	responseString, err := json.Marshal(response)
@@ -74,6 +84,22 @@ func (session *Session) Response(data interface{}) {
 		log.Println(ErrorSessionClosed)
 		return
 	}
+}
+
+func compress(raw []byte) string {
+	var compressed bytes.Buffer
+	gz := gzip.NewWriter(&compressed)
+	defer func() {
+		if err := gz.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	if _, err := gz.Write(raw); err != nil {
+		panic(err)
+	}
+	return base64.StdEncoding.EncodeToString(
+		compressed.Bytes(),
+	)
 }
 
 func (session *Session) RaiseError(message string) {
