@@ -91,12 +91,13 @@ func (session *Session) Response(data interface{}) {
 func compress(raw []byte) string {
 	var compressed bytes.Buffer
 	gz := gzip.NewWriter(&compressed)
-	defer func() {
-		if err := gz.Close(); err != nil {
-			panic(err)
-		}
-	}()
 	if _, err := gz.Write(raw); err != nil {
+		panic(err)
+	}
+	if err := gz.Flush(); err != nil {
+		panic(err)
+	}
+	if err := gz.Close(); err != nil {
 		panic(err)
 	}
 	return base64.StdEncoding.EncodeToString(
