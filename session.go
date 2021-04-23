@@ -49,17 +49,19 @@ func NewSession(socketSession *melody.Session, requestSalt string) *Session {
 
 func (session *Session) Response(data interface{}) {
 	// Export as a GZip string with base64
-	dataString, err := json.Marshal(data)
-	if err != nil {
-		session.RaiseError(ErrorJSONEncodingResponse)
-		return
+	if data != nil {
+		dataString, err := json.Marshal(data)
+		if err != nil {
+			session.RaiseError(ErrorJSONEncodingResponse)
+			return
+		}
+		data = compress(dataString)
 	}
-	exportData := compress(dataString)
 	// Generate Signature
 	// Due to the data has been turned into a string,
 	// there will be no JSON ordering problem while doing the verification.
 	signature := new(Signature)
-	signature.Data = exportData
+	signature.Data = data
 	signature.Salt = session.requestSalt
 	signature.Timestamp = time.Now().UnixNano()
 	rawSignatureString, err := json.Marshal(signature)
@@ -70,7 +72,7 @@ func (session *Session) Response(data interface{}) {
 	signatureString := sha256.Sum256(rawSignatureString)
 	// Generate Response
 	response := new(Response)
-	response.Data = exportData
+	response.Data = data
 	response.Timestamp = signature.Timestamp
 	response.Signature = fmt.Sprintf("%x", signatureString)
 	responseString, err := json.Marshal(response)
