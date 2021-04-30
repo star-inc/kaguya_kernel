@@ -102,7 +102,7 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	sort.Slice(messages, func(i, j int) bool {
 		return (messages)[i].CreatedTime < (messages)[j].CreatedTime
 	})
-	if messages != nil {
+	if messages != nil && len(messages) != 0 {
 		service.readMessagesHook(&messages[len(messages)-1])
 	}
 	service.GetSession().Response(messages)
