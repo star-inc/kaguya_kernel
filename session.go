@@ -55,7 +55,7 @@ func (session *Session) Response(data interface{}) {
 		session.RaiseError(ErrorJSONEncodingResponseData)
 		return
 	}
-	if dataString != "null" {
+	if dataString != []byte("null") {
 		data = compress(dataString)
 	}
 	// Generate Signature
