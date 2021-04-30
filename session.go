@@ -30,6 +30,7 @@ import (
 )
 
 const (
+	ErrorJSONEncodingResponseData = "JSON_encoding_response_data_error"
 	ErrorJSONEncodingResponse = "JSON_encoding_response_error"
 	ErrorGenerateSignature    = "Generate_signature_error"
 	ErrorSessionClosed        = "Session_closed_error"
@@ -49,12 +50,12 @@ func NewSession(socketSession *melody.Session, requestSalt string) *Session {
 
 func (session *Session) Response(data interface{}) {
 	// Export as a GZip string with base64
-	if data != nil {
-		dataString, err := json.Marshal(data)
-		if err != nil {
-			session.RaiseError(ErrorJSONEncodingResponse)
-			return
-		}
+	dataString, err := json.Marshal(data)
+	if err != nil {
+		session.RaiseError(ErrorJSONEncodingResponseData)
+		return
+	}
+	if dataString != "null" {
 		data = compress(dataString)
 	}
 	// Generate Signature
