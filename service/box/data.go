@@ -18,9 +18,10 @@ Package KaguyaKernel: The kernel for Kaguya
 package box
 
 import (
+	"log"
+
 	Kernel "github.com/star-inc/kaguya_kernel"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
-	"log"
 )
 
 type Data struct {
@@ -66,6 +67,9 @@ func (data *Data) getHistoryMessagebox(timestamp int, count int) []SyncMessagebo
 		log.Println(err)
 	}()
 	err = cursor.All(&messages)
+	if err == Rethink.ErrEmptyResult {
+		return nil
+	}
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -83,6 +87,9 @@ func (data *Data) getMessagebox(target string) *Messagebox {
 		log.Println(err)
 	}()
 	err = cursor.One(messagebox)
+	if err == Rethink.ErrEmptyResult {
+		return nil
+	}
 	if err != nil {
 		log.Panicln(err)
 	}
