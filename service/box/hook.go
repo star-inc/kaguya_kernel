@@ -93,6 +93,9 @@ func (hook *Hook) GetMessagebox(relatedID string, target string) *Messagebox {
 		log.Println(err)
 	}()
 	err = cursor.One(messagebox)
+	if err == Rethink.ErrEmptyResult {
+		return nil
+	}
 	if err != nil {
 		log.Panicln(err)
 	}
