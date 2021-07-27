@@ -5,7 +5,6 @@ import (
 )
 
 type Messagebox struct {
-	source      RethinkSource
 	CreatedTime int64       `rethinkdb:"createdTime" json:"createdTime"`
 	LastSeen    int64       `rethinkdb:"lastSeen" json:"lastSeen"`
 	Metadata    interface{} `rethinkdb:"metadata" json:"metadata"`
@@ -13,8 +12,13 @@ type Messagebox struct {
 	Target      string      `rethinkdb:"target" json:"target"`
 }
 
-func (m *Messagebox) Get(listenerID string) error {
-	cursor, err := m.source.Term.Table(listenerID).Get(m.Target).Run(m.source.Session)
+func NewMessagebox() Interface {
+	instance := new(Messagebox)
+	return instance
+}
+
+func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
+	cursor, err := source.Term.Table(source.Table).Get(m.Target).Run(source.Session)
 	if err != nil {
 		return err
 	}
@@ -25,6 +29,14 @@ func (m *Messagebox) Get(listenerID string) error {
 	return cursor.One(m)
 }
 
-func (m *Messagebox) Delete(listenerID string) error {
-	return m.source.Term.Table(listenerID).Get(m.Target).Delete().Exec(m.source.Session)
+func (m *Messagebox) Create(source *RethinkSource) error {
+	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
+}
+
+func (m *Messagebox) Update(source *RethinkSource) error {
+	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
+}
+
+func (m *Messagebox) Destroy(source *RethinkSource) error {
+	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
 }

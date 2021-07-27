@@ -15,21 +15,11 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package box
+package data
 
-import (
-	Kernel "github.com/star-inc/kaguya_kernel"
-	"github.com/star-inc/kaguya_kernel/data"
-)
-
-type Seen struct {
-	data.Data
-}
-
-func NewSeen(config Kernel.RethinkConfig) *Seen {
-	return seen
-}
-
-func (seen *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
-	return count
+type Interface interface {
+	Load(source *RethinkSource, filter ...interface{}) error
+	Create(source *RethinkSource) error
+	Update(source *RethinkSource) error
+	Destroy(source *RethinkSource) error
 }

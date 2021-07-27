@@ -20,25 +20,19 @@ package box
 import (
 	"context"
 	Kernel "github.com/star-inc/kaguya_kernel"
-	"github.com/star-inc/kaguya_kernel/data"
 )
 
 type Service struct {
 	Kernel.Service
-	syncExtraDataAssigner func(data.SyncMessagebox) interface{}
 }
 
-func NewServiceInterface(messageBoxConfig Kernel.RethinkConfig, syncExtraDataAssigner func(data.SyncMessagebox) interface{}, listenerID string) ServiceInterface {
+func NewServiceInterface() ServiceInterface {
 	service := new(Service)
-	service.syncExtraDataAssigner = syncExtraDataAssigner
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission() {
-		return false
-	}
-	return true
+	return false
 }
 
 func (service *Service) Fetch(ctx context.Context) {

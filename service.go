@@ -28,7 +28,7 @@ type Service struct {
 }
 
 type ServiceInterface interface {
-	Fetch(context.Context)
+	Fetch(ctx context.Context)
 	CheckPermission() bool
 	GetGuard() AuthorizeInterface
 	SetGuard(authorization AuthorizeInterface)

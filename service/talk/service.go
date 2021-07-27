@@ -18,24 +18,40 @@ Package KaguyaKernel: The kernel for Kaguya
 package talk
 
 import (
+	"context"
 	Kernel "github.com/star-inc/kaguya_kernel"
-	"github.com/star-inc/kaguya_kernel/data"
-	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
-	"log"
 )
 
-type Manager struct {
-	data.Data
+const (
+	ErrorEmptyContent   = "Content_is_empty"
+	ErrorInvalidContent = "Content_is_invalid"
+	ErrorOriginNotEmpty = "Origin_is_not_empty"
+)
+
+type Service struct {
+	Kernel.Service
 }
 
-func NewManager(config Kernel.RethinkConfig, chatRoomID string) *Manager {
+func NewServiceInterface() ServiceInterface {
+	service := new(Service)
+	return service
 }
 
-func (manager *Manager) Check() bool {
+func (service *Service) CheckPermission() bool {
+	return false
 }
 
-func (manager *Manager) Create() bool {
+func (service *Service) Fetch(ctx context.Context) {
 }
 
-func (manager *Manager) Drop() bool {
+func (service *Service) GetHistoryMessages(request *Kernel.Request) {
+}
+
+func (service *Service) GetMessage(request *Kernel.Request) {
+}
+
+func (service *Service) SendMessage(request *Kernel.Request) {
+}
+
+func (service *Service) CancelSentMessage(request *Kernel.Request) {
 }

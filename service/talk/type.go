@@ -21,8 +21,8 @@ import Kernel "github.com/star-inc/kaguya_kernel"
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
-	GetHistoryMessages(*Kernel.Request)
-	GetMessage(*Kernel.Request)
-	SendMessage(*Kernel.Request)
-	CancelSentMessage(*Kernel.Request)
+	GetMessage(request *Kernel.Request)
+	SendMessage(request *Kernel.Request)
+	CancelSentMessage(request *Kernel.Request)
+	GetHistoryMessages(request *Kernel.Request)
 }

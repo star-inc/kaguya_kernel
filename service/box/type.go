@@ -23,6 +23,6 @@ import (
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
-	SyncMessagebox(*Kernel.Request)
-	DeleteMessagebox(*Kernel.Request)
+	SyncMessagebox(request *Kernel.Request)
+	DeleteMessagebox(request *Kernel.Request)
 }
