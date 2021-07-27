@@ -100,3 +100,24 @@ func FetchContainersByTimestamp(source *RethinkSource, timestamp int, limit int)
 	}
 	return containers
 }
+
+func CountUnreadMessages(source *RethinkSource, timestamp int) int {
+	cursor, err := source.Term.Table(source.Table).
+		OrderBy(Rethink.Asc("createdTime")).
+		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
+		Count().
+		Run(source.Session)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	var count int
+	err = cursor.One(&count)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return count
+}
