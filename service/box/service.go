@@ -20,14 +20,18 @@ package box
 import (
 	"context"
 	Kernel "github.com/star-inc/kaguya_kernel"
+	"github.com/star-inc/kaguya_kernel/data"
+	"log"
 )
 
 type Service struct {
 	Kernel.Service
+	source *data.RethinkSource
 }
 
-func NewServiceInterface() ServiceInterface {
+func NewServiceInterface(source *data.RethinkSource) ServiceInterface {
 	service := new(Service)
+	service.source = source
 	return service
 }
 
@@ -36,13 +40,40 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch(ctx context.Context) {
-
+	cursor := service.source.GetFetchCursor()
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	var row interface{}
+	for cursor.Next(&row) {
+		select {
+		case <-ctx.Done():
+			log.Println("Stop Fetching")
+			return
+		default:
+			service.GetSession().Response(row)
+		}
+	}
+	if err := cursor.Err(); err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
-
+	query := request.Data.(map[string]interface{})
+	timestamp := int(query["timestamp"].(float64))
+	limit := int(query["count"].(float64))
+	containers := data.FetchMessageboxByTimestamp(service.source, timestamp, limit)
+	service.GetSession().Response(containers)
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
-
+	messagebox := data.NewMessagebox()
+	err := messagebox.Load(service.source, request.Data.(string))
+	if err == nil {
+		service.GetSession().Response(messagebox.Destroy(service.source))
+	} else {
+		service.GetSession().RaiseError(err.Error())
+	}
 }

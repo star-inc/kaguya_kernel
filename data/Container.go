@@ -62,6 +62,11 @@ func (c *Container) Create(source *RethinkSource) error {
 
 // Update: update a message context in database.
 func (c *Container) Update(source *RethinkSource) error {
+	return source.Term.Table(source.Table).Update(c).Exec(source.Session)
+}
+
+// Replace: update a message context in database.
+func (c *Container) Replace(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Replace(c).Exec(source.Session)
 }
 

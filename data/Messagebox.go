@@ -18,7 +18,7 @@ func NewMessagebox() Interface {
 }
 
 func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
-	cursor, err := source.Term.Table(source.Table).Get(m.Target).Run(source.Session)
+	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)
 	if err != nil {
 		return err
 	}
@@ -30,11 +30,15 @@ func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 }
 
 func (m *Messagebox) Create(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
+	return source.Term.Table(source.Table).Insert(m).Exec(source.Session)
 }
 
 func (m *Messagebox) Update(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
+	return source.Term.Table(source.Table).Update(m).Exec(source.Session)
+}
+
+func (m *Messagebox) Replace(source *RethinkSource) error {
+	return source.Term.Table(source.Table).Replace(m).Exec(source.Session)
 }
 
 func (m *Messagebox) Destroy(source *RethinkSource) error {
