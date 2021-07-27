@@ -26,12 +26,14 @@ import (
 
 type Service struct {
 	Kernel.Service
-	source *data.RethinkSource
+	source                *data.RethinkSource
+	syncExtraDataAssigner func(container data.SyncContainer) interface{}
 }
 
-func NewServiceInterface(source *data.RethinkSource) ServiceInterface {
+func NewServiceInterface(source *data.RethinkSource, syncExtraDataAssigner func(data.SyncContainer) interface{}) ServiceInterface {
 	service := new(Service)
 	service.source = source
+	service.syncExtraDataAssigner = syncExtraDataAssigner
 	return service
 }
 
@@ -64,6 +66,9 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	timestamp := int(query["timestamp"].(float64))
 	limit := int(query["count"].(float64))
 	containers := data.FetchSyncContainersByTimestamp(service.source, timestamp, limit)
+	for i, container := range containers {
+		containers[i].ExtraData = service.syncExtraDataAssigner(container)
+	}
 	service.GetSession().Response(containers)
 }
 
