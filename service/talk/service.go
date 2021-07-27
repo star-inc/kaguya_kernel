@@ -19,7 +19,11 @@ package talk
 
 import (
 	"context"
+	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
+	"github.com/star-inc/kaguya_kernel/data"
+	"log"
+	"strings"
 )
 
 const (
@@ -30,10 +34,14 @@ const (
 
 type Service struct {
 	Kernel.Service
+	source           *data.RethinkSource
+	contentValidator func(int, string) bool
 }
 
-func NewServiceInterface() ServiceInterface {
+func NewServiceInterface(source *data.RethinkSource, contentValidator func(int, string) bool) ServiceInterface {
 	service := new(Service)
+	service.source = source
+	service.contentValidator = contentValidator
 	return service
 }
 
@@ -42,16 +50,78 @@ func (service *Service) CheckPermission() bool {
 }
 
 func (service *Service) Fetch(ctx context.Context) {
+	cursor := service.source.GetFetchCursor()
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	var row interface{}
+	for cursor.Next(&row) {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			service.GetSession().Response(row)
+		}
+	}
+	if err := cursor.Err(); err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
+	query := request.Data.(map[string]interface{})
+	timestamp := int(query["timestamp"].(float64))
+	limit := int(query["count"].(float64))
+	containers := data.FetchContainersByTimestamp(service.source, timestamp, limit)
+	service.GetSession().Response(containers)
 }
 
 func (service *Service) GetMessage(request *Kernel.Request) {
+	container := new(data.Container)
+	err := container.Load(service.source, request.Data.(string))
+	if err == nil {
+		service.GetSession().Response(container)
+	} else {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) SendMessage(request *Kernel.Request) {
+	message := new(data.Message)
+	err := mapstructure.Decode(request.Data, message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if len(strings.Trim(message.Content, " ")) == 0 {
+		service.GetSession().RaiseError(ErrorEmptyContent)
+		return
+	}
+	if !service.contentValidator(message.ContentType, message.Content) {
+		service.GetSession().RaiseError(ErrorInvalidContent)
+		return
+	}
+	if message.Origin != "" {
+		service.GetSession().RaiseError(ErrorOriginNotEmpty)
+		return
+	}
+	message.Origin = service.GetGuard().Me()
+	container := data.NewContainer(message)
+	err = container.Create(service.source)
+	if err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }
 
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
+	container := new(data.Container)
+	err := container.Load(service.source, request.Data.(string))
+	if err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
+	err = container.Destroy(service.source)
+	if err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
 }

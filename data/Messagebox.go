@@ -12,11 +12,13 @@ type Messagebox struct {
 	Target      string      `rethinkdb:"target" json:"target"`
 }
 
+// NewMessagebox: ToDO
 func NewMessagebox() Interface {
 	instance := new(Messagebox)
 	return instance
 }
 
+// Load: ToDO
 func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)
 	if err != nil {
@@ -29,18 +31,22 @@ func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 	return cursor.One(m)
 }
 
+// Create: ToDO
 func (m *Messagebox) Create(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Insert(m).Exec(source.Session)
 }
 
+// Update: ToDO
 func (m *Messagebox) Update(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Update(m).Exec(source.Session)
 }
 
+// Replace: ToDO
 func (m *Messagebox) Replace(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Replace(m).Exec(source.Session)
 }
 
+// Destroy: ToDO
 func (m *Messagebox) Destroy(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
 }

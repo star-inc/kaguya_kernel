@@ -49,7 +49,6 @@ func (service *Service) Fetch(ctx context.Context) {
 	for cursor.Next(&row) {
 		select {
 		case <-ctx.Done():
-			log.Println("Stop Fetching")
 			return
 		default:
 			service.GetSession().Response(row)
@@ -64,16 +63,18 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
 	timestamp := int(query["timestamp"].(float64))
 	limit := int(query["count"].(float64))
-	containers := data.FetchMessageboxByTimestamp(service.source, timestamp, limit)
+	containers := data.FetchSyncContainersByTimestamp(service.source, timestamp, limit)
 	service.GetSession().Response(containers)
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
 	err := messagebox.Load(service.source, request.Data.(string))
-	if err == nil {
-		service.GetSession().Response(messagebox.Destroy(service.source))
-	} else {
+	if err != nil {
+		service.GetSession().RaiseError(err.Error())
+	}
+	err = messagebox.Destroy(service.source)
+	if err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
 }

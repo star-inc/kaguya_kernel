@@ -28,7 +28,8 @@ type SyncContainer struct {
 	ExtraData interface{} `json:"extraData"`
 }
 
-func FetchMessageboxByTimestamp(source *RethinkSource, timestamp int, limit int) []SyncContainer {
+// FetchSyncContainersByTimestamp: ToDo
+func FetchSyncContainersByTimestamp(source *RethinkSource, timestamp int, limit int) []SyncContainer {
 	containers := make([]SyncContainer, limit)
 	cursor, err := source.Term.Table(source.Table).
 		OrderBy(Rethink.Desc("createdTime")).

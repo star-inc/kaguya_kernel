@@ -20,6 +20,7 @@ package data
 import (
 	"errors"
 	"github.com/google/uuid"
+	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 	"log"
 	"time"
 )
@@ -33,7 +34,7 @@ type Container struct {
 }
 
 // NewContainer: include a message automatically, the function will fill the information required for Container.
-func NewContainer(source *RethinkSource, message *Message) Interface {
+func NewContainer(message *Message) Interface {
 	instance := new(Container)
 	instance.UUID = uuid.New().String()
 	instance.Message = message
@@ -73,4 +74,29 @@ func (c *Container) Replace(source *RethinkSource) error {
 // Destroy: the method can not be called.
 func (c *Container) Destroy(_ *RethinkSource) error {
 	return errors.New(ErrorBadMethodCallException)
+}
+
+// FetchSyncContainersByTimestamp: ToDO
+func FetchContainersByTimestamp(source *RethinkSource, timestamp int, limit int) []Container {
+	containers := make([]Container, limit)
+	cursor, err := source.Term.Table(source.Table).
+		OrderBy(Rethink.Desc("createdTime")).
+		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
+		Limit(limit).
+		Run(source.Session)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer func() {
+		err := cursor.Close()
+		log.Println(err)
+	}()
+	err = cursor.All(&containers)
+	if err == Rethink.ErrEmptyResult {
+		return nil
+	}
+	if err != nil {
+		log.Panicln(err)
+	}
+	return containers
 }
