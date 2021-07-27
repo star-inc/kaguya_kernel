@@ -33,13 +33,7 @@ type Hook struct {
 	messageboxNotFoundHandler func(string) bool
 }
 
-func NewHook(
-	config Kernel.RethinkConfig,
-	chatRoomID string,
-	getRelation func(string) []string,
-	metadataGenerator func(*talk.DatabaseMessage) interface{},
-	messageboxNotFoundHandler func(string) bool,
-) *Hook {
+func NewHook(config Kernel.RethinkConfig, chatRoomID string, getRelation func(string) []string, metadataGenerator func(*talk.DatabaseMessage) interface{}, messageboxNotFoundHandler func(string) bool) *Hook {
 	var err error
 	hook := new(Hook)
 	hook.session, err = Rethink.Connect(config.ConnectConfig)

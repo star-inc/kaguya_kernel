@@ -19,42 +19,17 @@ package box
 
 import (
 	Kernel "github.com/star-inc/kaguya_kernel"
-	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
-	"log"
+	"github.com/star-inc/kaguya_kernel/data"
 )
 
 type Seen struct {
-	Data
+	data.Data
 }
 
 func NewSeen(config Kernel.RethinkConfig) *Seen {
-	var err error
-	seen := new(Seen)
-	seen.session, err = Rethink.Connect(config.ConnectConfig)
-	if err != nil {
-		log.Panicln(err)
-	}
-	seen.database = Rethink.DB(config.DatabaseName)
 	return seen
 }
 
 func (seen *Seen) CountUnreadMessages(chatRoomID string, timestamp int64) int {
-	cursor, err := seen.database.Table(chatRoomID).
-		OrderBy(Rethink.Asc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
-		Count().
-		Run(seen.session)
-	if err != nil {
-		log.Panicln(err)
-	}
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
-	var count int
-	err = cursor.One(&count)
-	if err != nil {
-		log.Panicln(err)
-	}
 	return count
 }

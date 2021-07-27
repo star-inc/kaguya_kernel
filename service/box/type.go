@@ -26,28 +26,3 @@ type ServiceInterface interface {
 	SyncMessagebox(*Kernel.Request)
 	DeleteMessagebox(*Kernel.Request)
 }
-
-type SyncMessagebox struct {
-	Messagebox
-	ExtraData interface{} `json:"extraData"`
-}
-
-type Messagebox struct {
-	CreatedTime int64       `rethinkdb:"createdTime" json:"createdTime"`
-	LastSeen    int64       `rethinkdb:"lastSeen" json:"lastSeen"`
-	Metadata    interface{} `rethinkdb:"metadata" json:"metadata"`
-	Origin      string      `rethinkdb:"origin" json:"origin"`
-	Target      string      `rethinkdb:"target" json:"target"`
-}
-
-type MessageboxForNew struct {
-	CreatedTime int64       `rethinkdb:"createdTime"`
-	Metadata    interface{} `rethinkdb:"metadata"`
-	Origin      string      `rethinkdb:"origin"`
-	Target      string      `rethinkdb:"target"`
-}
-
-type MessageboxForUpdateSeen struct {
-	LastSeen int64  `rethinkdb:"lastSeen"`
-	Target   string `rethinkdb:"target"`
-}

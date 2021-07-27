@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	Kernel "github.com/star-inc/kaguya_kernel"
+	data2 "github.com/star-inc/kaguya_kernel/data"
+	"github.com/star-inc/kaguya_kernel/data/Message"
 	"log"
 	"sort"
 	"strings"
@@ -36,114 +38,30 @@ const (
 
 type Service struct {
 	Kernel.Service
-	data             *Data
+	data             *data2.Data
 	contentValidator func(int, string) bool
 	readMessagesHook func(*DatabaseMessage)
 	sendMessageHook  func(*DatabaseMessage)
 }
 
-func NewServiceInterface(
-	dbConfig Kernel.RethinkConfig,
-	chatRoomID string,
-	contentValidator func(int, string) bool,
-	readMessagesHook func(*DatabaseMessage),
-	sendMessageHook func(*DatabaseMessage),
-) ServiceInterface {
-	service := new(Service)
-	service.data = newData(dbConfig, chatRoomID)
-	service.contentValidator = contentValidator
-	service.readMessagesHook = readMessagesHook
-	service.sendMessageHook = sendMessageHook
+func NewServiceInterface(dbConfig Kernel.RethinkConfig, chatRoomID string, contentValidator func(int, string) bool, readMessagesHook func(*DatabaseMessage), sendMessageHook func(*DatabaseMessage)) ServiceInterface {
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission(service.data.chatRoomID) {
-		return false
-	}
-	return true
 }
 
 func (service *Service) Fetch(ctx context.Context) {
-	cursor := service.data.getFetchCursor()
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
-	var row interface{}
-	for cursor.Next(&row) {
-		select {
-		case <-ctx.Done():
-			log.Println("Stop Fetching")
-			return
-		default:
-			service.GetSession().Response(row)
-			row := row.(map[string]interface{})
-			message := new(DatabaseMessage)
-			err := mapstructure.Decode(row["new_val"], message)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			service.readMessagesHook(message)
-		}
-	}
-	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
-	}
 }
 
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
-	data := request.Data.(map[string]interface{})
-	messages := *service.data.getHistoryMessages(
-		int(data["timestamp"].(float64)),
-		int(data["count"].(float64)),
-	)
-	sort.Slice(messages, func(i, j int) bool {
-		return (messages)[i].CreatedTime < (messages)[j].CreatedTime
-	})
-	if messages != nil && len(messages) != 0 {
-		service.readMessagesHook(&messages[len(messages)-1])
-	}
-	service.GetSession().Response(messages)
 }
 
 func (service *Service) GetMessage(request *Kernel.Request) {
-	dbMessage := service.data.getMessage((request.Data).(string))
-	service.GetSession().Response(dbMessage)
 }
 
 func (service *Service) SendMessage(request *Kernel.Request) {
-	message := new(Message)
-	err := mapstructure.Decode(request.Data, message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	if len(strings.Trim(message.Content, " ")) == 0 {
-		service.GetSession().RaiseError(ErrorEmptyContent)
-		return
-	}
-	if !service.contentValidator(message.ContentType, message.Content) {
-		service.GetSession().RaiseError(ErrorInvalidContent)
-		return
-	}
-	if message.Origin != "" {
-		service.GetSession().RaiseError(ErrorOriginNotEmpty)
-		return
-	}
-	message.Origin = service.GetGuard().Me()
-	savedMessage := service.data.insertMessage(message)
-	service.sendMessageHook(savedMessage)
 }
 
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
-	message := service.data.getMessage((request.Data).(string))
-	if message.Message.Origin != service.GetGuard().Me() {
-		service.GetSession().RaiseError(Kernel.ErrorForbidden)
-		return
-	}
-	message.Message.Content = fmt.Sprint(time.Now().UnixNano())
-	message.Canceled = true
-	service.data.updateMessage(message)
 }

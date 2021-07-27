@@ -19,12 +19,13 @@ package box
 
 import (
 	Kernel "github.com/star-inc/kaguya_kernel"
+	"github.com/star-inc/kaguya_kernel/data"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 	"log"
 )
 
 type Manager struct {
-	Data
+	data.Data
 }
 
 func NewManager(config Kernel.RethinkConfig, listenerID string) *Manager {

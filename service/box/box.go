@@ -20,70 +20,35 @@ package box
 import (
 	"context"
 	Kernel "github.com/star-inc/kaguya_kernel"
-	"log"
-	"sort"
+	"github.com/star-inc/kaguya_kernel/data"
 )
 
 type Service struct {
 	Kernel.Service
-	data                  *Data
-	syncExtraDataAssigner func(SyncMessagebox) interface{}
+	syncExtraDataAssigner func(data.SyncMessagebox) interface{}
 }
 
-func NewServiceInterface(
-	messageBoxConfig Kernel.RethinkConfig,
-	syncExtraDataAssigner func(SyncMessagebox) interface{},
-	listenerID string,
-) ServiceInterface {
+func NewServiceInterface(messageBoxConfig Kernel.RethinkConfig, syncExtraDataAssigner func(data.SyncMessagebox) interface{}, listenerID string) ServiceInterface {
 	service := new(Service)
-	service.data = newData(messageBoxConfig, listenerID)
 	service.syncExtraDataAssigner = syncExtraDataAssigner
 	return service
 }
 
 func (service *Service) CheckPermission() bool {
-	if !service.GetGuard().Permission(service.data.listenerID) {
+	if !service.GetGuard().Permission() {
 		return false
 	}
 	return true
 }
 
 func (service *Service) Fetch(ctx context.Context) {
-	cursor := service.data.getFetchCursor()
-	defer func() {
-		err := cursor.Close()
-		log.Println(err)
-	}()
-	var row interface{}
-	for cursor.Next(&row) {
-		select {
-		case <-ctx.Done():
-			log.Println("Stop Fetching")
-			return
-		default:
-			service.GetSession().Response(row)
-		}
-	}
-	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
-	}
+
 }
 
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
-	data := request.Data.(map[string]interface{})
-	messages := service.data.getHistoryMessagebox(
-		int(data["timestamp"].(float64)),
-		int(data["count"].(float64)),
-	)
-	for i, message := range messages {
-		messages[i].ExtraData = service.syncExtraDataAssigner(message)
-	}
-	sort.Slice(messages, func(i, j int) bool {
-		return (messages)[i].CreatedTime > (messages)[j].CreatedTime
-	})
-	service.GetSession().Response(messages)
+
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
-	service.data.deleteMessagebox(request.Data.(string))
+
 }
