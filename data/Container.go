@@ -24,6 +24,7 @@ import (
 	"time"
 )
 
+// Container: Container is the data structure, only can be modified by server only, to include a message into database.
 type Container struct {
 	UUID        string   `rethinkdb:"id,omitempty" json:"uuid"`
 	Message     *Message `rethinkdb:"message" json:"message"`
@@ -31,6 +32,7 @@ type Container struct {
 	Canceled    bool     `rethinkdb:"canceled" json:"canceled"`
 }
 
+// NewContainer: include a message automatically, the function will fill the information required for Container.
 func NewContainer(source *RethinkSource, message *Message) Interface {
 	instance := new(Container)
 	instance.UUID = uuid.New().String()
@@ -63,7 +65,7 @@ func (c *Container) Update(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Replace(c).Exec(source.Session)
 }
 
-// Destroy: destroy a message.
+// Destroy: the method can not be called.
 func (c *Container) Destroy(_ *RethinkSource) error {
-	return errors.New("")
+	return errors.New(ErrorBadMethodCallException)
 }

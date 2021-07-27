@@ -15,26 +15,8 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package KaguyaKernel
+package data
 
-type Request struct {
-	Data interface{} `json:"data"`
-	Type string      `json:"type"`
-}
-
-type Response struct {
-	Data      interface{} `json:"data"`
-	Signature string      `json:"signature"`
-	Timestamp int64       `json:"timestamp"`
-}
-
-type ErrorReport struct {
-	Error     string `json:"error"`
-	Timestamp int64  `json:"timestamp"`
-}
-
-type Signature struct {
-	Data      interface{} `json:"data"`
-	Salt      string      `json:"salt"`
-	Timestamp int64       `json:"timestamp"`
-}
+const (
+	ErrorBadMethodCallException = "BadMethodCallException"
+)

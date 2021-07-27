@@ -15,11 +15,12 @@ Package KaguyaKernel: The kernel for Kaguya
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package data
+package KaguyaKernel
 
-// Message: Message is the data structure from client, to be created the message by including into Container.
-type Message struct {
-	Content     string `rethinkdb:"content" json:"content"`
-	ContentType int    `rethinkdb:"contentType" json:"contentType"`
-	Origin      string `rethinkdb:"origin" json:"origin"`
+// MiddlewareInterface:
+type MiddlewareInterface interface {
+	OnRequestBefore() []func(session *Session, request *Request)
+	OnRequestAfter() []func(session *Session, request *Request)
+	OnResponseBefore() []func(session *Session, data interface{})
+	OnResponseAfter() []func(session *Session, response *Response)
 }

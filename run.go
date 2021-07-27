@@ -30,42 +30,68 @@ const (
 	ErrorInvalidRequestType  = "Request_type_is_invalid"
 )
 
-func Run(service ServiceInterface, guard AuthorizeInterface, requestSalt string) *melody.Melody {
+// Run: to execute KaguyaKernel with specific arguments.
+func Run(service ServiceInterface, guard AuthorizeInterface, middlewares MiddlewareInterface, requestSalt string) *melody.Melody {
 	worker := melody.New()
-	ctx, cancel := context.WithCancel(context.Background())
+	fetchCtx, fetchCancel := context.WithCancel(context.Background())
 	worker.HandleConnect(func(socketSession *melody.Session) {
-		service.SetSession(NewSession(socketSession, requestSalt))
+		session := NewSession(socketSession, middlewares, requestSalt)
 		service.SetGuard(guard)
-		if !service.CheckPermission() {
-			defer func() {
-				err := socketSession.Close()
-				if err != nil {
-					log.Println(err)
-				}
-			}()
-			service.GetSession().RaiseError(ErrorForbidden)
-			return
-		}
-		go service.Fetch(ctx)
+		service.SetSession(session)
+		connectHandler(service, fetchCtx)
 	})
-	worker.HandleMessage(func(socketSession *melody.Session, message []byte) {
-		request := new(Request)
-		err := json.Unmarshal(message, request)
-		if err != nil {
-			service.GetSession().RaiseError(ErrorJSONDecodingRequest)
-			return
-		}
-		method := reflect.ValueOf(service).MethodByName(request.Type)
-		if !service.CheckRequestType(method) {
-			service.GetSession().RaiseError(ErrorInvalidRequestType)
-			return
-		}
-		if method.IsValid() {
-			method.Call([]reflect.Value{reflect.ValueOf(request)})
-		}
+	worker.HandleMessage(func(_ *melody.Session, message []byte) {
+		messageHandler(service, message)
 	})
 	worker.HandleDisconnect(func(_ *melody.Session) {
-		cancel()
+		disconnectHandler(fetchCancel)
 	})
 	return worker
+}
+
+func connectHandler(service ServiceInterface, fetchCtx context.Context) {
+	if !service.CheckPermission() {
+		defer func() {
+			err := service.GetSession().socketSession.Close()
+			if err != nil {
+				log.Println(err)
+			}
+		}()
+		service.GetSession().RaiseError(ErrorForbidden)
+		return
+	}
+	go service.Fetch(fetchCtx)
+}
+
+func messageHandler(service ServiceInterface, message []byte) {
+	request := new(Request)
+	// Decode JSON into Request.
+	err := json.Unmarshal(message, request)
+	if err != nil {
+		service.GetSession().RaiseError(ErrorJSONDecodingRequest)
+		return
+	}
+	// Check method requested is exists.
+	method := reflect.ValueOf(service).MethodByName(request.Type)
+	if !service.CheckRequestType(method) {
+		service.GetSession().RaiseError(ErrorInvalidRequestType)
+		return
+	}
+	// Check method requested is valid (can be requested by client).
+	if method.IsValid() {
+		// Do middlewares [before]
+		for _, middleware := range service.GetSession().middlewares.OnRequestBefore() {
+			middleware(service.GetSession(), request)
+		}
+		// Do main
+		method.Call([]reflect.Value{reflect.ValueOf(request)})
+		// Do middlewares [after]
+		for _, middleware := range service.GetSession().middlewares.OnRequestAfter() {
+			middleware(service.GetSession(), request)
+		}
+	}
+}
+
+func disconnectHandler(fetchCancel context.CancelFunc) {
+	fetchCancel()
 }
