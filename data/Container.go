@@ -40,6 +40,11 @@ func NewContainer(message *Message) Interface {
 	return instance
 }
 
+// CheckReady: check model is ready.
+func (c *Container) CheckReady() bool {
+	return c != nil && c.UUID != ""
+}
+
 // Load: load a message from database, filter is the message ID.
 func (c *Container) Load(source *RethinkSource, filter ...interface{}) error {
 	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)

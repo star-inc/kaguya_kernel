@@ -32,6 +32,11 @@ func NewMessagebox() Interface {
 	return instance
 }
 
+// CheckReady: check model is ready.
+func (m *Messagebox) CheckReady() bool {
+	return m != nil && m.Origin != "" && m.Target != ""
+}
+
 // Load: ToDO
 func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)

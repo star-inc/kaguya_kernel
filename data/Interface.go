@@ -15,6 +15,7 @@
 package data
 
 type Interface interface {
+	CheckReady() bool
 	Load(source *RethinkSource, filter ...interface{}) error
 	Reload(source *RethinkSource) error
 	Create(source *RethinkSource) error
