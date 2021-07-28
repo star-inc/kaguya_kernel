@@ -1,6 +1,6 @@
 package talk
 
-import Kernel "github.com/star-inc/kaguya_kernel"
+import Kernel "gopkg.in/star-inc/kaguyakernel.v1"
 
 type ServiceInterface interface {
 	Kernel.ServiceInterface
