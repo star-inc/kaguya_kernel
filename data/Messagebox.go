@@ -45,6 +45,11 @@ func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 	return cursor.One(m)
 }
 
+// Reload: ToDO
+func (m *Messagebox) Reload(source *RethinkSource) error {
+	return m.Load(source, m.Target)
+}
+
 // Create: ToDO
 func (m *Messagebox) Create(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Insert(m).Exec(source.Session)

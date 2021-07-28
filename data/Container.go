@@ -53,6 +53,11 @@ func (c *Container) Load(source *RethinkSource, filter ...interface{}) error {
 	return cursor.One(c)
 }
 
+// Reload: reload a message from database,
+func (c *Container) Reload(source *RethinkSource) error {
+	return c.Load(source, c.UUID)
+}
+
 // Create: create a new message to database.
 func (c *Container) Create(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Insert(c).Exec(source.Session)
@@ -98,6 +103,7 @@ func FetchContainersByTimestamp(source *RethinkSource, timestamp int, limit int)
 	return containers
 }
 
+// CountUnreadMessages: ToDo
 func CountUnreadMessages(source *RethinkSource, timestamp int) int {
 	cursor, err := source.Term.Table(source.Table).
 		OrderBy(Rethink.Asc("createdTime")).
