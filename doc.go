@@ -1,5 +1,6 @@
 /*
-Package KaguyaKernel: The kernel for Kaguya
+Package KaguyaKernel: The opensource instant messaging framework.
+
     Copyright 2021 Star Inc.(https://starinc.xyz)
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
