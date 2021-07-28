@@ -1,4 +1,4 @@
-module github.com/star-inc/kaguya_kernel
+module gopkg.in/star-inc/kaguyakernel.v2
 
 go 1.16
 

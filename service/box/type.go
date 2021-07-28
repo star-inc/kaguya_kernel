@@ -15,7 +15,7 @@
 package box
 
 import (
-	Kernel "github.com/star-inc/kaguya_kernel"
+	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 )
 
 type ServiceInterface interface {

@@ -17,8 +17,8 @@ package talk
 import (
 	"context"
 	"github.com/mitchellh/mapstructure"
-	Kernel "github.com/star-inc/kaguya_kernel"
-	"github.com/star-inc/kaguya_kernel/data"
+	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
+	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	"log"
 	"strings"
 )
