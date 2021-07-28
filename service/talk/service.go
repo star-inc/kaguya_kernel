@@ -31,6 +31,7 @@ const (
 	ErrorOriginNotEmpty = "Origin_is_not_empty"
 )
 
+// Service: this is the struct of Talk Service.
 type Service struct {
 	Kernel.Service
 	data             *Data
@@ -39,6 +40,7 @@ type Service struct {
 	sendMessageHook  func(*DatabaseMessage)
 }
 
+// NewServiceInterface: create service interface of Talk.
 func NewServiceInterface(
 	dbConfig Kernel.RethinkConfig,
 	chatRoomID string,
@@ -54,6 +56,7 @@ func NewServiceInterface(
 	return service
 }
 
+// CheckPermission: check the permission of client.
 func (service *Service) CheckPermission() bool {
 	if !service.GetGuard().Permission(service.data.chatRoomID) {
 		return false
@@ -61,6 +64,7 @@ func (service *Service) CheckPermission() bool {
 	return true
 }
 
+// Fetch: do the fetch for data, if there is a change in database, it will throw the event out.
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.data.getFetchCursor()
 	defer func() {
@@ -90,6 +94,7 @@ func (service *Service) Fetch(ctx context.Context) {
 	}
 }
 
+// GetHistoryMessages: get the history messages for client.
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	data := request.Data.(map[string]interface{})
 	messages := *service.data.getHistoryMessages(
@@ -105,11 +110,13 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	service.GetSession().Response(messages)
 }
 
+// GetMessage: get the message specific for client.
 func (service *Service) GetMessage(request *Kernel.Request) {
 	dbMessage := service.data.getMessage((request.Data).(string))
 	service.GetSession().Response(dbMessage)
 }
 
+// SendMessage: send a message by the request of client.
 func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(Message)
 	err := mapstructure.Decode(request.Data, message)
@@ -134,6 +141,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	service.sendMessageHook(savedMessage)
 }
 
+// CancelSentMessage: cancel a message delivery by the request of client.
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	message := service.data.getMessage((request.Data).(string))
 	if message.Message.Origin != service.GetGuard().Me() {

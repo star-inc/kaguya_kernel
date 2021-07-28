@@ -21,12 +21,14 @@ import (
 	"sort"
 )
 
+// Service: this is the struct of Messagebox Service.
 type Service struct {
 	Kernel.Service
 	data                  *Data
 	syncExtraDataAssigner func(SyncMessagebox) interface{}
 }
 
+// NewServiceInterface: create service interface of Messagebox.
 func NewServiceInterface(
 	messageBoxConfig Kernel.RethinkConfig,
 	syncExtraDataAssigner func(SyncMessagebox) interface{},
@@ -38,6 +40,7 @@ func NewServiceInterface(
 	return service
 }
 
+// CheckPermission: check the permission of client.
 func (service *Service) CheckPermission() bool {
 	if !service.GetGuard().Permission(service.data.listenerID) {
 		return false
@@ -45,6 +48,7 @@ func (service *Service) CheckPermission() bool {
 	return true
 }
 
+// Fetch: do the fetch for data, if there is a change in database, it will throw the event out.
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.data.getFetchCursor()
 	defer func() {
@@ -66,6 +70,7 @@ func (service *Service) Fetch(ctx context.Context) {
 	}
 }
 
+// SyncMessagebox: get the history messageboxes for client.
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	data := request.Data.(map[string]interface{})
 	messages := service.data.getHistoryMessagebox(
@@ -81,6 +86,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	service.GetSession().Response(messages)
 }
 
+// DeleteMessagebox: delete a messagebox by the request of client.
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	service.data.deleteMessagebox(request.Data.(string))
 }
