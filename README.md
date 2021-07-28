@@ -1,8 +1,16 @@
 # Kaguya Kernel
 
+![Version](https://img.shields.io/badge/v2-OpenSource-009977.svg)
+![GoLang](https://img.shields.io/badge/go-1.16-0066FF.svg)
+![License](https://img.shields.io/badge/license-Apache--2.0-FF0033.svg)
+
 The opensource instant messaging framework.
 
 ![logo](logo.svg)
+
+## Documentation
+
+API reference is available on <https://pkg.go.dev/gopkg.in/star-inc/kaguyakernel.v2>.
 
 ## License
 
