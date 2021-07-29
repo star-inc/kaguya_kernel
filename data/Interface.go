@@ -19,7 +19,6 @@ type Interface interface {
 	Load(source *RethinkSource, filter ...interface{}) error
 	Reload(source *RethinkSource) error
 	Create(source *RethinkSource) error
-	Update(source *RethinkSource) error
 	Replace(source *RethinkSource) error
 	Destroy(source *RethinkSource) error
 }

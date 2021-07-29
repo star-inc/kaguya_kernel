@@ -60,11 +60,6 @@ func (m *Messagebox) Create(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Insert(m).Exec(source.Session)
 }
 
-// Update: ToDO
-func (m *Messagebox) Update(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Update(m).Exec(source.Session)
-}
-
 // Replace: ToDO
 func (m *Messagebox) Replace(source *RethinkSource) error {
 	return source.Term.Table(source.Table).Replace(m).Exec(source.Session)
