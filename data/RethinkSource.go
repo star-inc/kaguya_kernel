@@ -16,13 +16,27 @@ package data
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
+	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"log"
 )
 
 type RethinkSource struct {
 	Table   string
-	Term    *rethinkdb.Term
+	Term    rethinkdb.Term
 	Session *rethinkdb.Session
+}
+
+// NewRethinkSource: create a new RethinkSource instance to connect RethinkDB Server.
+func NewRethinkSource(config Kernel.RethinkConfig, table string) (*RethinkSource, error) {
+	var err error
+	instance := new(RethinkSource)
+	instance.Term = rethinkdb.DB(config.DatabaseName)
+	instance.Session, err = rethinkdb.Connect(config.ConnectConfig)
+	if err != nil {
+		return nil, err
+	}
+	instance.Table = table
+	return instance, nil
 }
 
 func (s *RethinkSource) GetFetchCursor() *rethinkdb.Cursor {
