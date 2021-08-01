@@ -27,7 +27,7 @@ type Service struct {
 	syncExtraDataAssigner func(container data.SyncContainer) interface{}
 }
 
-func NewServiceInterface(source *data.RethinkSource, syncExtraDataAssigner func(data.SyncContainer) interface{}) ServiceInterface {
+func NewServiceInterface(source *data.RethinkSource, syncExtraDataAssigner func(container data.SyncContainer) interface{}) ServiceInterface {
 	service := new(Service)
 	service.source = source
 	service.syncExtraDataAssigner = syncExtraDataAssigner

@@ -32,10 +32,10 @@ const (
 type Service struct {
 	Kernel.Service
 	source           *data.RethinkSource
-	contentValidator func(int, string) bool
+	contentValidator func(contentType int, content string) bool
 }
 
-func NewServiceInterface(source *data.RethinkSource, contentValidator func(int, string) bool) ServiceInterface {
+func NewServiceInterface(source *data.RethinkSource, contentValidator func(contentType int, content string) bool) ServiceInterface {
 	service := new(Service)
 	service.source = source
 	service.contentValidator = contentValidator
