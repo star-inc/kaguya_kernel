@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package seen
+package talk
 
 import "gopkg.in/star-inc/kaguyakernel.v2/data"
 
