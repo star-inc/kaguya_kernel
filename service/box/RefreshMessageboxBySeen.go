@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package talk
+package box
 
 import "gopkg.in/star-inc/kaguyakernel.v2/data"
 
-// UpdateSeen: refresh Messagebox by Container.
-func UpdateSeen(source *data.RethinkSource, relatedID string, container *data.Container) {
+// RefreshMessageboxBySeen: refresh Messagebox by fetch a message.
+func RefreshMessageboxBySeen(source *data.RethinkSource, container *data.Container, relatedID string) {
 	messagebox := new(data.Messagebox)
 	err := messagebox.Load(source, relatedID)
 	if err != nil {
