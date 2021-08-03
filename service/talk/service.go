@@ -19,6 +19,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
 	"log"
 	"strings"
 )
@@ -31,13 +32,13 @@ const (
 
 type Service struct {
 	Kernel.Service
-	source           *data.RethinkSource
+	source           *KernelSource.ContainerSource
 	contentValidator func(contentType int, content string) bool
 }
 
-func NewServiceInterface(source *data.RethinkSource, contentValidator func(contentType int, content string) bool) ServiceInterface {
+func NewServiceInterface(source KernelSource.Interface, contentValidator func(contentType int, content string) bool) ServiceInterface {
 	service := new(Service)
-	service.source = source
+	service.source = source.(*KernelSource.ContainerSource)
 	service.contentValidator = contentValidator
 	return service
 }

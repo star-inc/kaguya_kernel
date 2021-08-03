@@ -18,6 +18,7 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
 	"log"
 	"time"
 )
@@ -46,8 +47,9 @@ func (c *Container) CheckReady() bool {
 }
 
 // Load: load a message from database, filter is the message ID.
-func (c *Container) Load(source *RethinkSource, filter ...interface{}) error {
-	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)
+func (c *Container) Load(source KernelSource.Interface, filter ...interface{}) error {
+	sourceInstance := source.(*KernelSource.ContainerSource)
+	cursor, err := source.GetTerm().Table(sourceInstance.RelationID).Get(filter[0].(string)).Run(source.GetSession())
 	if err != nil {
 		return err
 	}
@@ -59,33 +61,35 @@ func (c *Container) Load(source *RethinkSource, filter ...interface{}) error {
 }
 
 // Reload: reload a message from database,
-func (c *Container) Reload(source *RethinkSource) error {
+func (c *Container) Reload(source KernelSource.Interface) error {
 	return c.Load(source, c.UUID)
 }
 
 // Create: create a new message to database.
-func (c *Container) Create(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Insert(c).Exec(source.Session)
+func (c *Container) Create(source KernelSource.Interface) error {
+	sourceInstance := source.(*KernelSource.ContainerSource)
+	return source.GetTerm().Table(sourceInstance.RelationID).Insert(c).Exec(source.GetSession())
 }
 
 // Replace: update a message context in database.
-func (c *Container) Replace(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Replace(c).Exec(source.Session)
+func (c *Container) Replace(source KernelSource.Interface) error {
+	sourceInstance := source.(*KernelSource.ContainerSource)
+	return source.GetTerm().Table(sourceInstance.RelationID).Replace(c).Exec(source.GetSession())
 }
 
 // Destroy: the method can not be called.
-func (c *Container) Destroy(_ *RethinkSource) error {
+func (c *Container) Destroy(_ KernelSource.Interface) error {
 	return errors.New(ErrorBadMethodCallException)
 }
 
 // FetchSyncContainersByTimestamp: ToDO
-func FetchContainersByTimestamp(source *RethinkSource, timestamp int, limit int) []Container {
+func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int, limit int) []Container {
 	containers := make([]Container, limit)
-	cursor, err := source.Term.Table(source.Table).
+	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
-		Run(source.Session)
+		Run(source.GetSession())
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -104,12 +108,12 @@ func FetchContainersByTimestamp(source *RethinkSource, timestamp int, limit int)
 }
 
 // CountContainersByTimestamp: ToDo
-func CountContainersByTimestamp(source *RethinkSource, timestamp int) int {
-	cursor, err := source.Term.Table(source.Table).
+func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int) int {
+	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
 		Count().
-		Run(source.Session)
+		Run(source.GetSession())
 	if err != nil {
 		log.Panicln(err)
 	}

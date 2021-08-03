@@ -12,15 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package data
+package source
 
-import "gopkg.in/star-inc/kaguyakernel.v2/data/source"
+import (
+	"gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"log"
+)
 
-type Interface interface {
-	CheckReady() bool
-	Load(source source.Interface, filter ...interface{}) error
-	Reload(source source.Interface) error
-	Create(source source.Interface) error
-	Replace(source source.Interface) error
-	Destroy(source source.Interface) error
+type Base struct {
+	Term    rethinkdb.Term
+	Session *rethinkdb.Session
+}
+
+func (b *Base) GetTerm() rethinkdb.Term {
+	return b.Term
+}
+
+func (b *Base) GetSession() *rethinkdb.Session {
+	return b.Session
+}
+
+func (b *Base) GetRawFetchCursor(tableName string) *rethinkdb.Cursor {
+	cursor, err := b.Term.Table(tableName).Changes().Run(b.Session)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return cursor
 }

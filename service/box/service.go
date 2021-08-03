@@ -18,18 +18,19 @@ import (
 	"context"
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
 	"log"
 )
 
 type Service struct {
 	Kernel.Service
-	source                *data.RethinkSource
+	source                *KernelSource.MessageboxSource
 	syncExtraDataAssigner func(container data.SyncContainer) interface{}
 }
 
-func NewServiceInterface(source *data.RethinkSource, syncExtraDataAssigner func(container data.SyncContainer) interface{}) ServiceInterface {
+func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner func(container data.SyncContainer) interface{}) ServiceInterface {
 	service := new(Service)
-	service.source = source
+	service.source = source.(*KernelSource.MessageboxSource)
 	service.syncExtraDataAssigner = syncExtraDataAssigner
 	return service
 }

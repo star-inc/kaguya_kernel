@@ -14,12 +14,15 @@
 
 package box
 
-import "gopkg.in/star-inc/kaguyakernel.v2/data"
+import (
+	"gopkg.in/star-inc/kaguyakernel.v2/data"
+	"gopkg.in/star-inc/kaguyakernel.v2/data/source"
+)
 
 // RefreshMessageboxBySeen: refresh Messagebox by fetch a message.
 // target: target is the Table name of talk service, to update the specified item of messagebox.
-func RefreshMessageboxBySeen(source *data.RethinkSource, target string, container *data.Container, relatedID string) {
-	source.Table = relatedID
+func RefreshMessageboxBySeen(source *source.MessageboxSource, target string, container *data.Container, relatedID string) {
+	source.ClientID = relatedID
 	messagebox := new(data.Messagebox)
 	err := messagebox.Load(source, target)
 	if err != nil {

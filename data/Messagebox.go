@@ -15,6 +15,7 @@
 package data
 
 import (
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
 	"log"
 )
 
@@ -38,8 +39,9 @@ func (m *Messagebox) CheckReady() bool {
 }
 
 // Load: ToDO
-func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
-	cursor, err := source.Term.Table(source.Table).Get(filter[0].(string)).Run(source.Session)
+func (m *Messagebox) Load(source KernelSource.Interface, filter ...interface{}) error {
+	sourceInstance := source.(*KernelSource.MessageboxSource)
+	cursor, err := source.GetTerm().Table(sourceInstance.ClientID).Get(filter[0].(string)).Run(source.GetSession())
 	if err != nil {
 		return err
 	}
@@ -51,21 +53,24 @@ func (m *Messagebox) Load(source *RethinkSource, filter ...interface{}) error {
 }
 
 // Reload: ToDO
-func (m *Messagebox) Reload(source *RethinkSource) error {
+func (m *Messagebox) Reload(source KernelSource.Interface) error {
 	return m.Load(source, m.Target)
 }
 
 // Create: ToDO
-func (m *Messagebox) Create(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Insert(m).Exec(source.Session)
+func (m *Messagebox) Create(source KernelSource.Interface) error {
+	sourceInstance := source.(*KernelSource.MessageboxSource)
+	return source.GetTerm().Table(sourceInstance.ClientID).Insert(m).Exec(source.GetSession())
 }
 
 // Replace: ToDO
-func (m *Messagebox) Replace(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Replace(m).Exec(source.Session)
+func (m *Messagebox) Replace(source KernelSource.Interface) error {
+	sourceInstance := source.(*KernelSource.MessageboxSource)
+	return source.GetTerm().Table(sourceInstance.ClientID).Replace(m).Exec(source.GetSession())
 }
 
 // Destroy: ToDO
-func (m *Messagebox) Destroy(source *RethinkSource) error {
-	return source.Term.Table(source.Table).Get(m.Target).Delete().Exec(source.Session)
+func (m *Messagebox) Destroy(source KernelSource.Interface) error {
+	sourceInstance := source.(*KernelSource.MessageboxSource)
+	return source.GetTerm().Table(sourceInstance.ClientID).Get(m.Target).Delete().Exec(source.GetSession())
 }

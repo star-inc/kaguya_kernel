@@ -12,37 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package data
+package source
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
-	"log"
 )
 
-type RethinkSource struct {
-	Table   string
-	Term    rethinkdb.Term
-	Session *rethinkdb.Session
+type MessageboxSource struct {
+	Base
+	ClientID string
 }
 
-// NewRethinkSource: create a new RethinkSource instance to connect RethinkDB Server.
-func NewRethinkSource(config Kernel.RethinkConfig, table string) (*RethinkSource, error) {
+// NewMessageboxSource: create a new Source instance to connect RethinkDB Server for Messagebox.
+func NewMessageboxSource(config Kernel.RethinkConfig) (*Base, error) {
 	var err error
-	instance := new(RethinkSource)
+	instance := new(Base)
 	instance.Term = rethinkdb.DB(config.DatabaseName)
 	instance.Session, err = rethinkdb.Connect(config.ConnectConfig)
 	if err != nil {
 		return nil, err
 	}
-	instance.Table = table
 	return instance, nil
 }
 
-func (s *RethinkSource) GetFetchCursor() *rethinkdb.Cursor {
-	cursor, err := s.Term.Table(s.Table).Changes().Run(s.Session)
-	if err != nil {
-		log.Panicln(err)
-	}
-	return cursor
+func (s *MessageboxSource) GetFetchCursor() *rethinkdb.Cursor {
+	return s.GetRawFetchCursor(s.ClientID)
 }

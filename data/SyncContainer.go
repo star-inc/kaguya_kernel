@@ -16,6 +16,7 @@ package data
 
 import (
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
 	"log"
 )
 
@@ -26,9 +27,9 @@ type SyncContainer struct {
 }
 
 // FetchSyncContainersByTimestamp: ToDo
-func FetchSyncContainersByTimestamp(source *RethinkSource, timestamp int, limit int) []SyncContainer {
+func FetchSyncContainersByTimestamp(source *KernelSource.MessageboxSource, timestamp int, limit int) []SyncContainer {
 	containers := make([]SyncContainer, limit)
-	cursor, err := source.Term.Table(source.Table).
+	cursor, err := source.Term.Table(source.ClientID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
