@@ -16,8 +16,8 @@ package seen
 
 import "gopkg.in/star-inc/kaguyakernel.v2/data"
 
-// SeenTrigger: refresh Messagebox by Container.
-func SeenTrigger(source *data.RethinkSource, relatedID string, container *data.Container) {
+// UpdateSeen: refresh Messagebox by Container.
+func UpdateSeen(source *data.RethinkSource, relatedID string, container *data.Container) {
 	messagebox := new(data.Messagebox)
 	err := messagebox.Load(source, relatedID)
 	if err != nil {

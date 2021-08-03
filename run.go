@@ -27,7 +27,7 @@ const (
 	ErrorInvalidRequestType  = "Request_type_is_invalid"
 )
 
-// Run: to execute KaguyaKernel with specific arguments.
+// Run: to execute kernel with specific arguments.
 func Run(service ServiceInterface, guard AuthorizeInterface, middlewares MiddlewareInterface, requestSalt string) *melody.Melody {
 	worker := melody.New()
 	fetchCtx, fetchCancel := context.WithCancel(context.Background())
@@ -77,19 +77,11 @@ func messageHandler(service ServiceInterface, message []byte) {
 	// Check method requested is valid (can be requested by client).
 	if method.IsValid() {
 		// Do middlewares [before]
-		if middlewares := service.GetSession().middlewares.OnRequestBefore(); middlewares != nil {
-			for _, middleware := range middlewares {
-				middleware(service.GetSession(), request)
-			}
-		}
+		doMiddlewareBeforeRequest(service.GetSession(), request)
 		// Do main
 		method.Call([]reflect.Value{reflect.ValueOf(request)})
 		// Do middlewares [after]
-		if middlewares := service.GetSession().middlewares.OnRequestAfter(); middlewares != nil {
-			for _, middleware := range middlewares {
-				middleware(service.GetSession(), request)
-			}
-		}
+		doMiddlewareAfterRequest(service.GetSession(), request)
 	}
 }
 

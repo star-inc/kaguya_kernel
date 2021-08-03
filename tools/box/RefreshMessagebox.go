@@ -16,8 +16,8 @@ package box
 
 import "gopkg.in/star-inc/kaguyakernel.v2/data"
 
-// ContainerTrigger: refresh Messagebox by Container.
-func ContainerTrigger(source *data.RethinkSource, relatedMessagebox []string, container *data.Container, metadata string) {
+// RefreshMessagebox: refresh Messagebox by Container.
+func RefreshMessagebox(source *data.RethinkSource, relatedMessagebox []string, container *data.Container, metadata string) {
 	for _, relatedID := range relatedMessagebox {
 		messagebox := new(data.Messagebox)
 		err := messagebox.Load(source, relatedID)
