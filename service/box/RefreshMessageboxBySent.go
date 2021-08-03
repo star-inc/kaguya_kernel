@@ -17,14 +17,15 @@ package box
 import "gopkg.in/star-inc/kaguyakernel.v2/data"
 
 // RefreshMessageboxBySent: refresh Messagebox by sent a message.
-func RefreshMessageboxBySent(source *data.RethinkSource, container *data.Container, relatedMessagebox []string, metadata string) {
+// target: target is the Table name of talk service, to update the specified item of messagebox.
+func RefreshMessageboxBySent(source *data.RethinkSource, target string, container *data.Container, relatedMessagebox []string, metadata string) {
 	for _, relatedID := range relatedMessagebox {
+		source.Table = relatedID
 		messagebox := new(data.Messagebox)
-		err := messagebox.Load(source, relatedID)
+		err := messagebox.Load(source, target)
 		if err != nil {
 			panic(err)
 		}
-		messagebox.Target = source.Table
 		messagebox.Origin = container.Message.Origin
 		messagebox.CreatedTime = container.CreatedTime
 		messagebox.Metadata = metadata
@@ -34,6 +35,7 @@ func RefreshMessageboxBySent(source *data.RethinkSource, container *data.Contain
 				panic(err)
 			}
 		} else {
+			messagebox.Target = target
 			err = messagebox.Create(source)
 			if err != nil {
 				panic(err)
