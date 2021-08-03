@@ -4,6 +4,19 @@ The opensource instant messaging framework.
 
 ![logo](logo.svg)
 
+## Version 1
+
+This is the first version of Kaguya Kernel, which the structure of programming is messy, sloppy, and dirty.
+
+The only duty of this version is trying to create a prototype of Kaguya System, the framework of instant messaging.
+
+So, it's not flexible enough as a framework, but it's still being a good system to create a server,
+the kernel already has full power to run the messaging service, and features are ready to deliver every messages.
+
+## Documentation
+
+Preparing...
+
 ## License
 
 ```license
