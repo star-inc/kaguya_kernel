@@ -51,8 +51,10 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 // Response: response a data to client.
 func (session *Session) Response(data interface{}) {
 	// Do middlewares [before]
-	for _, middleware := range session.middlewares.OnResponseBefore() {
-		middleware(session, data)
+	if middlewares := session.middlewares.OnResponseBefore(); middlewares != nil {
+		for _, middleware := range middlewares {
+			middleware(session, data)
+		}
 	}
 	// Encode data into JSON format.
 	dataBytes, err := json.Marshal(data)
@@ -78,8 +80,10 @@ func (session *Session) Response(data interface{}) {
 		return
 	}
 	// Do middlewares [after]
-	for _, middleware := range session.middlewares.OnResponseAfter() {
-		middleware(session, response)
+	if middlewares := session.middlewares.OnResponseAfter(); middlewares != nil {
+		for _, middleware := range middlewares {
+			middleware(session, response)
+		}
 	}
 }
 

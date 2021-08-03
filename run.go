@@ -77,14 +77,18 @@ func messageHandler(service ServiceInterface, message []byte) {
 	// Check method requested is valid (can be requested by client).
 	if method.IsValid() {
 		// Do middlewares [before]
-		for _, middleware := range service.GetSession().middlewares.OnRequestBefore() {
-			middleware(service.GetSession(), request)
+		if middlewares := service.GetSession().middlewares.OnRequestBefore(); middlewares != nil {
+			for _, middleware := range middlewares {
+				middleware(service.GetSession(), request)
+			}
 		}
 		// Do main
 		method.Call([]reflect.Value{reflect.ValueOf(request)})
 		// Do middlewares [after]
-		for _, middleware := range service.GetSession().middlewares.OnRequestAfter() {
-			middleware(service.GetSession(), request)
+		if middlewares := service.GetSession().middlewares.OnRequestAfter(); middlewares != nil {
+			for _, middleware := range middlewares {
+				middleware(service.GetSession(), request)
+			}
 		}
 	}
 }
