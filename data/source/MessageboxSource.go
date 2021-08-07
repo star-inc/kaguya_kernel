@@ -25,7 +25,7 @@ type MessageboxSource struct {
 }
 
 // NewMessageboxSource: create a new Source instance to connect RethinkDB Server for Messagebox.
-func NewMessageboxSource(config Kernel.RethinkConfig) (*Base, error) {
+func NewMessageboxSource(config Kernel.RethinkConfig) (Interface, error) {
 	var err error
 	instance := new(Base)
 	instance.Term = rethinkdb.DB(config.DatabaseName)

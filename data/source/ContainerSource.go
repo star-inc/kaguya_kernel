@@ -25,7 +25,7 @@ type ContainerSource struct {
 }
 
 // NewContainerSource: create a new Source instance to connect RethinkDB Server for Container.
-func NewContainerSource(config Kernel.RethinkConfig) (*Base, error) {
+func NewContainerSource(config Kernel.RethinkConfig) (Interface, error) {
 	var err error
 	instance := new(Base)
 	instance.Term = rethinkdb.DB(config.DatabaseName)
