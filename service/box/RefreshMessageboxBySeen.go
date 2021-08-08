@@ -20,7 +20,7 @@ import (
 )
 
 // RefreshMessageboxBySeen: refresh Messagebox by fetch a message.
-// target: target is the Table name of talk service, to update the specified item of messagebox.
+// target: target is the Table name of talk service(RoomID/ChatID), to update the specified container of messagebox.
 func RefreshMessageboxBySeen(source *source.MessageboxSource, target string, container *data.Container, relatedID string) {
 	source.ClientID = relatedID
 	messagebox := new(data.Messagebox)
