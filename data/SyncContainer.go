@@ -16,7 +16,7 @@ package data
 
 import (
 	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
-	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 )
 

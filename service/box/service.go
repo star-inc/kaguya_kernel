@@ -18,7 +18,7 @@ import (
 	"context"
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
-	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 )
 

@@ -15,7 +15,7 @@
 package data
 
 import (
-	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/data/source"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 )
 

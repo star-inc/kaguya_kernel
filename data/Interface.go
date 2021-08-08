@@ -14,7 +14,7 @@
 
 package data
 
-import "gopkg.in/star-inc/kaguyakernel.v2/data/source"
+import "gopkg.in/star-inc/kaguyakernel.v2/source"
 
 type Interface interface {
 	CheckReady() bool

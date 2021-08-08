@@ -16,7 +16,7 @@ package box
 
 import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
-	"gopkg.in/star-inc/kaguyakernel.v2/data/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/source"
 )
 
 // RefreshMessageboxBySeen: refresh Messagebox by fetch a message.
