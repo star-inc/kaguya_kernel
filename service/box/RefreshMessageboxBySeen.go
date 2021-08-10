@@ -16,13 +16,12 @@ package box
 
 import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
-	"gopkg.in/star-inc/kaguyakernel.v2/source"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 )
 
 // RefreshMessageboxBySeen: refresh Messagebox by fetch a message.
-// target: target is the Table name of talk service(UserID), to update the specified row with a container from messageboxes.
-func RefreshMessageboxBySeen(source *source.MessageboxSource, target string, container *data.Container, relatedID string) {
-	source.ClientID = relatedID
+// target: target is the relation ID, used for getting the room, as known as chat room ID.
+func RefreshMessageboxBySeen(source *KernelSource.MessageboxSource, target string, container *data.Container) {
 	messagebox := new(data.Messagebox)
 	err := messagebox.Load(source, target)
 	if err != nil {

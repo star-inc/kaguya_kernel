@@ -16,33 +16,30 @@ package box
 
 import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
-	"gopkg.in/star-inc/kaguyakernel.v2/source"
+	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 )
 
 // RefreshMessageboxBySent: refresh Messagebox by sent a message.
-// target: target is the Table name of talk service(UserID), to update the specified row with a container from messageboxes.
-func RefreshMessageboxBySent(source *source.MessageboxSource, target string, container *data.Container, relatedMessagebox []string, metadata string) {
-	for _, relatedID := range relatedMessagebox {
-		source.ClientID = relatedID
-		messagebox := new(data.Messagebox)
-		err := messagebox.Load(source, target)
+// target: target is the relation ID, used for getting the room, as known as chat room ID.
+func RefreshMessageboxBySent(source *KernelSource.MessageboxSource, target string, container *data.Container, metadata string) {
+	messagebox := new(data.Messagebox)
+	err := messagebox.Load(source, target)
+	if err != nil {
+		panic(err)
+	}
+	messagebox.Origin = container.Message.Origin
+	messagebox.CreatedTime = container.CreatedTime
+	messagebox.Metadata = metadata
+	if messagebox.CheckReady() {
+		err = messagebox.Replace(source)
 		if err != nil {
 			panic(err)
 		}
-		messagebox.Origin = container.Message.Origin
-		messagebox.CreatedTime = container.CreatedTime
-		messagebox.Metadata = metadata
-		if messagebox.CheckReady() {
-			err = messagebox.Replace(source)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			messagebox.Target = target
-			err = messagebox.Create(source)
-			if err != nil {
-				panic(err)
-			}
+	} else {
+		messagebox.Target = target
+		err = messagebox.Create(source)
+		if err != nil {
+			panic(err)
 		}
 	}
 }
