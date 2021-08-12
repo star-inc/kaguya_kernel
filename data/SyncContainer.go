@@ -20,15 +20,15 @@ import (
 	"log"
 )
 
-// SyncContainer: this is the container to wrap client a messagebox with extra data.
-type SyncContainer struct {
+// SyncMessagebox: this is the wrapper to wrap client a messagebox with extra data.
+type SyncMessagebox struct {
 	Messagebox
 	ExtraData interface{} `json:"extraData"`
 }
 
-// FetchSyncContainersByTimestamp: ToDo
-func FetchSyncContainersByTimestamp(source *KernelSource.MessageboxSource, timestamp int, limit int) []SyncContainer {
-	containers := make([]SyncContainer, limit)
+// FetchSyncMessageboxesByTimestamp: ToDo
+func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int, limit int) []SyncMessagebox {
+	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).
 		OrderBy(Rethink.Desc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).

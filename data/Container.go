@@ -82,7 +82,7 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 	return errors.New(ErrorBadMethodCallException)
 }
 
-// FetchSyncContainersByTimestamp: ToDO
+// FetchSyncMessageboxsByTimestamp: ToDO
 func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int, limit int) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
