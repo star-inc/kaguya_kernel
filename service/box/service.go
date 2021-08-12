@@ -25,10 +25,10 @@ import (
 type Service struct {
 	Kernel.Service
 	source                *KernelSource.MessageboxSource
-	syncExtraDataAssigner func(container data.SyncMessagebox) interface{}
+	syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}
 }
 
-func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner func(container data.SyncMessagebox) interface{}) ServiceInterface {
+func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.MessageboxSource)
 	service.syncExtraDataAssigner = syncExtraDataAssigner
@@ -63,11 +63,11 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
 	timestamp := int(query["timestamp"].(float64))
 	limit := int(query["count"].(float64))
-	containers := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
-	for i, container := range containers {
-		containers[i].ExtraData = service.syncExtraDataAssigner(container)
+	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
+	for i, syncMessagebox := range syncMessageboxes {
+		syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
 	}
-	service.GetSession().Response(containers)
+	service.GetSession().Response(syncMessageboxes)
 }
 
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
