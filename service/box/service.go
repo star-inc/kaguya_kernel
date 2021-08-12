@@ -61,8 +61,8 @@ func (service *Service) Fetch(ctx context.Context) {
 
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
-	timestamp := int(query["timestamp"].(float64))
-	limit := int(query["count"].(float64))
+	timestamp := int64(query["timestamp"].(float64))
+	limit := int64(query["count"].(float64))
 	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
 	for i, syncMessagebox := range syncMessageboxes {
 		syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)

@@ -27,7 +27,7 @@ type SyncMessagebox struct {
 }
 
 // FetchSyncMessageboxesByTimestamp: ToDo
-func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int, limit int) []SyncMessagebox {
+func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int64, limit int64) []SyncMessagebox {
 	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).
 		OrderBy(Rethink.Desc("createdTime")).

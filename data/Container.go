@@ -82,8 +82,8 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 	return errors.New(ErrorBadMethodCallException)
 }
 
-// FetchSyncMessageboxsByTimestamp: ToDO
-func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int, limit int) []Container {
+// FetchContainersByTimestamp: ToDO
+func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(Rethink.Desc("createdTime")).
@@ -108,7 +108,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 }
 
 // CountContainersByTimestamp: ToDo
-func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int) int {
+func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(Rethink.Asc("createdTime")).
 		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
