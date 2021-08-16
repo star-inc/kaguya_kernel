@@ -30,12 +30,14 @@ const (
 	ErrorOriginNotEmpty = "Origin_is_not_empty"
 )
 
+// Service: this is the struct of Talk Service.
 type Service struct {
 	Kernel.Service
 	source           *KernelSource.ContainerSource
 	contentValidator func(contentType int, content string) bool
 }
 
+// NewServiceInterface: create service interface of Talk.
 func NewServiceInterface(source KernelSource.Interface, contentValidator func(contentType int, content string) bool) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.ContainerSource)
@@ -43,10 +45,12 @@ func NewServiceInterface(source KernelSource.Interface, contentValidator func(co
 	return service
 }
 
+// CheckPermission: check the permission of client.
 func (service *Service) CheckPermission() bool {
-	return false
+	return service.GetGuard().Permission(service.source.RelationID)
 }
 
+// Fetch: do the fetch for data, if there is a change in database, it will throw the event out.
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
@@ -67,6 +71,7 @@ func (service *Service) Fetch(ctx context.Context) {
 	}
 }
 
+// GetHistoryMessages: get the history messages for client.
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
 	timestamp := int64(query["timestamp"].(float64))
@@ -75,6 +80,7 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	service.GetSession().Response(containers)
 }
 
+// GetMessage: get the message specific for client.
 func (service *Service) GetMessage(request *Kernel.Request) {
 	container := new(data.Container)
 	err := container.Load(service.source, request.Data.(string))
@@ -85,6 +91,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 	}
 }
 
+// SendMessage: send a message by the request of client.
 func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(data.Message)
 	err := mapstructure.Decode(request.Data, message)
@@ -112,6 +119,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	}
 }
 
+// CancelSentMessage: cancel a message delivery by the request of client.
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	container := new(data.Container)
 	err := container.Load(service.source, request.Data.(string))
