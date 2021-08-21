@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"gopkg.in/olahol/melody.v1"
@@ -58,12 +57,14 @@ func (session *Session) Response(data interface{}) {
 		session.RaiseError(ErrorJSONEncodingResponseData)
 		return
 	}
-	// Let dataBytes compressed by GZip, and encoded by Base64.
+	// Let dataBytes compressed by GZip.
 	dataBytes = compress(dataBytes)
 	// Create a new Response object.
 	now := time.Now().UnixNano()
 	response := responseFactory(session, now, dataBytes)
 	// Encode the response into JSON format.
+	// JSON package will convert bytes to base64 automatically,
+	// so dataBytes with compressed will be encoded into Base64 format.
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
 		session.RaiseError(ErrorJSONEncodingResponse)
@@ -107,7 +108,7 @@ func sign(session *Session, currentTimestamp int64, dataBytes []byte) string {
 	}
 }
 
-// compress: compress bytes by GZip, and encode into Base64 format.
+// compress: compress bytes by GZip.
 func compress(raw []byte) []byte {
 	var compressed bytes.Buffer
 	gz := gzip.NewWriter(&compressed)
@@ -120,10 +121,7 @@ func compress(raw []byte) []byte {
 	if err := gz.Close(); err != nil {
 		panic(err)
 	}
-	compressedBytes := compressed.Bytes()
-	compressedResult := make([]byte, base64.StdEncoding.EncodedLen(len(compressedBytes)))
-	base64.StdEncoding.Encode(compressedResult, compressedBytes)
-	return compressedResult
+	return compressed.Bytes()
 }
 
 // RaiseError: throw an error to client.
