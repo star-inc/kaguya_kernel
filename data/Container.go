@@ -17,7 +17,7 @@ package data
 import (
 	"errors"
 	"github.com/google/uuid"
-	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 	"time"
@@ -86,8 +86,8 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
-		OrderBy(Rethink.Desc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
+		OrderBy(rethinkdb.Desc("createdTime")).
+		Filter(rethinkdb.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
 		Run(source.GetSession())
 	if err != nil {
@@ -98,7 +98,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 		log.Println(err)
 	}()
 	err = cursor.All(&containers)
-	if err == Rethink.ErrEmptyResult {
+	if err == rethinkdb.ErrEmptyResult {
 		return nil
 	}
 	if err != nil {
@@ -110,8 +110,8 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 // CountContainersByTimestamp: ToDo
 func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
-		OrderBy(Rethink.Asc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Gt(timestamp)).
+		OrderBy(rethinkdb.Asc("createdTime")).
+		Filter(rethinkdb.Row.Field("createdTime").Gt(timestamp)).
 		Count().
 		Run(source.GetSession())
 	if err != nil {

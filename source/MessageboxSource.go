@@ -16,7 +16,6 @@ package source
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
-	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 )
 
 type MessageboxSource struct {
@@ -24,13 +23,13 @@ type MessageboxSource struct {
 	ClientID string
 }
 
-// NewMessageboxSource: create a new Source instance to connect RethinkDB Server for Messagebox.
-func NewMessageboxSource(config Kernel.RethinkConfig, ClientID string) (Interface, error) {
+// NewMessageboxSource: create a new Source instance to connect rethinkdbDB Server for Messagebox.
+func NewMessageboxSource(config rethinkdb.ConnectOpts, databaseName string, clientID string) (Interface, error) {
 	var err error
 	instance := new(MessageboxSource)
-	instance.ClientID = ClientID
-	instance.Term = rethinkdb.DB(config.DatabaseName)
-	instance.Session, err = rethinkdb.Connect(config.ConnectConfig)
+	instance.ClientID = clientID
+	instance.Term = rethinkdb.DB(databaseName)
+	instance.Session, err = rethinkdb.Connect(config)
 	if err != nil {
 		return nil, err
 	}

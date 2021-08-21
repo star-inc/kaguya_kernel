@@ -15,7 +15,7 @@
 package data
 
 import (
-	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 )
@@ -30,8 +30,8 @@ type SyncMessagebox struct {
 func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int64, limit int64) []SyncMessagebox {
 	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).
-		OrderBy(Rethink.Desc("createdTime")).
-		Filter(Rethink.Row.Field("createdTime").Lt(timestamp)).
+		OrderBy(rethinkdb.Desc("createdTime")).
+		Filter(rethinkdb.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
 		Run(source.Session)
 	if err != nil {
@@ -42,7 +42,7 @@ func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, tim
 		log.Println(err)
 	}()
 	err = cursor.All(&containers)
-	if err == Rethink.ErrEmptyResult {
+	if err == rethinkdb.ErrEmptyResult {
 		return nil
 	}
 	if err != nil {

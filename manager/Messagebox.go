@@ -15,7 +15,7 @@
 package manager
 
 import (
-	Rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 )
@@ -51,7 +51,7 @@ func (m *Messagebox) Create() error {
 		GetTerm().
 		TableCreate(
 			m.source.ClientID,
-			Rethink.TableCreateOpts{PrimaryKey: "target"},
+			rethinkdb.TableCreateOpts{PrimaryKey: "target"},
 		).
 		IndexCreate("origin").
 		IndexCreate("createdTime").

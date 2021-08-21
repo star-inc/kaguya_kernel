@@ -16,7 +16,6 @@ package source
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
-	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 )
 
 type ContainerSource struct {
@@ -24,13 +23,13 @@ type ContainerSource struct {
 	RelationID string
 }
 
-// NewContainerSource: create a new Source instance to connect RethinkDB Server for Container.
-func NewContainerSource(config Kernel.RethinkConfig, RelationID string) (Interface, error) {
+// NewContainerSource: create a new Source instance to connect rethinkdbDB Server for Container.
+func NewContainerSource(config rethinkdb.ConnectOpts, databaseName string, relationID string) (Interface, error) {
 	var err error
 	instance := new(ContainerSource)
-	instance.RelationID = RelationID
-	instance.Term = rethinkdb.DB(config.DatabaseName)
-	instance.Session, err = rethinkdb.Connect(config.ConnectConfig)
+	instance.RelationID = relationID
+	instance.Term = rethinkdb.DB(databaseName)
+	instance.Session, err = rethinkdb.Connect(config)
 	if err != nil {
 		return nil, err
 	}
