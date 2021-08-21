@@ -24,16 +24,19 @@ type ContainerSource struct {
 }
 
 // NewContainerSource: create a new Source instance to connect rethinkdbDB Server for Container.
-func NewContainerSource(config rethinkdb.ConnectOpts, databaseName string, relationID string) (Interface, error) {
+func NewContainerSource(config rethinkdb.ConnectOpts, databaseName string) (Interface, error) {
 	var err error
 	instance := new(ContainerSource)
-	instance.RelationID = relationID
 	instance.Term = rethinkdb.DB(databaseName)
 	instance.Session, err = rethinkdb.Connect(config)
 	if err != nil {
 		return nil, err
 	}
 	return instance, nil
+}
+
+func (s *ContainerSource) CheckReady() bool {
+	return s.RelationID != ""
 }
 
 func (s *ContainerSource) GetFetchCursor() *rethinkdb.Cursor {

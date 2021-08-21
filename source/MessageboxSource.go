@@ -24,16 +24,19 @@ type MessageboxSource struct {
 }
 
 // NewMessageboxSource: create a new Source instance to connect rethinkdbDB Server for Messagebox.
-func NewMessageboxSource(config rethinkdb.ConnectOpts, databaseName string, clientID string) (Interface, error) {
+func NewMessageboxSource(config rethinkdb.ConnectOpts, databaseName string) (Interface, error) {
 	var err error
 	instance := new(MessageboxSource)
-	instance.ClientID = clientID
 	instance.Term = rethinkdb.DB(databaseName)
 	instance.Session, err = rethinkdb.Connect(config)
 	if err != nil {
 		return nil, err
 	}
 	return instance, nil
+}
+
+func (s *MessageboxSource) CheckReady() bool {
+	return s.ClientID != ""
 }
 
 func (s *MessageboxSource) GetFetchCursor() *rethinkdb.Cursor {
