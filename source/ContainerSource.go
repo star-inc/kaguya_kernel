@@ -16,6 +16,7 @@ package source
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"log"
 )
 
 type ContainerSource struct {
@@ -36,9 +37,45 @@ func NewContainerSource(config rethinkdb.ConnectOpts, databaseName string) (Inte
 }
 
 func (s *ContainerSource) CheckReady() bool {
-	return s.RelationID != ""
+	return s.RelationID != "" && s.checkTerm()
 }
 
 func (s *ContainerSource) GetFetchCursor() *rethinkdb.Cursor {
 	return s.GetRawFetchCursor(s.RelationID)
+}
+
+func (s *ContainerSource) checkTerm() bool {
+	cursor, err := s.
+		GetTerm().
+		TableList().
+		Contains(s.RelationID).
+		Run(s.GetSession())
+	if err != nil {
+		log.Panicln(err)
+	}
+	var status bool
+	err = cursor.One(&status)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return status
+}
+
+func (s *ContainerSource) CreateTerm() error {
+	return s.
+		GetTerm().
+		TableCreate(
+			s.RelationID,
+			rethinkdb.TableCreateOpts{PrimaryKey: "id"},
+		).
+		IndexCreate("origin").
+		IndexCreate("createdTime").
+		Exec(s.GetSession())
+}
+
+func (s *ContainerSource) DropTerm() error {
+	return s.
+		GetTerm().
+		TableDrop(s.RelationID).
+		Exec(s.GetSession())
 }

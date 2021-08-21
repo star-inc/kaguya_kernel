@@ -16,6 +16,7 @@ package source
 
 import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"log"
 )
 
 type MessageboxSource struct {
@@ -36,9 +37,45 @@ func NewMessageboxSource(config rethinkdb.ConnectOpts, databaseName string) (Int
 }
 
 func (s *MessageboxSource) CheckReady() bool {
-	return s.ClientID != ""
+	return s.ClientID != "" && s.checkTerm()
 }
 
 func (s *MessageboxSource) GetFetchCursor() *rethinkdb.Cursor {
 	return s.GetRawFetchCursor(s.ClientID)
+}
+
+func (s *MessageboxSource) checkTerm() bool {
+	cursor, err := s.
+		GetTerm().
+		TableList().
+		Contains(s.ClientID).
+		Run(s.GetSession())
+	if err != nil {
+		log.Panicln(err)
+	}
+	var status bool
+	err = cursor.One(&status)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return status
+}
+
+func (s *MessageboxSource) CreateTerm() error {
+	return s.
+		GetTerm().
+		TableCreate(
+			s.ClientID,
+			rethinkdb.TableCreateOpts{PrimaryKey: "target"},
+		).
+		IndexCreate("origin").
+		IndexCreate("createdTime").
+		Exec(s.GetSession())
+}
+
+func (s *MessageboxSource) DropTerm() error {
+	return s.
+		GetTerm().
+		TableDrop(s.ClientID).
+		Exec(s.GetSession())
 }
