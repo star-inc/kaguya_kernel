@@ -121,8 +121,9 @@ func compress(raw []byte) []byte {
 		panic(err)
 	}
 	compressedBytes := compressed.Bytes()
-	base64.StdEncoding.Encode(compressedBytes, compressedBytes)
-	return compressedBytes
+	compressedResult := make([]byte, base64.StdEncoding.EncodedLen(len(compressedBytes)))
+	base64.StdEncoding.Encode(compressedResult, compressedBytes)
+	return compressedResult
 }
 
 // RaiseError: throw an error to client.
