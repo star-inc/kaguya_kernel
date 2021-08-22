@@ -24,7 +24,7 @@ type ContainerSource struct {
 	RelationID string
 }
 
-// NewContainerSource: create a new Source instance to connect rethinkdbDB Server for Container.
+// NewContainerSource will create a new Source instance to connect rethinkdbDB Server for Container.
 func NewContainerSource(config rethinkdb.ConnectOpts, databaseName string) (Interface, error) {
 	var err error
 	instance := new(ContainerSource)

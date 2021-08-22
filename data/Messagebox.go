@@ -27,18 +27,18 @@ type Messagebox struct {
 	Target      string      `rethinkdb:"target" json:"target"`
 }
 
-// NewMessagebox: ToDO
+// NewMessagebox ToDO
 func NewMessagebox() Interface {
 	instance := new(Messagebox)
 	return instance
 }
 
-// CheckReady: check model is ready.
+// CheckReady will check model is ready.
 func (m *Messagebox) CheckReady() bool {
 	return m != nil && m.Origin != "" && m.Target != ""
 }
 
-// Load: ToDO
+// Load ToDO
 func (m *Messagebox) Load(source KernelSource.Interface, filter ...interface{}) error {
 	sourceInstance := source.(*KernelSource.MessageboxSource)
 	cursor, err := source.GetTerm().Table(sourceInstance.ClientID).Get(filter[0].(string)).Run(source.GetSession())
@@ -54,24 +54,24 @@ func (m *Messagebox) Load(source KernelSource.Interface, filter ...interface{}) 
 	return cursor.One(m)
 }
 
-// Reload: ToDO
+// Reload ToDO
 func (m *Messagebox) Reload(source KernelSource.Interface) error {
 	return m.Load(source, m.Target)
 }
 
-// Create: ToDO
+// Create ToDO
 func (m *Messagebox) Create(source KernelSource.Interface) error {
 	sourceInstance := source.(*KernelSource.MessageboxSource)
 	return source.GetTerm().Table(sourceInstance.ClientID).Insert(m).Exec(source.GetSession())
 }
 
-// Replace: ToDO
+// Replace ToDO
 func (m *Messagebox) Replace(source KernelSource.Interface) error {
 	sourceInstance := source.(*KernelSource.MessageboxSource)
 	return source.GetTerm().Table(sourceInstance.ClientID).Replace(m).Exec(source.GetSession())
 }
 
-// Destroy: ToDO
+// Destroy ToDO
 func (m *Messagebox) Destroy(source KernelSource.Interface) error {
 	sourceInstance := source.(*KernelSource.MessageboxSource)
 	return source.GetTerm().Table(sourceInstance.ClientID).Get(m.Target).Delete().Exec(source.GetSession())

@@ -19,8 +19,8 @@ import (
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 )
 
-// RefreshMessageboxAfterSeen: refresh Messagebox by fetch a Container.
-// target: target is the relation ID, used for getting the room, as known as chat room ID.
+// RefreshMessageboxAfterSeen will refresh Messagebox by fetch a Container.
+// target is the relation ID, used for getting the room, as known as chat room ID.
 func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, container *data.Container) {
 	messagebox := new(data.Messagebox)
 	err := messagebox.Load(source, target)

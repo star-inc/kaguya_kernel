@@ -27,7 +27,7 @@ const (
 	ErrorInvalidRequestType  = "Request_type_is_invalid"
 )
 
-// Run: to execute kernel with specific arguments.
+// Run will execute kernel with specific arguments.
 func Run(service ServiceInterface, guard AuthorizeInterface, middlewares MiddlewareInterface, requestSalt string) *melody.Melody {
 	worker := melody.New()
 	fetchCtx, fetchCancel := context.WithCancel(context.Background())

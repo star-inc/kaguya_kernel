@@ -22,14 +22,14 @@ import (
 	"log"
 )
 
-// Service: this is the struct of Messagebox Service.
+// Service will this is the struct of Messagebox Service.
 type Service struct {
 	Kernel.Service
 	source                *KernelSource.MessageboxSource
 	syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}
 }
 
-// NewServiceInterface: create service interface of Messagebox.
+// NewServiceInterface will create service interface of Messagebox.
 func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.MessageboxSource)
@@ -37,12 +37,12 @@ func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner fu
 	return service
 }
 
-// CheckPermission: check the permission of client.
+// CheckPermission will check the permission of client.
 func (service *Service) CheckPermission() bool {
 	return service.GetGuard().Permission(service.source.ClientID)
 }
 
-// Fetch: do the fetch for data, if there is a change in database, it will throw the event out.
+// Fetch will do the fetch for data, if there is a change in database, it will throw the event out.
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
@@ -65,7 +65,7 @@ func (service *Service) Fetch(ctx context.Context) {
 	}
 }
 
-// SyncMessagebox: get the history messageboxes for client.
+// SyncMessagebox will get the history messageboxes for client.
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
 	timestamp := int64(query["timestamp"].(float64))
@@ -77,7 +77,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	service.GetSession().Response(syncMessageboxes)
 }
 
-// DeleteMessagebox: delete a messagebox by the request of client.
+// DeleteMessagebox will delete a messagebox by the request of client.
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
 	err := messagebox.Load(service.source, request.Data.(string))

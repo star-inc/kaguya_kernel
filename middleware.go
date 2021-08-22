@@ -16,7 +16,7 @@ package KaguyaKernel
 
 import "sync"
 
-// MiddlewareInterface: the interface to get middlewares for kernel.
+// MiddlewareInterface will the interface to get middlewares for kernel.
 type MiddlewareInterface interface {
 	OnRequestBefore() []func(session *Session, wg *sync.WaitGroup, request *Request)
 	OnRequestAfter() []func(session *Session, wg *sync.WaitGroup, request *Request)

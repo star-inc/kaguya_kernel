@@ -1,5 +1,5 @@
 /*
-	Package KaguyaKernel: The opensource instant messaging framework.
+	Package KaguyaKernel will The opensource instant messaging framework.
 
     Copyright 2021 Star Inc.(https://starinc.xyz)
     Licensed under the Apache License, Version 2.0 (the "License");

@@ -20,13 +20,13 @@ import (
 	"log"
 )
 
-// SyncMessagebox: this is the wrapper to wrap client a messagebox with extra data.
+// SyncMessagebox this is the wrapper to wrap client a messagebox with extra data.
 type SyncMessagebox struct {
 	Messagebox
 	ExtraData interface{} `json:"extraData"`
 }
 
-// FetchSyncMessageboxesByTimestamp: ToDo
+// FetchSyncMessageboxesByTimestamp ToDo
 func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int64, limit int64) []SyncMessagebox {
 	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).

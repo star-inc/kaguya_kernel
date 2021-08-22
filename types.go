@@ -14,6 +14,7 @@
 
 package KaguyaKernel
 
+// Request the data structure for receiving from clients.
 // Type is the method name that the client requested to server,
 // kernel will to the reflection and find the method in the ServiceInterface,
 // if the only argument of the method is Request, the method will be executed and returned,
@@ -23,6 +24,7 @@ type Request struct {
 	Type string      `json:"type"`
 }
 
+// Response
 // Method is a mark of the origin method,
 // to declare where is the Response sent, the field is omitempty.
 type Response struct {

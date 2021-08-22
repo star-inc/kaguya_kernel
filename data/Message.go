@@ -14,7 +14,7 @@
 
 package data
 
-// Message: Message is the data structure from client, to be created the message by including into Container.
+// Message is the data structure from client, to be created the message by including into Container.
 type Message struct {
 	Content     string `rethinkdb:"content" json:"content"`
 	ContentType int    `rethinkdb:"contentType" json:"contentType"`

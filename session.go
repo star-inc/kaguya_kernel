@@ -39,7 +39,7 @@ type Session struct {
 	middlewares   MiddlewareInterface
 }
 
-// NewSession: starts a new session.
+// NewSession will starts a new session.
 func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, requestSalt string) *Session {
 	session := new(Session)
 	session.socketSession = socketSession
@@ -48,7 +48,7 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 	return session
 }
 
-// Response: response data to client.
+// Response will response data to client.
 func (session *Session) Response(data interface{}) {
 	// Find original method from Caller.
 	skip := 1
@@ -88,7 +88,7 @@ func (session *Session) Response(data interface{}) {
 	doMiddlewareAfterResponse(session, method, response)
 }
 
-// responseFactory: Generate a Response.
+// responseFactory will Generate a Response.
 func responseFactory(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Response {
 	// Generate Response
 	instance := new(Response)
@@ -99,7 +99,7 @@ func responseFactory(session *Session, currentTimestamp int64, method string, da
 	return instance
 }
 
-// sign: Generate a Signature as hex string by SHA256.
+// sign will Generate a Signature as hex string by SHA256.
 // Due to the data has been turned into compressed bytes,
 // there will be no JSON ordering problem while doing the verification.
 func sign(session *Session, currentTimestamp int64, method string, dataBytes []byte) string {
@@ -118,7 +118,7 @@ func sign(session *Session, currentTimestamp int64, method string, dataBytes []b
 	}
 }
 
-// compress: compress bytes by GZip.
+// compress will compress bytes by GZip.
 func compress(raw []byte) []byte {
 	var compressed bytes.Buffer
 	gz := gzip.NewWriter(&compressed)
@@ -134,7 +134,7 @@ func compress(raw []byte) []byte {
 	return compressed.Bytes()
 }
 
-// RaiseError: throw an error to client.
+// RaiseError will throw an error to client.
 func (session *Session) RaiseError(message string) {
 	pc, _, _, _ := runtime.Caller(1)
 	method := runtime.FuncForPC(pc).Name()

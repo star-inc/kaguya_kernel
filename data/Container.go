@@ -23,7 +23,7 @@ import (
 	"time"
 )
 
-// Container: Container is the data structure, only can be modified by server only, to include a message into database.
+// Container is the data structure, only can be modified by server only, to include a message into database.
 type Container struct {
 	UUID        string   `rethinkdb:"id,omitempty" json:"uuid"`
 	Message     *Message `rethinkdb:"message" json:"message"`
@@ -31,7 +31,7 @@ type Container struct {
 	Canceled    bool     `rethinkdb:"canceled" json:"canceled"`
 }
 
-// NewContainer: include a message automatically, the function will fill the information required for Container.
+// NewContainer will include a message automatically, the function will fill the information required for Container.
 func NewContainer(message *Message) Interface {
 	instance := new(Container)
 	instance.UUID = uuid.New().String()
@@ -41,12 +41,12 @@ func NewContainer(message *Message) Interface {
 	return instance
 }
 
-// CheckReady: check model is ready.
+// CheckReady will check model is ready.
 func (c *Container) CheckReady() bool {
 	return c != nil && c.UUID != ""
 }
 
-// Load: load a message from database, filter is the message ID.
+// Load will load a message from database, filter is the message ID.
 func (c *Container) Load(source KernelSource.Interface, filter ...interface{}) error {
 	sourceInstance := source.(*KernelSource.ContainerSource)
 	cursor, err := source.GetTerm().Table(sourceInstance.RelationID).Get(filter[0].(string)).Run(source.GetSession())
@@ -62,29 +62,29 @@ func (c *Container) Load(source KernelSource.Interface, filter ...interface{}) e
 	return cursor.One(c)
 }
 
-// Reload: reload a message from database,
+// Reload will reload a message from database,
 func (c *Container) Reload(source KernelSource.Interface) error {
 	return c.Load(source, c.UUID)
 }
 
-// Create: create a new message to database.
+// Create will create a new message to database.
 func (c *Container) Create(source KernelSource.Interface) error {
 	sourceInstance := source.(*KernelSource.ContainerSource)
 	return source.GetTerm().Table(sourceInstance.RelationID).Insert(c).Exec(source.GetSession())
 }
 
-// Replace: update a message context in database.
+// Replace will update a message context in database.
 func (c *Container) Replace(source KernelSource.Interface) error {
 	sourceInstance := source.(*KernelSource.ContainerSource)
 	return source.GetTerm().Table(sourceInstance.RelationID).Replace(c).Exec(source.GetSession())
 }
 
-// Destroy: the method can not be called.
+// Destroy will the method can not be called.
 func (c *Container) Destroy(_ KernelSource.Interface) error {
 	return errors.New(ErrorBadMethodCallException)
 }
 
-// FetchContainersByTimestamp: ToDO
+// FetchContainersByTimestamp ToDO
 func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
@@ -111,7 +111,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 	return containers
 }
 
-// CountContainersByTimestamp: ToDo
+// CountContainersByTimestamp ToDo
 func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(rethinkdb.Asc("createdTime")).
