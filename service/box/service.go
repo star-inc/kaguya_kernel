@@ -22,7 +22,7 @@ import (
 	"log"
 )
 
-// Service will this is the struct of Messagebox Service.
+// Service is the data structure of Messagebox Service.
 type Service struct {
 	Kernel.Service
 	source                *KernelSource.MessageboxSource
@@ -77,7 +77,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	service.GetSession().Respond(syncMessageboxes)
 }
 
-// DeleteMessagebox will delete a messagebox by the request of client.
+// DeleteMessagebox will delete a messagebox by the request from client.
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
 	err := messagebox.Load(service.source, request.Data.(string))

@@ -10,7 +10,7 @@ type Response struct {
 	Method    string `json:"method,omitempty"`
 }
 
-// responseFactory will Generate a Response.
+// responseFactory will generate a Response.
 func responseFactory(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Response {
 	// Generate Response
 	instance := new(Response)

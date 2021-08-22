@@ -79,7 +79,7 @@ func (c *Container) Replace(source KernelSource.Interface) error {
 	return source.GetTerm().Table(sourceInstance.RelationID).Replace(c).Exec(source.GetSession())
 }
 
-// Destroy will the method can not be called.
+// Destroy is the method can not be called.
 func (c *Container) Destroy(_ KernelSource.Interface) error {
 	return errors.New(ErrorBadMethodCallException)
 }

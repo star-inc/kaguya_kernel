@@ -30,7 +30,7 @@ const (
 	ErrorOriginNotEmpty = "Origin_is_not_empty"
 )
 
-// Service will this is the struct of Talk Service.
+// Service is the data structure of Talk Service.
 type Service struct {
 	Kernel.Service
 	source           *KernelSource.ContainerSource
@@ -93,7 +93,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 	}
 }
 
-// SendMessage will send a message by the request of client.
+// SendMessage will send a message by the request from client.
 func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(data.Message)
 	err := mapstructure.Decode(request.Data, message)
@@ -121,7 +121,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	}
 }
 
-// CancelSentMessage will cancel a message delivery by the request of client.
+// CancelSentMessage will cancel a message delivery by the request from client.
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	container := new(data.Container)
 	err := container.Load(service.source, request.Data.(string))

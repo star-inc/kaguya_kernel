@@ -86,7 +86,7 @@ func (session *Session) Respond(data interface{}) {
 	doMiddlewareAfterRespond(session, method, response)
 }
 
-// compress will compress bytes by GZip.
+// compress bytes by GZip.
 func compress(raw []byte) []byte {
 	var compressed bytes.Buffer
 	gz := gzip.NewWriter(&compressed)
