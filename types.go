@@ -29,7 +29,7 @@ type Response struct {
 	Data      []byte `json:"data"`
 	Signature string `json:"signature"`
 	Timestamp int64  `json:"timestamp"`
-	Method    string `json:"type,omitempty"`
+	Method    string `json:"method,omitempty"`
 }
 
 type ErrorReport struct {
@@ -41,5 +41,5 @@ type Signature struct {
 	Data      []byte `json:"data"`
 	Salt      string `json:"salt"`
 	Timestamp int64  `json:"timestamp"`
-	Method    string `json:"type,omitempty"`
+	Method    string `json:"method,omitempty"`
 }
