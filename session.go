@@ -48,7 +48,7 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 	return session
 }
 
-// Response: response a data to client.
+// Response: response data to client.
 func (session *Session) Response(data interface{}) {
 	// Find original method from Caller.
 	skip := 1
