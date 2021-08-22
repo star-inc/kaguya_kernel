@@ -128,7 +128,9 @@ func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	if err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
-	err = container.Destroy(service.source)
+	container.Canceled = true
+	container.Message.Content = ""
+	err = container.Replace(service.source)
 	if err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
