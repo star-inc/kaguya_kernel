@@ -57,7 +57,7 @@ func (service *Service) Fetch(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			service.GetSession().Response(row)
+			service.GetSession().Respond(row)
 		}
 	}
 	if err := cursor.Err(); err != nil {
@@ -74,7 +74,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	for i, syncMessagebox := range syncMessageboxes {
 		syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
 	}
-	service.GetSession().Response(syncMessageboxes)
+	service.GetSession().Respond(syncMessageboxes)
 }
 
 // DeleteMessagebox will delete a messagebox by the request of client.

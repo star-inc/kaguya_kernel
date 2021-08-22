@@ -17,9 +17,7 @@ package KaguyaKernel
 import (
 	"bytes"
 	"compress/gzip"
-	"crypto/sha256"
 	"encoding/json"
-	"fmt"
 	"gopkg.in/olahol/melody.v1"
 	"log"
 	"runtime"
@@ -48,8 +46,8 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 	return session
 }
 
-// Response will respond data to client.
-func (session *Session) Response(data interface{}) {
+// Respond will send data to client.
+func (session *Session) Respond(data interface{}) {
 	// Find original method from Caller.
 	skip := 1
 	if _, ok := data.(*ErrorReport); ok {
@@ -58,7 +56,7 @@ func (session *Session) Response(data interface{}) {
 	pc, _, _, _ := runtime.Caller(skip)
 	method := runtime.FuncForPC(pc).Name()
 	// Do middlewares [before]
-	doMiddlewareBeforeResponse(session, method, data)
+	doMiddlewareBeforeRespond(session, method, data)
 	// Encode data into JSON format.
 	dataBytes, err := json.Marshal(data)
 	if err != nil {
@@ -85,37 +83,7 @@ func (session *Session) Response(data interface{}) {
 		return
 	}
 	// Do middlewares [after]
-	doMiddlewareAfterResponse(session, method, response)
-}
-
-// responseFactory will Generate a Response.
-func responseFactory(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Response {
-	// Generate Response
-	instance := new(Response)
-	instance.Data = dataBytes
-	instance.Method = method
-	instance.Timestamp = currentTimestamp
-	instance.Signature = sign(session, currentTimestamp, method, dataBytes)
-	return instance
-}
-
-// sign will Generate a Signature as hex string by SHA256.
-// Due to the data has been turned into compressed bytes,
-// there will be no JSON ordering problem while doing the verification.
-func sign(session *Session, currentTimestamp int64, method string, dataBytes []byte) string {
-	instance := new(Signature)
-	instance.Data = dataBytes
-	instance.Method = method
-	instance.Salt = session.requestSalt
-	instance.Timestamp = currentTimestamp
-	signatureString, err := json.Marshal(instance)
-	if err == nil {
-		signatureHash := sha256.Sum256(signatureString)
-		return fmt.Sprintf("%x", signatureHash)
-	} else {
-		session.RaiseError(ErrorGenerateSignature)
-		return ErrorGenerateSignature
-	}
+	doMiddlewareAfterRespond(session, method, response)
 }
 
 // compress will compress bytes by GZip.
@@ -139,7 +107,7 @@ func (session *Session) RaiseError(message string) {
 	pc, _, _, _ := runtime.Caller(1)
 	method := runtime.FuncForPC(pc).Name()
 	log.Printf("[%s] %s\n", method, message)
-	session.Response(&ErrorReport{
+	session.Respond(&ErrorReport{
 		Timestamp: time.Now().UnixNano(),
 		Error:     message,
 	})

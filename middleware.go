@@ -46,7 +46,7 @@ func doMiddlewareAfterRequest(session *Session, request *Request) {
 	}
 }
 
-func doMiddlewareBeforeResponse(session *Session, method string, data interface{}) {
+func doMiddlewareBeforeRespond(session *Session, method string, data interface{}) {
 	if middlewares := session.middlewares.OnResponseBefore(); middlewares != nil {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(middlewares))
@@ -57,7 +57,7 @@ func doMiddlewareBeforeResponse(session *Session, method string, data interface{
 	}
 }
 
-func doMiddlewareAfterResponse(session *Session, method string, response *Response) {
+func doMiddlewareAfterRespond(session *Session, method string, response *Response) {
 	if middlewares := session.middlewares.OnResponseAfter(); middlewares != nil {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(middlewares))

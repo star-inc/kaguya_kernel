@@ -65,7 +65,7 @@ func (service *Service) Fetch(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			service.GetSession().Response(row)
+			service.GetSession().Respond(row)
 		}
 	}
 	if err := cursor.Err(); err != nil {
@@ -79,7 +79,7 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	timestamp := int64(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	containers := data.FetchContainersByTimestamp(service.source, timestamp, limit)
-	service.GetSession().Response(containers)
+	service.GetSession().Respond(containers)
 }
 
 // GetMessage will get the message specific for client.
@@ -87,7 +87,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 	container := new(data.Container)
 	err := container.Load(service.source, request.Data.(string))
 	if err == nil {
-		service.GetSession().Response(container)
+		service.GetSession().Respond(container)
 	} else {
 		service.GetSession().RaiseError(err.Error())
 	}

@@ -57,7 +57,7 @@ func connectHandler(service ServiceInterface, fetchCtx context.Context) {
 		service.GetSession().RaiseError(ErrorForbidden)
 		return
 	}
-	service.GetSession().Response(map[string]int{"kaguya": 2})
+	service.GetSession().Respond(map[string]int{"kaguya": 2})
 	go service.Fetch(fetchCtx)
 }
 
