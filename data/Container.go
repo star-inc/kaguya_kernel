@@ -89,7 +89,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(rethinkdb.Asc("createdTime")).
-		Filter(rethinkdb.Row.Field("createdTime").Lt(timestamp)).
+		Filter(rethinkdb.Row.Field("createdTime").Gt(timestamp)).
 		Limit(limit).
 		Run(source.GetSession())
 	if err != nil {

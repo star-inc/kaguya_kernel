@@ -30,7 +30,7 @@ type SyncMessagebox struct {
 func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int64, limit int64) []SyncMessagebox {
 	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).
-		OrderBy(rethinkdb.Asc("createdTime")).
+		OrderBy(rethinkdb.Desc("createdTime")).
 		Filter(rethinkdb.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
 		Run(source.Session)
