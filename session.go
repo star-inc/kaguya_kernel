@@ -39,7 +39,7 @@ type Session struct {
 	middlewares   MiddlewareInterface
 }
 
-// NewSession will starts a new session.
+// NewSession will start a new session.
 func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, requestSalt string) *Session {
 	session := new(Session)
 	session.socketSession = socketSession
@@ -48,7 +48,7 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 	return session
 }
 
-// Response will response data to client.
+// Response will respond data to client.
 func (session *Session) Response(data interface{}) {
 	// Find original method from Caller.
 	skip := 1
