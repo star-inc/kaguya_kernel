@@ -47,7 +47,9 @@ func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	var row interface{}
 	for cursor.Next(&row) {

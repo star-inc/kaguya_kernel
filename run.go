@@ -51,7 +51,7 @@ func connectHandler(service ServiceInterface, fetchCtx context.Context) {
 		defer func() {
 			err := service.GetSession().socketSession.Close()
 			if err != nil {
-				log.Println(err)
+				log.Panicln(err)
 			}
 		}()
 		service.GetSession().RaiseError(ErrorForbidden)

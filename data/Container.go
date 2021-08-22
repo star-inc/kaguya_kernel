@@ -55,7 +55,9 @@ func (c *Container) Load(source KernelSource.Interface, filter ...interface{}) e
 	}
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	return cursor.One(c)
 }
@@ -95,7 +97,9 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 	}
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	err = cursor.All(&containers)
 	if err == rethinkdb.ErrEmptyResult {
@@ -119,7 +123,9 @@ func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 	}
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	var count int
 	err = cursor.One(&count)

@@ -39,7 +39,9 @@ func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, tim
 	}
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	err = cursor.All(&containers)
 	if err == rethinkdb.ErrEmptyResult {

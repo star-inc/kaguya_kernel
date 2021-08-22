@@ -20,8 +20,8 @@ import "sync"
 type MiddlewareInterface interface {
 	OnRequestBefore() []func(session *Session, wg *sync.WaitGroup, request *Request)
 	OnRequestAfter() []func(session *Session, wg *sync.WaitGroup, request *Request)
-	OnResponseBefore() []func(session *Session, wg *sync.WaitGroup, data interface{})
-	OnResponseAfter() []func(session *Session, wg *sync.WaitGroup, response *Response)
+	OnResponseBefore() []func(session *Session, wg *sync.WaitGroup, method string, data interface{})
+	OnResponseAfter() []func(session *Session, wg *sync.WaitGroup, method string, response *Response)
 }
 
 func doMiddlewareBeforeRequest(session *Session, request *Request) {
@@ -46,23 +46,23 @@ func doMiddlewareAfterRequest(session *Session, request *Request) {
 	}
 }
 
-func doMiddlewareBeforeResponse(session *Session, data interface{}) {
+func doMiddlewareBeforeResponse(session *Session, method string, data interface{}) {
 	if middlewares := session.middlewares.OnResponseBefore(); middlewares != nil {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(middlewares))
 		for _, middleware := range middlewares {
-			go middleware(session, wg, data)
+			go middleware(session, wg, method, data)
 		}
 		wg.Wait()
 	}
 }
 
-func doMiddlewareAfterResponse(session *Session, response *Response) {
+func doMiddlewareAfterResponse(session *Session, method string, response *Response) {
 	if middlewares := session.middlewares.OnResponseAfter(); middlewares != nil {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(middlewares))
 		for _, middleware := range middlewares {
-			go middleware(session, wg, response)
+			go middleware(session, wg, method, response)
 		}
 		wg.Wait()
 	}

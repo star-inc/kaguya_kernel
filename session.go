@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"gopkg.in/olahol/melody.v1"
 	"log"
+	"runtime"
 	"time"
 )
 
@@ -49,8 +50,15 @@ func NewSession(socketSession *melody.Session, middlewares MiddlewareInterface, 
 
 // Response: response a data to client.
 func (session *Session) Response(data interface{}) {
+	// Find original method from Caller.
+	skip := 1
+	if _, ok := data.(*ErrorReport); ok {
+		skip = 2
+	}
+	pc, _, _, _ := runtime.Caller(skip)
+	method := runtime.FuncForPC(pc).Name()
 	// Do middlewares [before]
-	doMiddlewareBeforeResponse(session, data)
+	doMiddlewareBeforeResponse(session, method, data)
 	// Encode data into JSON format.
 	dataBytes, err := json.Marshal(data)
 	if err != nil {
@@ -61,7 +69,7 @@ func (session *Session) Response(data interface{}) {
 	dataBytes = compress(dataBytes)
 	// Create a new Response object.
 	now := time.Now().UnixNano()
-	response := responseFactory(session, now, dataBytes)
+	response := responseFactory(session, now, method, dataBytes)
 	// Encode the response into JSON format.
 	// JSON package will convert bytes to base64 automatically,
 	// so dataBytes with compressed will be encoded into Base64 format.
@@ -77,25 +85,27 @@ func (session *Session) Response(data interface{}) {
 		return
 	}
 	// Do middlewares [after]
-	doMiddlewareAfterResponse(session, response)
+	doMiddlewareAfterResponse(session, method, response)
 }
 
 // responseFactory: Generate a Response.
-func responseFactory(session *Session, currentTimestamp int64, dataBytes []byte) *Response {
+func responseFactory(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Response {
 	// Generate Response
 	instance := new(Response)
 	instance.Data = dataBytes
+	instance.Method = method
 	instance.Timestamp = currentTimestamp
-	instance.Signature = sign(session, currentTimestamp, dataBytes)
+	instance.Signature = sign(session, currentTimestamp, method, dataBytes)
 	return instance
 }
 
 // sign: Generate a Signature as hex string by SHA256.
 // Due to the data has been turned into compressed bytes,
 // there will be no JSON ordering problem while doing the verification.
-func sign(session *Session, currentTimestamp int64, dataBytes []byte) string {
+func sign(session *Session, currentTimestamp int64, method string, dataBytes []byte) string {
 	instance := new(Signature)
 	instance.Data = dataBytes
+	instance.Method = method
 	instance.Salt = session.requestSalt
 	instance.Timestamp = currentTimestamp
 	signatureString, err := json.Marshal(instance)
@@ -126,6 +136,9 @@ func compress(raw []byte) []byte {
 
 // RaiseError: throw an error to client.
 func (session *Session) RaiseError(message string) {
+	pc, _, _, _ := runtime.Caller(1)
+	method := runtime.FuncForPC(pc).Name()
+	log.Printf("[%s] %s\n", method, message)
 	session.Response(&ErrorReport{
 		Timestamp: time.Now().UnixNano(),
 		Error:     message,

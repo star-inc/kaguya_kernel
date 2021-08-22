@@ -14,15 +14,22 @@
 
 package KaguyaKernel
 
+// Type is the method name that the client requested to server,
+// kernel will to the reflection and find the method in the ServiceInterface,
+// if the only argument of the method is Request, the method will be executed and returned,
+// otherwise the request will be denied.
 type Request struct {
 	Data interface{} `json:"data"`
 	Type string      `json:"type"`
 }
 
+// Method is a mark of the origin method,
+// to declare where is the Response sent, the field is omitempty.
 type Response struct {
 	Data      []byte `json:"data"`
 	Signature string `json:"signature"`
 	Timestamp int64  `json:"timestamp"`
+	Method    string `json:"type,omitempty"`
 }
 
 type ErrorReport struct {
@@ -34,4 +41,5 @@ type Signature struct {
 	Data      []byte `json:"data"`
 	Salt      string `json:"salt"`
 	Timestamp int64  `json:"timestamp"`
+	Method    string `json:"type,omitempty"`
 }

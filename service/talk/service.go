@@ -55,7 +55,9 @@ func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	var row interface{}
 	for cursor.Next(&row) {
@@ -96,7 +98,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(data.Message)
 	err := mapstructure.Decode(request.Data, message)
 	if err != nil {
-		log.Println(err)
+		log.Panicln(err)
 		return
 	}
 	if len(strings.Trim(message.Content, " ")) == 0 {

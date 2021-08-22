@@ -47,7 +47,9 @@ func (m *Messagebox) Load(source KernelSource.Interface, filter ...interface{}) 
 	}
 	defer func() {
 		err := cursor.Close()
-		log.Println(err)
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 	return cursor.One(m)
 }
