@@ -88,7 +88,7 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
-		OrderBy(rethinkdb.Desc("createdTime")).
+		OrderBy(rethinkdb.Asc("createdTime")).
 		Filter(rethinkdb.Row.Field("createdTime").Lt(timestamp)).
 		Limit(limit).
 		Run(source.GetSession())
