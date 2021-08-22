@@ -23,18 +23,19 @@ import (
 
 func Test_responseFactory(t *testing.T) {
 	session := &Session{}
+	method := "Test_responseFactory"
 	data := []byte("test")
 	currentTimestamp := time.Now().UnixNano()
-	response := responseFactory(session, currentTimestamp, data)
-	raw := &Response{Data: data, Signature: response.Signature, Timestamp: currentTimestamp}
+	response := responseFactory(session, currentTimestamp, method, data)
+	raw := &Response{Data: data, Signature: response.Signature, Timestamp: currentTimestamp, Method: method}
 	if !reflect.DeepEqual(response, raw) {
 		t.Fatalf("\n%#v\nis not equal to\n%#v", response, raw)
 	}
 }
 
 func Test_sign(t *testing.T) {
-	signature := sign(&Session{}, 1629552882143314889, []byte("test"))
-	if target := "35e267e2d0fe80f8a3acfa02d5ecc648069c38d4a2d937f70a02ac63014610aa"; signature != target {
+	signature := sign(&Session{}, 1629552882143314889, "Test_sign", []byte("test"))
+	if target := "fd159afc02f3a88985ff1da2600d9c4a5b28a8fa792d9d0607e62936e8faae34"; signature != target {
 		t.Fatalf("\n%s\nis not equal to\n%s", signature, target)
 	}
 }
