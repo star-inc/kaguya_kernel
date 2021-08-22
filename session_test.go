@@ -43,7 +43,7 @@ func Test_sign(t *testing.T) {
 func Test_compress(t *testing.T) {
 	data := []byte("test")
 	compressed := compress(data)
-	if target := []byte("H4sIAAAAAAAA/ypJLS4BAAAA//8BAAD//wx+f9gEAAAA"); bytes.Compare(compressed, target) != 0 {
+	if target := []byte("H4sIAAAAAAAA/ypJLS4BAAAA//8BAAD//wx+f9gEAAAA"); !bytes.Equal(compressed, target) {
 		t.Fatalf("\n%s\nis not equal to\n%s", compressed, target)
 	}
 }

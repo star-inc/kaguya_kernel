@@ -3,6 +3,7 @@ module gopkg.in/star-inc/kaguyakernel.v2
 go 1.16
 
 require (
+	github.com/cloudflare/circl v1.0.0 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
