@@ -18,6 +18,7 @@ import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
+	"time"
 )
 
 // RefreshMessageboxAfterSeen will refresh Messagebox by fetch a Container.
@@ -27,11 +28,7 @@ func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target st
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
 	}
-	if !messagebox.CheckReady() {
-		messagebox.Target = target
-	}
 	messagebox.Origin = container.Message.Origin
-	messagebox.CreatedTime = container.CreatedTime
 	messagebox.LastSeen = container.CreatedTime
 	if messagebox.CheckReady() {
 		if err := messagebox.Replace(source); err != nil {
@@ -39,6 +36,7 @@ func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target st
 		}
 	} else {
 		messagebox.Target = target
+		messagebox.CreatedTime = time.Now().UnixNano()
 		if err := messagebox.Create(source); err != nil {
 			log.Panicln(err)
 		}

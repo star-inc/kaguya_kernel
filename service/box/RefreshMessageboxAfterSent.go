@@ -28,9 +28,6 @@ func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target st
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
 	}
-	if !messagebox.CheckReady() {
-		messagebox.Target = target
-	}
 	messagebox.Origin = message.Origin
 	messagebox.CreatedTime = time.Now().UnixNano()
 	messagebox.Metadata = metadata
