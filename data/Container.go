@@ -115,7 +115,6 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 // CountContainersByTimestamp ToDo
 func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
-		OrderBy(rethinkdb.Asc("createdTime")).
 		Filter(rethinkdb.Row.Field("createdTime").Gt(timestamp)).
 		Count().
 		Run(source.GetSession())
