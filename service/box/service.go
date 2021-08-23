@@ -72,8 +72,10 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	timestamp := int64(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
-	for i, syncMessagebox := range syncMessageboxes {
-		syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
+	if syncMessageboxes != nil {
+		for i, syncMessagebox := range syncMessageboxes {
+			syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
+		}
 	}
 	service.GetSession().Respond(syncMessageboxes)
 	request.Processed = true
