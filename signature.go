@@ -25,7 +25,7 @@ func NewSignature(session *Session, currentTimestamp int64, method string, dataB
 	return instance
 }
 
-// JSONHashHex will generate a hex after hashing the json signature.
+// JSONHashHex will generate a hex after hashing the JSON signature.
 func (s *Signature) JSONHashHex() (string, error) {
 	signatureString, err := json.Marshal(s)
 	if err != nil {
