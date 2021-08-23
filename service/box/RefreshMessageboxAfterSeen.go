@@ -23,19 +23,19 @@ import (
 
 // RefreshMessageboxAfterSeen will refresh Messagebox by fetch a Container.
 // target is the relation ID, used for getting the room, as known as chat room ID.
-func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, container *data.Container) {
+func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, message *data.Message) {
 	messagebox := new(data.Messagebox)
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
 	}
-	messagebox.Origin = container.Message.Origin
-	messagebox.LastSeen = container.CreatedTime
+	messagebox.LastSeen = time.Now().UnixNano()
 	if messagebox.CheckReady() {
 		if err := messagebox.Replace(source); err != nil {
 			log.Panicln(err)
 		}
 	} else {
 		messagebox.Target = target
+		messagebox.Origin = message.Origin
 		messagebox.CreatedTime = time.Now().UnixNano()
 		if err := messagebox.Create(source); err != nil {
 			log.Panicln(err)
