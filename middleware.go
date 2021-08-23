@@ -16,12 +16,19 @@ package KaguyaKernel
 
 import "sync"
 
+type (
+	OnRequestBefore  []func(session *Session, wg *sync.WaitGroup, request *Request)
+	OnRequestAfter   []func(session *Session, wg *sync.WaitGroup, request *Request)
+	OnResponseBefore []func(session *Session, wg *sync.WaitGroup, method string, data interface{})
+	OnResponseAfter  []func(session *Session, wg *sync.WaitGroup, method string, response *Response)
+)
+
 // MiddlewareInterface is the interface to get middlewares for kernel.
 type MiddlewareInterface interface {
-	OnRequestBefore() []func(session *Session, wg *sync.WaitGroup, request *Request)
-	OnRequestAfter() []func(session *Session, wg *sync.WaitGroup, request *Request)
-	OnResponseBefore() []func(session *Session, wg *sync.WaitGroup, method string, data interface{})
-	OnResponseAfter() []func(session *Session, wg *sync.WaitGroup, method string, response *Response)
+	OnRequestBefore() OnRequestBefore
+	OnRequestAfter() OnRequestAfter
+	OnResponseBefore() OnResponseBefore
+	OnResponseAfter() OnResponseAfter
 }
 
 func doMiddlewareBeforeRequest(session *Session, request *Request) {

@@ -30,6 +30,8 @@ const (
 	ErrorOriginNotEmpty = "Origin_is_not_empty"
 )
 
+type ContentValidator func(contentType int, content string) bool
+
 // Service is the data structure of Talk Service.
 type Service struct {
 	Kernel.Service
@@ -38,7 +40,7 @@ type Service struct {
 }
 
 // NewServiceInterface will create service interface of Talk.
-func NewServiceInterface(source KernelSource.Interface, contentValidator func(contentType int, content string) bool) ServiceInterface {
+func NewServiceInterface(source KernelSource.Interface, contentValidator ContentValidator) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.ContainerSource)
 	service.contentValidator = contentValidator

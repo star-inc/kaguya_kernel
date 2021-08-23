@@ -22,15 +22,17 @@ import (
 	"log"
 )
 
+type SyncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}
+
 // Service is the data structure of Messagebox Service.
 type Service struct {
 	Kernel.Service
 	source                *KernelSource.MessageboxSource
-	syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}
+	syncExtraDataAssigner SyncExtraDataAssigner
 }
 
 // NewServiceInterface will create service interface of Messagebox.
-func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}) ServiceInterface {
+func NewServiceInterface(source KernelSource.Interface, syncExtraDataAssigner SyncExtraDataAssigner) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.MessageboxSource)
 	service.syncExtraDataAssigner = syncExtraDataAssigner
