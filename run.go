@@ -67,6 +67,8 @@ func messageHandler(service ServiceInterface, message []byte) {
 		service.GetSession().RaiseError(ErrorJSONDecodingRequest)
 		return
 	}
+	// Force setting processed value to be false.
+	request.Processed = false
 	// Check method requested is exists.
 	method := reflect.ValueOf(service).MethodByName(request.Type)
 	if !service.CheckRequestType(method) {

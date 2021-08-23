@@ -6,6 +6,7 @@ package KaguyaKernel
 // if the only argument of the method is Request, the method will be executed and returned,
 // otherwise the request will be denied.
 type Request struct {
-	Data interface{} `json:"data"`
-	Type string      `json:"type"`
+	Processed bool
+	Data      interface{} `json:"data"`
+	Type      string      `json:"type"`
 }

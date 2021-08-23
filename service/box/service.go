@@ -76,6 +76,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 		syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
 	}
 	service.GetSession().Respond(syncMessageboxes)
+	request.Processed = true
 }
 
 // DeleteMessagebox will delete a messagebox by the request from client.
@@ -87,4 +88,5 @@ func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	if err := messagebox.Destroy(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
+	request.Processed = true
 }

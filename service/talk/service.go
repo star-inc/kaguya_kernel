@@ -81,6 +81,7 @@ func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	limit := int64(query["count"].(float64))
 	containers := data.FetchContainersByTimestamp(service.source, timestamp, limit)
 	service.GetSession().Respond(containers)
+	request.Processed = true
 }
 
 // GetMessage will get the message specific for client.
@@ -92,6 +93,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 	} else {
 		service.GetSession().RaiseError(err.Error())
 	}
+	request.Processed = true
 }
 
 // SendMessage will send a message by the request from client.
@@ -118,6 +120,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	if err := container.Create(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
+	request.Processed = true
 }
 
 // CancelSentMessage will cancel a message delivery by the request from client.
@@ -131,4 +134,5 @@ func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	if err := container.Replace(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
+	request.Processed = true
 }
