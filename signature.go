@@ -13,21 +13,24 @@ type Signature struct {
 	Method    string `json:"method,omitempty"`
 }
 
-// sign will Generate a Signature as hex string by SHA256.
+// NewSignature will Generate a Signature as hex string by SHA256.
 // Due to the data has been turned into compressed bytes,
 // there will be no JSON ordering problem while doing the verification.
-func sign(session *Session, currentTimestamp int64, method string, dataBytes []byte) string {
+func NewSignature(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Signature {
 	instance := new(Signature)
 	instance.Data = dataBytes
 	instance.Method = method
 	instance.Salt = session.requestSalt
 	instance.Timestamp = currentTimestamp
-	signatureString, err := json.Marshal(instance)
-	if err == nil {
-		signatureHash := sha256.Sum256(signatureString)
-		return fmt.Sprintf("%x", signatureHash)
-	} else {
-		session.RaiseError(ErrorGenerateSignature)
-		return ErrorGenerateSignature
+	return instance
+}
+
+// JSONHashHex will generate a hex after hashing the json signature.
+func (s *Signature) JSONHashHex() (string, error) {
+	signatureString, err := json.Marshal(s)
+	if err != nil {
+		return "", err
 	}
+	signatureHash := sha256.Sum256(signatureString)
+	return fmt.Sprintf("%x", signatureHash), nil
 }

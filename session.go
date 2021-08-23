@@ -67,11 +67,11 @@ func (session *Session) Respond(data interface{}) {
 	dataBytes = compress(dataBytes)
 	// Create a new Response object.
 	now := time.Now().UnixNano()
-	response := responseFactory(session, now, method, dataBytes)
+	response := NewResponse(session, now, method, dataBytes)
 	// Encode the response into JSON format.
 	// JSON package will convert bytes to base64 automatically,
 	// so dataBytes with compressed will be encoded into Base64 format.
-	responseBytes, err := json.Marshal(response)
+	responseBytes, err := response.JSON()
 	if err != nil {
 		session.RaiseError(ErrorJSONEncodingResponse)
 		return
