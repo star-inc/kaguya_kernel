@@ -17,6 +17,7 @@ package box
 import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"log"
 	"time"
 )
 
@@ -25,7 +26,7 @@ import (
 func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target string, message *data.Message, metadata string) {
 	messagebox := new(data.Messagebox)
 	if err := messagebox.Load(source, target); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	if !messagebox.CheckReady() {
 		messagebox.Target = target
@@ -35,12 +36,12 @@ func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target st
 	messagebox.Metadata = metadata
 	if messagebox.CheckReady() {
 		if err := messagebox.Replace(source); err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 	} else {
 		messagebox.Target = target
 		if err := messagebox.Create(source); err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 	}
 }

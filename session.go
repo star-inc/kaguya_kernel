@@ -90,13 +90,13 @@ func compress(raw []byte) []byte {
 	var compressed bytes.Buffer
 	gz := gzip.NewWriter(&compressed)
 	if _, err := gz.Write(raw); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	if err := gz.Flush(); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	if err := gz.Close(); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	return compressed.Bytes()
 }
