@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-// RefreshMessageboxAfterSeen will refresh Messagebox by fetch a Container.
+// RefreshMessageboxAfterSeen will refresh Messagebox by fetching a Container or getting the history.
 // target is the relation ID, used for getting the room, as known as chat room ID.
 func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, message *data.Message) {
 	messagebox := new(data.Messagebox)
