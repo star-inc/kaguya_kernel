@@ -49,8 +49,7 @@ func Run(service ServiceInterface, guard AuthorizeInterface, middlewares Middlew
 func connectHandler(service ServiceInterface, fetchCtx context.Context) {
 	if !service.CheckPermission() {
 		defer func() {
-			err := service.GetSession().socketSession.Close()
-			if err != nil {
+			if err := service.GetSession().socketSession.Close(); err != nil {
 				log.Panicln(err)
 			}
 		}()
@@ -64,8 +63,7 @@ func connectHandler(service ServiceInterface, fetchCtx context.Context) {
 func messageHandler(service ServiceInterface, message []byte) {
 	request := new(Request)
 	// Decode JSON into Request.
-	err := json.Unmarshal(message, request)
-	if err != nil {
+	if err := json.Unmarshal(message, request); err != nil {
 		service.GetSession().RaiseError(ErrorJSONDecodingRequest)
 		return
 	}

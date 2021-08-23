@@ -54,8 +54,7 @@ func (s *MessageboxSource) checkTerm() bool {
 		log.Panicln(err)
 	}
 	var status bool
-	err = cursor.One(&status)
-	if err != nil {
+	if err = cursor.One(&status); err != nil {
 		log.Panicln(err)
 	}
 	return status

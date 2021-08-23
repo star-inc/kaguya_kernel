@@ -54,8 +54,7 @@ func (c *Container) Load(source KernelSource.Interface, filter ...interface{}) e
 		return err
 	}
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()
@@ -97,8 +96,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 		log.Panicln(err)
 	}
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()
@@ -122,14 +120,12 @@ func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 		log.Panicln(err)
 	}
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()
 	var count int
-	err = cursor.One(&count)
-	if err != nil {
+	if err = cursor.One(&count); err != nil {
 		log.Panicln(err)
 	}
 	return count

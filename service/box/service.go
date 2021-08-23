@@ -48,8 +48,7 @@ func (service *Service) CheckPermission() bool {
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()
@@ -82,12 +81,10 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 // DeleteMessagebox will delete a messagebox by the request from client.
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
-	err := messagebox.Load(service.source, request.Data.(string))
-	if err != nil {
+	if err := messagebox.Load(service.source, request.Data.(string)); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
-	err = messagebox.Destroy(service.source)
-	if err != nil {
+	if err := messagebox.Destroy(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
 }

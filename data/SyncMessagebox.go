@@ -38,8 +38,7 @@ func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, tim
 		log.Panicln(err)
 	}
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()

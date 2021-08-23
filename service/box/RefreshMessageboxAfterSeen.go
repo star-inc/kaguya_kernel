@@ -23,8 +23,7 @@ import (
 // target is the relation ID, used for getting the room, as known as chat room ID.
 func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, container *data.Container) {
 	messagebox := new(data.Messagebox)
-	err := messagebox.Load(source, target)
-	if err != nil {
+	if err := messagebox.Load(source, target); err != nil {
 		panic(err)
 	}
 	if !messagebox.CheckReady() {
@@ -34,14 +33,12 @@ func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target st
 	messagebox.CreatedTime = container.CreatedTime
 	messagebox.LastSeen = container.CreatedTime
 	if messagebox.CheckReady() {
-		err = messagebox.Replace(source)
-		if err != nil {
+		if err := messagebox.Replace(source); err != nil {
 			panic(err)
 		}
 	} else {
 		messagebox.Target = target
-		err = messagebox.Create(source)
-		if err != nil {
+		if err := messagebox.Create(source); err != nil {
 			panic(err)
 		}
 	}

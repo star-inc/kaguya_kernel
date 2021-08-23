@@ -56,8 +56,7 @@ func (service *Service) CheckPermission() bool {
 func (service *Service) Fetch(ctx context.Context) {
 	cursor := service.source.GetFetchCursor()
 	defer func() {
-		err := cursor.Close()
-		if err != nil {
+		if err := cursor.Close(); err != nil {
 			log.Panicln(err)
 		}
 	}()
@@ -98,8 +97,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 // SendMessage will send a message by the request from client.
 func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(data.Message)
-	err := mapstructure.Decode(request.Data, message)
-	if err != nil {
+	if err := mapstructure.Decode(request.Data, message); err != nil {
 		log.Panicln(err)
 		return
 	}
@@ -117,8 +115,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	}
 	message.Origin = service.GetGuard().Me()
 	container := data.NewContainer(message)
-	err = container.Create(service.source)
-	if err != nil {
+	if err := container.Create(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
 }
@@ -126,14 +123,12 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 // CancelSentMessage will cancel a message delivery by the request from client.
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	container := new(data.Container)
-	err := container.Load(service.source, request.Data.(string))
-	if err != nil {
+	if err := container.Load(service.source, request.Data.(string)); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
 	container.Canceled = true
 	container.Message.Content = ""
-	err = container.Replace(service.source)
-	if err != nil {
+	if err := container.Replace(service.source); err != nil {
 		service.GetSession().RaiseError(err.Error())
 	}
 }

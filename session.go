@@ -77,8 +77,7 @@ func (session *Session) Respond(data interface{}) {
 		return
 	}
 	// Flush the response.
-	err = session.socketSession.Write(responseBytes)
-	if err != nil {
+	if err = session.socketSession.Write(responseBytes); err != nil {
 		log.Println(ErrorSessionClosed)
 		return
 	}
