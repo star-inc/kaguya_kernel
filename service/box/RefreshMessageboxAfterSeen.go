@@ -23,7 +23,11 @@ import (
 
 // RefreshMessageboxAfterSeen will refresh Messagebox by fetching a Container or getting the history.
 // target is the relation ID, used for getting the room, as known as chat room ID.
-func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, message *data.Message) {
+// origin is the ID of the Message sender.
+func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, origin string) {
+	if target == "" || origin == "" {
+		log.Panicf("target or origin is not specified. %s %s\n", target, origin)
+	}
 	messagebox := new(data.Messagebox)
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
@@ -35,7 +39,7 @@ func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target st
 		}
 	} else {
 		messagebox.Target = target
-		messagebox.Origin = message.Origin
+		messagebox.Origin = origin
 		messagebox.CreatedTime = time.Now().UnixNano()
 		if err := messagebox.Create(source); err != nil {
 			log.Panicln(err)

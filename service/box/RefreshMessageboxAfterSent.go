@@ -23,12 +23,16 @@ import (
 
 // RefreshMessageboxAfterSent will refresh Messagebox after sent a Message.
 // target is the relation ID, used for getting the room, as known as chat room ID.
-func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target string, message *data.Message, metadata string) {
+// origin is the ID of the Message sender.
+func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target string, origin string, metadata string) {
+	if target == "" || origin == "" {
+		log.Panicf("target or origin is not specified. %s %s\n", target, origin)
+	}
 	messagebox := new(data.Messagebox)
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
 	}
-	messagebox.Origin = message.Origin
+	messagebox.Origin = origin
 	messagebox.CreatedTime = time.Now().UnixNano()
 	messagebox.Metadata = metadata
 	if messagebox.CheckReady() {

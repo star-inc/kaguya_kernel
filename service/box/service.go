@@ -72,7 +72,7 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	timestamp := int64(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
-	if syncMessageboxes != nil {
+	if syncMessageboxes != nil && len(syncMessageboxes) != 0 {
 		for i, syncMessagebox := range syncMessageboxes {
 			syncMessageboxes[i].ExtraData = service.syncExtraDataAssigner(syncMessagebox)
 		}
