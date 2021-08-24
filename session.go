@@ -17,7 +17,6 @@ package KaguyaKernel
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"gopkg.in/olahol/melody.v1"
 	"log"
 	"runtime"
@@ -57,17 +56,8 @@ func (session *Session) Respond(data interface{}) {
 	method := runtime.FuncForPC(pc).Name()
 	// Do middlewares [before]
 	doMiddlewareBeforeRespond(session, method, data)
-	// Encode data into JSON format.
-	dataBytes, err := json.Marshal(data)
-	if err != nil {
-		session.RaiseError(ErrorJSONEncodingResponseData)
-		return
-	}
-	// Let dataBytes compressed by GZip.
-	dataBytes = compress(dataBytes)
 	// Create a new Response object.
-	now := time.Now().UnixNano()
-	response := NewResponse(session, now, method, dataBytes)
+	response := NewResponse(session, method, data)
 	// Encode the response into JSON format.
 	// JSON package will convert bytes to base64 automatically,
 	// so dataBytes with compressed will be encoded into Base64 format.

@@ -2,6 +2,7 @@ package KaguyaKernel
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // Response
@@ -15,13 +16,27 @@ type Response struct {
 }
 
 // NewResponse will generate a Response.
-func NewResponse(session *Session, currentTimestamp int64, method string, dataBytes []byte) *Response {
+func NewResponse(session *Session, method string, data interface{}) *Response {
 	// Generate Response
 	instance := new(Response)
-	instance.Data = dataBytes
+	// Get Current Timestamp
+	currentTimestamp := time.Now().UnixNano()
+	// If data is nil, ignore to compress.
+	if data != nil {
+		// Encode data into JSON format.
+		dataBytes, err := json.Marshal(data)
+		if err != nil {
+			session.RaiseError(ErrorJSONEncodingResponseData)
+		}
+		// Let dataBytes compressed by GZip.
+		instance.Data = compress(dataBytes)
+	} else {
+		// Set return as nil.
+		instance.Data = nil
+	}
 	instance.Method = method
 	instance.Timestamp = currentTimestamp
-	signature := NewSignature(session, currentTimestamp, method, dataBytes)
+	signature := NewSignature(session, currentTimestamp, method, instance.Data)
 	hashHex, err := signature.JSONHashHex()
 	if err != nil {
 		session.RaiseError(ErrorGenerateSignature)
