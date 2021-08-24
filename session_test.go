@@ -16,34 +16,46 @@ package KaguyaKernel
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"reflect"
 	"testing"
-	"time"
 )
 
-func Test_responseFactory(t *testing.T) {
-	session := &Session{}
-	method := "Test_responseFactory"
+func Test_compress(t *testing.T) {
 	data := []byte("test")
-	currentTimestamp := time.Now().UnixNano()
-	response := responseFactory(session, currentTimestamp, method, data)
-	raw := &Response{Data: data, Signature: response.Signature, Timestamp: currentTimestamp, Method: method}
+	compressed := b64Compress(data)
+	if target := []byte("H4sIAAAAAAAA/ypJLS4BAAAA//8BAAD//wx+f9gEAAAA"); !bytes.Equal(compressed, target) {
+		t.Fatalf("\n%s\nis not equal to\n%s", compressed, target)
+	}
+}
+
+func Test_NewSignature(t *testing.T) {
+	signature := NewSignature(&Session{}, 1629552882143314889, "Test_sign", []byte("test"))
+	target := "fd159afc02f3a88985ff1da2600d9c4a5b28a8fa792d9d0607e62936e8faae34"
+	if hex, _ := signature.JSONHashHex(); hex != target {
+		t.Fatalf("\n%s\nis not equal to\n%s", hex, target)
+	}
+}
+
+func Test_NewResponse(t *testing.T) {
+	session := &Session{}
+	method := "Test_NewResponse"
+	data := []byte("test")
+	// Generated
+	response := NewResponse(session, method, data)
+	// Raw
+	jsonData, _ := json.Marshal(data)
+	compressed := compress(jsonData)
+	raw := &Response{Data: compressed, Signature: response.Signature, Timestamp: response.Timestamp, Method: method}
 	if !reflect.DeepEqual(response, raw) {
 		t.Fatalf("\n%#v\nis not equal to\n%#v", response, raw)
 	}
 }
 
-func Test_sign(t *testing.T) {
-	signature := sign(&Session{}, 1629552882143314889, "Test_sign", []byte("test"))
-	if target := "fd159afc02f3a88985ff1da2600d9c4a5b28a8fa792d9d0607e62936e8faae34"; signature != target {
-		t.Fatalf("\n%s\nis not equal to\n%s", signature, target)
-	}
-}
-
-func Test_compress(t *testing.T) {
-	data := []byte("test")
-	compressed := compress(data)
-	if target := []byte("H4sIAAAAAAAA/ypJLS4BAAAA//8BAAD//wx+f9gEAAAA"); !bytes.Equal(compressed, target) {
-		t.Fatalf("\n%s\nis not equal to\n%s", compressed, target)
-	}
+func b64Compress(raw []byte) []byte {
+	compressedBytes := compress(raw)
+	compressedResult := make([]byte, base64.StdEncoding.EncodedLen(len(compressedBytes)))
+	base64.StdEncoding.Encode(compressedResult, compressedBytes)
+	return compressedResult
 }
