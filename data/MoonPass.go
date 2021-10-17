@@ -21,42 +21,42 @@ import (
 	"log"
 )
 
-type Moonpass struct {
+type MoonPass struct {
 	ID        uint8
 	RNG       io.Reader
 	PublicKey []byte
 }
 
-func NewMoonpass() Interface {
-	instance := new(Moonpass)
+func NewMoonPass() Interface {
+	instance := new(MoonPass)
 	return instance
 }
 
-func (m Moonpass) CheckReady() bool {
+func (m *MoonPass) CheckReady() bool {
 	panic("implement me")
 }
 
-func (m Moonpass) Load(source KernelSource.Interface, filter ...interface{}) error {
+func (m *MoonPass) Load(source KernelSource.Interface, filter ...interface{}) error {
 	panic("implement me")
 }
 
-func (m Moonpass) Reload(source KernelSource.Interface) error {
+func (m *MoonPass) Reload(source KernelSource.Interface) error {
 	panic("implement me")
 }
 
-func (m Moonpass) Create(source KernelSource.Interface) error {
+func (m *MoonPass) Create(source KernelSource.Interface) error {
 	panic("implement me")
 }
 
-func (m Moonpass) Replace(source KernelSource.Interface) error {
+func (m *MoonPass) Replace(source KernelSource.Interface) error {
 	panic("implement me")
 }
 
-func (m Moonpass) Destroy(source KernelSource.Interface) error {
+func (m *MoonPass) Destroy(source KernelSource.Interface) error {
 	panic("implement me")
 }
 
-func (m Moonpass) Encrypt(data []byte) []byte {
+func (m *MoonPass) Encrypt(data []byte) []byte {
 	var output []byte
 	publicKey := sidh.NewPublicKey(m.ID, sidh.KeyVariantSike)
 	if err := publicKey.Import(m.PublicKey); err != nil {

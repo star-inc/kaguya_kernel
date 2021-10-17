@@ -25,13 +25,13 @@ import (
 	"log"
 )
 
-// Service is the data structure of Moonpass Service.
+// Service is the data structure of MoonPass Service.
 type Service struct {
 	Kernel.Service
 	source *KernelSource.ContainerSource
 }
 
-// NewServiceInterface will create service interface of Moonpass.
+// NewServiceInterface will create service interface of MoonPass.
 func NewServiceInterface(source KernelSource.Interface) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.ContainerSource)
@@ -66,28 +66,28 @@ func (service *Service) Fetch(ctx context.Context) {
 }
 
 func (service *Service) InitPublicKey(request *Kernel.Request) {
-	moonpass := request.Data.(*data.Moonpass)
+	MoonPass := request.Data.(*data.MoonPass)
 	blk := make([]byte, 32)
 	if _, err := rand.Read(blk); err != nil {
 		log.Panicln(err)
 	}
 	blkHash := sha256.Sum256(blk)
 	blkHashHex := fmt.Sprintf("%x", blkHash)
-	question := moonpass.Encrypt(blk)
-	confirmMessage := data.NewMoonpassConfirm(moonpass, blkHashHex, question)
+	question := MoonPass.Encrypt(blk)
+	confirmMessage := data.NewMoonPassConfirm(MoonPass, blkHashHex, question)
 	service.GetSession().Respond(confirmMessage)
 	request.Processed = true
 }
 
 func (service *Service) ConfirmPublicKey(request *Kernel.Request) {
-	confirmMessage := request.Data.(*data.MoonpassConfirm)
+	confirmMessage := request.Data.(*data.MoonPassConfirm)
 	blkHash := sha256.Sum256(confirmMessage.Data)
 	blkHashHex := fmt.Sprintf("%x", blkHash)
-	question := confirmMessage.Moonpass.Encrypt(confirmMessage.Data)
+	question := confirmMessage.MoonPass.Encrypt(confirmMessage.Data)
 	questionHash := sha256.Sum256(question)
 	questionHashHex := fmt.Sprintf("%x", questionHash)
 	if confirmMessage.Hash == blkHashHex && confirmMessage.Hash == questionHashHex {
-		if err := confirmMessage.Moonpass.Create(service.source); err != nil {
+		if err := confirmMessage.MoonPass.Create(service.source); err != nil {
 			panic(err)
 		}
 		service.GetSession().Respond("")
@@ -98,16 +98,16 @@ func (service *Service) ConfirmPublicKey(request *Kernel.Request) {
 }
 
 func (service *Service) GetPublicKey(request *Kernel.Request) {
-	moonpass := new(data.Moonpass)
-	if err := moonpass.Load(service.source, request.Data.(string)); err != nil {
+	MoonPass := new(data.MoonPass)
+	if err := MoonPass.Load(service.source, request.Data.(string)); err != nil {
 		panic(err)
 	} else {
-		service.GetSession().Respond(moonpass)
+		service.GetSession().Respond(MoonPass)
 	}
 	request.Processed = true
 }
 
 func (service *Service) SyncPublicKeys(_ *Kernel.Request) {
-	moonpasses := make([]data.Moonpass, 2)
-	service.GetSession().Respond(moonpasses)
+	MoonPasses := make([]data.MoonPass, 2)
+	service.GetSession().Respond(MoonPasses)
 }

@@ -14,15 +14,15 @@
 
 package data
 
-type MoonpassConfirm struct {
-	Moonpass *Moonpass
+type MoonPassConfirm struct {
+	MoonPass *MoonPass
 	Hash     string `json:"hash"`
 	Data     []byte `json:"data"`
 }
 
-func NewMoonpassConfirm(moonpass *Moonpass, hash string, data []byte) *MoonpassConfirm {
-	instance := new(MoonpassConfirm)
-	instance.Moonpass = moonpass
+func NewMoonPassConfirm(moonPass *MoonPass, hash string, data []byte) *MoonPassConfirm {
+	instance := new(MoonPassConfirm)
+	instance.MoonPass = moonPass
 	instance.Hash = hash
 	instance.Data = data
 	return instance
