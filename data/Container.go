@@ -25,10 +25,10 @@ import (
 
 // Container is the data structure, only can be modified by server only, to include a message into database.
 type Container struct {
-	UUID        string   `rethinkdb:"id,omitempty" json:"uuid"`
-	Message     *Message `rethinkdb:"message" json:"message"`
-	CreatedTime int64    `rethinkdb:"createdTime" json:"createdTime"`
-	Canceled    bool     `rethinkdb:"canceled" json:"canceled"`
+	UUID        string        `rethinkdb:"id,omitempty" json:"uuid"`
+	Message     *Message      `rethinkdb:"message" json:"message"`
+	CreatedTime time.Duration `rethinkdb:"createdTime" json:"createdTime"`
+	Canceled    bool          `rethinkdb:"canceled" json:"canceled"`
 }
 
 // NewContainer will include a message automatically, the function will fill the information required for Container.
@@ -36,7 +36,7 @@ func NewContainer(message *Message) Interface {
 	instance := new(Container)
 	instance.UUID = uuid.New().String()
 	instance.Message = message
-	instance.CreatedTime = time.Now().UnixNano()
+	instance.CreatedTime = time.Duration(time.Now().UnixNano())
 	instance.Canceled = false
 	return instance
 }
@@ -84,7 +84,7 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 }
 
 // FetchContainersByTimestamp ToDo
-func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64, limit int64) []Container {
+func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.Duration, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(rethinkdb.Desc("createdTime")).
@@ -111,7 +111,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 }
 
 // CountContainersByTimestamp ToDo
-func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp int64) int {
+func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.Duration) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		Filter(rethinkdb.Row.Field("createdTime").Gt(timestamp)).
 		Count().

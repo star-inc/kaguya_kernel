@@ -20,6 +20,7 @@ import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
+	"time"
 )
 
 type SyncExtraDataAssigner func(syncMessagebox data.SyncMessagebox) interface{}
@@ -69,7 +70,7 @@ func (service *Service) Fetch(ctx context.Context) {
 // SyncMessagebox will get the history messageboxes for client.
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
-	timestamp := int64(query["timestamp"].(float64))
+	timestamp := time.Duration(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
 	if syncMessageboxes != nil && len(syncMessageboxes) != 0 {

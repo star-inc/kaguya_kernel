@@ -18,6 +18,7 @@ import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
+	"time"
 )
 
 // SyncMessagebox this is the wrapper to wrap client a messagebox with extra data.
@@ -27,7 +28,7 @@ type SyncMessagebox struct {
 }
 
 // FetchSyncMessageboxesByTimestamp ToDo
-func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp int64, limit int64) []SyncMessagebox {
+func FetchSyncMessageboxesByTimestamp(source *KernelSource.MessageboxSource, timestamp time.Duration, limit int64) []SyncMessagebox {
 	containers := make([]SyncMessagebox, limit)
 	cursor, err := source.Term.Table(source.ClientID).
 		OrderBy(rethinkdb.Desc("createdTime")).

@@ -22,6 +22,7 @@ import (
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"log"
 	"strings"
+	"time"
 )
 
 const (
@@ -77,7 +78,7 @@ func (service *Service) Fetch(ctx context.Context) {
 // GetHistoryMessages will get the history messages for client.
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
-	timestamp := int64(query["timestamp"].(float64))
+	timestamp := time.Duration(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	containers := data.FetchContainersByTimestamp(service.source, timestamp, limit)
 	service.GetSession().Respond(containers)

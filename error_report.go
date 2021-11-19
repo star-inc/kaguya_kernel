@@ -14,7 +14,9 @@
 
 package KaguyaKernel
 
+import "time"
+
 type ErrorReport struct {
-	Error     string `json:"error"`
-	Timestamp int64  `json:"timestamp"`
+	Error     string        `json:"error"`
+	Timestamp time.Duration `json:"timestamp"`
 }

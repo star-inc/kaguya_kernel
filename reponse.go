@@ -23,10 +23,10 @@ import (
 // Method is a mark of the origin method,
 // to declare where is the Response sent, the field is omitempty.
 type Response struct {
-	Data      []byte `json:"data"`
-	Signature string `json:"signature"`
-	Timestamp int64  `json:"timestamp"`
-	Method    string `json:"method,omitempty"`
+	Data      []byte        `json:"data"`
+	Signature string        `json:"signature"`
+	Timestamp time.Duration `json:"timestamp"`
+	Method    string        `json:"method,omitempty"`
 }
 
 // NewResponse will generate a Response.
@@ -49,8 +49,8 @@ func NewResponse(session *Session, method string, data interface{}) *Response {
 		instance.Data = nil
 	}
 	instance.Method = method
-	instance.Timestamp = currentTimestamp
-	signature := NewSignature(session, currentTimestamp, method, instance.Data)
+	instance.Timestamp = time.Duration(currentTimestamp)
+	signature := NewSignature(session, time.Duration(currentTimestamp), method, instance.Data)
 	hashHex, err := signature.JSONHashHex()
 	if err != nil {
 		session.RaiseError(ErrorGenerateSignature)
