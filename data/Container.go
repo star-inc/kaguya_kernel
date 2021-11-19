@@ -19,15 +19,15 @@ import (
 	"github.com/google/uuid"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
-	"time"
 )
 
 // Container is the data structure, only can be modified by server only, to include a message into database.
 type Container struct {
 	UUID        string        `rethinkdb:"id,omitempty" json:"uuid"`
 	Message     *Message      `rethinkdb:"message" json:"message"`
-	CreatedTime time.Duration `rethinkdb:"createdTime" json:"createdTime"`
+	CreatedTime time.NanoTime `rethinkdb:"createdTime" json:"createdTime"`
 	Canceled    bool          `rethinkdb:"canceled" json:"canceled"`
 }
 
@@ -36,7 +36,7 @@ func NewContainer(message *Message) Interface {
 	instance := new(Container)
 	instance.UUID = uuid.New().String()
 	instance.Message = message
-	instance.CreatedTime = time.Duration(time.Now().UnixNano())
+	instance.CreatedTime = time.Now()
 	instance.Canceled = false
 	return instance
 }
@@ -84,7 +84,7 @@ func (c *Container) Destroy(_ KernelSource.Interface) error {
 }
 
 // FetchContainersByTimestamp ToDo
-func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.Duration, limit int64) []Container {
+func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.NanoTime, limit int64) []Container {
 	containers := make([]Container, limit)
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		OrderBy(rethinkdb.Desc("createdTime")).
@@ -111,7 +111,7 @@ func FetchContainersByTimestamp(source *KernelSource.ContainerSource, timestamp 
 }
 
 // CountContainersByTimestamp ToDo
-func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.Duration) int {
+func CountContainersByTimestamp(source *KernelSource.ContainerSource, timestamp time.NanoTime) int {
 	cursor, err := source.GetTerm().Table(source.RelationID).
 		Filter(rethinkdb.Row.Field("createdTime").Gt(timestamp)).
 		Count().

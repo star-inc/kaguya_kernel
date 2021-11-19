@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package KaguyaKernel
+package time
 
-import "gopkg.in/star-inc/kaguyakernel.v2/time"
+import systemTime "time"
 
-type ErrorReport struct {
-	Error     string        `json:"error"`
-	Timestamp time.NanoTime `json:"timestamp"`
+type NanoTime int64
+
+func Now() NanoTime {
+	return NanoTime(systemTime.Now().UnixNano())
 }

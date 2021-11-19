@@ -16,7 +16,7 @@ package KaguyaKernel
 
 import (
 	"encoding/json"
-	"time"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 )
 
 // Response
@@ -25,7 +25,7 @@ import (
 type Response struct {
 	Data      []byte        `json:"data"`
 	Signature string        `json:"signature"`
-	Timestamp time.Duration `json:"timestamp"`
+	Timestamp time.NanoTime `json:"timestamp"`
 	Method    string        `json:"method,omitempty"`
 }
 
@@ -34,7 +34,7 @@ func NewResponse(session *Session, method string, data interface{}) *Response {
 	// Generate Response
 	instance := new(Response)
 	// Get Current Timestamp
-	currentTimestamp := time.Now().UnixNano()
+	currentTimestamp := time.Now()
 	// If data is nil, ignore to compress.
 	if data != nil {
 		// Encode data into JSON format.
@@ -49,8 +49,8 @@ func NewResponse(session *Session, method string, data interface{}) *Response {
 		instance.Data = nil
 	}
 	instance.Method = method
-	instance.Timestamp = time.Duration(currentTimestamp)
-	signature := NewSignature(session, time.Duration(currentTimestamp), method, instance.Data)
+	instance.Timestamp = time.NanoTime(currentTimestamp)
+	signature := NewSignature(session, time.NanoTime(currentTimestamp), method, instance.Data)
 	hashHex, err := signature.JSONHashHex()
 	if err != nil {
 		session.RaiseError(ErrorGenerateSignature)

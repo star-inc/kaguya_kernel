@@ -16,13 +16,13 @@ package data
 
 import (
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
-	"time"
 )
 
 type Messagebox struct {
-	CreatedTime time.Duration `rethinkdb:"createdTime" json:"createdTime"`
-	LastSeen    time.Duration `rethinkdb:"lastSeen" json:"lastSeen"`
+	CreatedTime time.NanoTime `rethinkdb:"createdTime" json:"createdTime"`
+	LastSeen    time.NanoTime `rethinkdb:"lastSeen" json:"lastSeen"`
 	Metadata    interface{}   `rethinkdb:"metadata" json:"metadata"`
 	Origin      string        `rethinkdb:"origin" json:"origin"`
 	Target      string        `rethinkdb:"target" json:"target"`

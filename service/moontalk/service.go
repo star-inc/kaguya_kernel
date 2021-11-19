@@ -20,8 +20,8 @@ import (
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
-	"time"
 )
 
 // Service is the data structure of MoonPass Service.
@@ -67,7 +67,7 @@ func (service *Service) Fetch(ctx context.Context) {
 // GetHistoryMessages will get the history messages for client.
 func (service *Service) GetHistoryMessages(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
-	timestamp := time.Duration(query["timestamp"].(float64))
+	timestamp := time.NanoTime(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	containers := data.FetchContainersByTimestamp(service.source, timestamp, limit)
 	service.GetSession().Respond(containers)

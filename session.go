@@ -18,9 +18,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"gopkg.in/olahol/melody.v1"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
 	"runtime"
-	"time"
 )
 
 const (
@@ -97,7 +97,7 @@ func (session *Session) RaiseError(message string) {
 	method := runtime.FuncForPC(pc).Name()
 	log.Printf("[%s] %s\n", method, message)
 	session.Respond(&ErrorReport{
-		Timestamp: time.Now().UnixNano(),
+		Timestamp: time.Now(),
 		Error:     message,
 	})
 }
