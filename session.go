@@ -24,10 +24,10 @@ import (
 )
 
 const (
-	ErrorJSONEncodingResponseData = "JSON_encoding_response_data_error"
-	ErrorJSONEncodingResponse     = "JSON_encoding_response_error"
-	ErrorGenerateSignature        = "Generate_signature_error"
-	ErrorSessionClosed            = "Session_closed_error"
+	ErrorJSONEncodingResponseData = "json_encoding_response_data_error"
+	ErrorJSONEncodingResponse     = "json_encoding_response_error"
+	ErrorGenerateSignature        = "generate_signature_error"
+	ErrorSessionClosed            = "session_closed_error"
 )
 
 type Session struct {

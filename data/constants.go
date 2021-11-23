@@ -15,5 +15,5 @@
 package data
 
 const (
-	ErrorBadMethodCallException = "BadMethodCallException"
+	ErrorBadMethodCallException = "bad_method_call_exception"
 )

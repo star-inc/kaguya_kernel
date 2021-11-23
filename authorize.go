@@ -14,7 +14,7 @@
 
 package KaguyaKernel
 
-const ErrorForbidden = "Forbidden"
+const ErrorForbidden = "forbidden"
 
 type AuthorizeInterface interface {
 	Me() string

@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	ErrorJSONDecodingRequest = "JSON_decoding_request_error"
-	ErrorInvalidRequestType  = "Request_type_is_invalid"
+	ErrorJSONDecodingRequest = "json_decoding_request_error"
+	ErrorInvalidRequestType  = "request_type_is_invalid"
 )
 
 // Run will execute kernel with specific arguments.

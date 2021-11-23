@@ -26,9 +26,9 @@ import (
 )
 
 const (
-	ErrorEmptyContent   = "Content_is_empty"
-	ErrorInvalidContent = "Content_is_invalid"
-	ErrorOriginNotEmpty = "Origin_is_not_empty"
+	ErrorEmptyContent   = "content_is_empty"
+	ErrorInvalidContent = "content_is_invalid"
+	ErrorOriginNotEmpty = "origin_is_not_empty"
 )
 
 type ContentValidator func(contentType int, content string) bool
