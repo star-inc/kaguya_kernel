@@ -14,7 +14,9 @@
 
 package KaguyaKernel
 
-const ErrorForbidden = "forbidden"
+import "errors"
+
+var ErrorForbidden = errors.New("forbidden")
 
 type AuthorizeInterface interface {
 	Me() string

@@ -15,7 +15,6 @@
 package data
 
 import (
-	"errors"
 	"github.com/google/uuid"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
@@ -80,7 +79,7 @@ func (c *Container) Replace(source KernelSource.Interface) error {
 
 // Destroy is the method can not be called.
 func (c *Container) Destroy(_ KernelSource.Interface) error {
-	return errors.New(ErrorBadMethodCallException)
+	return ErrorBadMethodCallException
 }
 
 // FetchContainersByTimestamp ToDo

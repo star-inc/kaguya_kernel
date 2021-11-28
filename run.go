@@ -17,14 +17,15 @@ package KaguyaKernel
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"gopkg.in/olahol/melody.v1"
 	"log"
 	"reflect"
 )
 
-const (
-	ErrorJSONDecodingRequest = "json_decoding_request_error"
-	ErrorInvalidRequestType  = "request_type_is_invalid"
+var (
+	ErrorJSONDecodingRequest = errors.New("json_decoding_request_error")
+	ErrorInvalidRequestType  = errors.New("request_type_is_invalid")
 )
 
 // Run will execute kernel with specific arguments.

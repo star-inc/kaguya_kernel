@@ -61,7 +61,7 @@ func (service *Service) Fetch(ctx context.Context) {
 		}
 	}
 	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 }
 

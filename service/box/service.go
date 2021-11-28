@@ -63,7 +63,7 @@ func (service *Service) Fetch(ctx context.Context) {
 		}
 	}
 	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 }
 
@@ -86,10 +86,10 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
 	if err := messagebox.Load(service.source, request.Data.(string)); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	if err := messagebox.Destroy(service.source); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	request.Processed = true
 }

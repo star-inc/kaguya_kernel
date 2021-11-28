@@ -60,7 +60,7 @@ func (service *Service) Fetch(ctx context.Context) {
 		}
 	}
 	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 }
 
@@ -81,7 +81,7 @@ func (service *Service) GetMessage(request *Kernel.Request) {
 	if err == nil {
 		service.GetSession().Respond(container)
 	} else {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	request.Processed = true
 }
@@ -96,7 +96,7 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	message.Origin = service.GetGuard().Me()
 	container := data.NewContainer(message)
 	if err := container.Create(service.source); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	request.Processed = true
 }
@@ -105,12 +105,12 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 func (service *Service) CancelSentMessage(request *Kernel.Request) {
 	container := new(data.Container)
 	if err := container.Load(service.source, request.Data.(string)); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	container.Canceled = true
 	container.Message.Content = ""
 	if err := container.Replace(service.source); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	request.Processed = true
 }

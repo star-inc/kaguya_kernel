@@ -14,6 +14,8 @@
 
 package data
 
-const (
-	ErrorBadMethodCallException = "bad_method_call_exception"
+import "errors"
+
+var (
+	ErrorBadMethodCallException = errors.New("bad_method_call_exception")
 )
