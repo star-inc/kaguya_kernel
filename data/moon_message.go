@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package KaguyaKernel
+package data
 
-import "gopkg.in/star-inc/kaguyakernel.v2/time"
-
-type ErrorReport struct {
-	Error     string        `json:"error"`
-	Timestamp time.NanoTime `json:"timestamp"`
+type MoonMessage struct {
 }

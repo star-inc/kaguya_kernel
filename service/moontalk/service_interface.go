@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package KaguyaKernel
+package moontalk
 
-import "gopkg.in/star-inc/kaguyakernel.v2/time"
+import Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 
-type ErrorReport struct {
-	Error     string        `json:"error"`
-	Timestamp time.NanoTime `json:"timestamp"`
+type ServiceInterface interface {
+	Kernel.ServiceInterface
+	GetMessage(request *Kernel.Request)
+	SendMessage(request *Kernel.Request)
+	CancelSentMessage(request *Kernel.Request)
+	GetHistoryMessages(request *Kernel.Request)
 }

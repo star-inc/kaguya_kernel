@@ -16,17 +16,17 @@ package KaguyaKernel
 
 import (
 	"encoding/json"
-	"time"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 )
 
 // Response
 // Method is a mark of the origin method,
 // to declare where is the Response sent, the field is omitempty.
 type Response struct {
-	Data      []byte `json:"data"`
-	Signature string `json:"signature"`
-	Timestamp int64  `json:"timestamp"`
-	Method    string `json:"method,omitempty"`
+	Data      []byte        `json:"data"`
+	Signature string        `json:"signature"`
+	Timestamp time.NanoTime `json:"timestamp"`
+	Method    string        `json:"method,omitempty"`
 }
 
 // NewResponse will generate a Response.
@@ -34,7 +34,7 @@ func NewResponse(session *Session, method string, data interface{}) *Response {
 	// Generate Response
 	instance := new(Response)
 	// Get Current Timestamp
-	currentTimestamp := time.Now().UnixNano()
+	currentTimestamp := time.Now()
 	// If data is nil, ignore to compress.
 	if data != nil {
 		// Encode data into JSON format.
@@ -49,8 +49,8 @@ func NewResponse(session *Session, method string, data interface{}) *Response {
 		instance.Data = nil
 	}
 	instance.Method = method
-	instance.Timestamp = currentTimestamp
-	signature := NewSignature(session, currentTimestamp, method, instance.Data)
+	instance.Timestamp = time.NanoTime(currentTimestamp)
+	signature := NewSignature(session, time.NanoTime(currentTimestamp), method, instance.Data)
 	hashHex, err := signature.JSONHashHex()
 	if err != nil {
 		session.RaiseError(ErrorGenerateSignature)

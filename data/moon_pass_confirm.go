@@ -14,6 +14,16 @@
 
 package data
 
-const (
-	ErrorBadMethodCallException = "BadMethodCallException"
-)
+type MoonPassConfirm struct {
+	MoonPass *MoonPass
+	Hash     string `json:"hash"`
+	Data     []byte `json:"data"`
+}
+
+func NewMoonPassConfirm(moonPass *MoonPass, hash string, data []byte) *MoonPassConfirm {
+	instance := new(MoonPassConfirm)
+	instance.MoonPass = moonPass
+	instance.Hash = hash
+	instance.Data = data
+	return instance
+}

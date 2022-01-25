@@ -8,6 +8,14 @@ The opensource instant messaging framework.
 
 ![logo](logo.svg)
 
+## Installation
+
+**Go 1.16+ is required.**
+
+```shell
+    go get -u gopkg.in/star-inc/kaguyakernel.v2
+```
+
 ## Documentation
 
 API reference is available on <https://pkg.go.dev/gopkg.in/star-inc/kaguyakernel.v2>.

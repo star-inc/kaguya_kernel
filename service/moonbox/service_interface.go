@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package KaguyaKernel
+package moonbox
 
-import "gopkg.in/star-inc/kaguyakernel.v2/time"
+import Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 
-type ErrorReport struct {
-	Error     string        `json:"error"`
-	Timestamp time.NanoTime `json:"timestamp"`
+type ServiceInterface interface {
+	Kernel.ServiceInterface
+	InitPublicKey(request *Kernel.Request)
+	GetPublicKey(request *Kernel.Request)
+	SyncPublicKeys(request *Kernel.Request)
 }

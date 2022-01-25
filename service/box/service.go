@@ -19,6 +19,7 @@ import (
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
 )
 
@@ -62,14 +63,14 @@ func (service *Service) Fetch(ctx context.Context) {
 		}
 	}
 	if err := cursor.Err(); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 }
 
 // SyncMessagebox will get the history messageboxes for client.
 func (service *Service) SyncMessagebox(request *Kernel.Request) {
 	query := request.Data.(map[string]interface{})
-	timestamp := int64(query["timestamp"].(float64))
+	timestamp := time.NanoTime(query["timestamp"].(float64))
 	limit := int64(query["count"].(float64))
 	syncMessageboxes := data.FetchSyncMessageboxesByTimestamp(service.source, timestamp, limit)
 	if syncMessageboxes != nil && len(syncMessageboxes) != 0 {
@@ -85,10 +86,10 @@ func (service *Service) SyncMessagebox(request *Kernel.Request) {
 func (service *Service) DeleteMessagebox(request *Kernel.Request) {
 	messagebox := data.NewMessagebox()
 	if err := messagebox.Load(service.source, request.Data.(string)); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	if err := messagebox.Destroy(service.source); err != nil {
-		service.GetSession().RaiseError(err.Error())
+		service.GetSession().RaiseError(err)
 	}
 	request.Processed = true
 }

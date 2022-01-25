@@ -17,14 +17,14 @@ package box
 import (
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
-	"time"
 )
 
-// RefreshMessageboxAfterSeen will refresh Messagebox by fetching a Container or getting the history.
+// RefreshMessageboxAfterSent will refresh Messagebox after sent a Message.
 // target is the relation ID, used for getting the room, as known as chat room ID.
 // origin is the ID of the Message sender.
-func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target string, origin string) {
+func RefreshMessageboxAfterSent(source *KernelSource.MessageboxSource, target string, origin string, metadata string) {
 	if target == "" || origin == "" {
 		log.Panicf("target or origin is not specified. %s %s\n", target, origin)
 	}
@@ -32,15 +32,15 @@ func RefreshMessageboxAfterSeen(source *KernelSource.MessageboxSource, target st
 	if err := messagebox.Load(source, target); err != nil {
 		log.Panicln(err)
 	}
-	messagebox.LastSeen = time.Now().UnixNano()
+	messagebox.Origin = origin
+	messagebox.CreatedTime = time.Now()
+	messagebox.Metadata = metadata
 	if messagebox.CheckReady() {
 		if err := messagebox.Replace(source); err != nil {
 			log.Panicln(err)
 		}
 	} else {
 		messagebox.Target = target
-		messagebox.Origin = origin
-		messagebox.CreatedTime = time.Now().UnixNano()
 		if err := messagebox.Create(source); err != nil {
 			log.Panicln(err)
 		}

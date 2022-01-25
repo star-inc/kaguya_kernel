@@ -17,17 +17,18 @@ package KaguyaKernel
 import (
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"gopkg.in/olahol/melody.v1"
+	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
 	"runtime"
-	"time"
 )
 
-const (
-	ErrorJSONEncodingResponseData = "JSON_encoding_response_data_error"
-	ErrorJSONEncodingResponse     = "JSON_encoding_response_error"
-	ErrorGenerateSignature        = "Generate_signature_error"
-	ErrorSessionClosed            = "Session_closed_error"
+var (
+	ErrorJSONEncodingResponseData = errors.New("json_encoding_response_data_error")
+	ErrorJSONEncodingResponse     = errors.New("json_encoding_response_error")
+	ErrorGenerateSignature        = errors.New("generate_signature_error")
+	ErrorSessionClosed            = errors.New("session_closed_error")
 )
 
 type Session struct {
@@ -92,12 +93,12 @@ func compress(raw []byte) []byte {
 }
 
 // RaiseError will throw an error to client.
-func (session *Session) RaiseError(message string) {
+func (session *Session) RaiseError(message error) {
 	pc, _, _, _ := runtime.Caller(1)
 	method := runtime.FuncForPC(pc).Name()
 	log.Printf("[%s] %s\n", method, message)
 	session.Respond(&ErrorReport{
-		Timestamp: time.Now().UnixNano(),
-		Error:     message,
+		Timestamp: time.Now(),
+		Error:     message.Error(),
 	})
 }

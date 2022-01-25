@@ -12,40 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package talk
+package moontalk
 
 import (
 	"context"
-	"errors"
 	"github.com/mitchellh/mapstructure"
 	Kernel "gopkg.in/star-inc/kaguyakernel.v2"
 	"gopkg.in/star-inc/kaguyakernel.v2/data"
 	KernelSource "gopkg.in/star-inc/kaguyakernel.v2/source"
 	"gopkg.in/star-inc/kaguyakernel.v2/time"
 	"log"
-	"strings"
 )
 
-var (
-	ErrorEmptyContent   = errors.New("content_is_empty")
-	ErrorInvalidContent = errors.New("content_is_invalid")
-	ErrorOriginNotEmpty = errors.New("origin_is_not_empty")
-)
-
-type ContentValidator func(contentType int, content string) bool
-
-// Service is the data structure of Talk Service.
+// Service is the data structure of MoonPass Service.
 type Service struct {
 	Kernel.Service
-	source           *KernelSource.ContainerSource
-	contentValidator func(contentType int, content string) bool
+	source *KernelSource.ContainerSource
 }
 
-// NewServiceInterface will create service interface of Talk.
-func NewServiceInterface(source KernelSource.Interface, contentValidator ContentValidator) ServiceInterface {
+// NewServiceInterface will create service interface of MoonPass.
+func NewServiceInterface(source KernelSource.Interface) ServiceInterface {
 	service := new(Service)
 	service.source = source.(*KernelSource.ContainerSource)
-	service.contentValidator = contentValidator
 	return service
 }
 
@@ -103,18 +91,6 @@ func (service *Service) SendMessage(request *Kernel.Request) {
 	message := new(data.Message)
 	if err := mapstructure.Decode(request.Data, message); err != nil {
 		log.Panicln(err)
-		return
-	}
-	if len(strings.TrimSpace(message.Content)) == 0 {
-		service.GetSession().RaiseError(ErrorEmptyContent)
-		return
-	}
-	if !service.contentValidator(message.ContentType, message.Content) {
-		service.GetSession().RaiseError(ErrorInvalidContent)
-		return
-	}
-	if message.Origin != "" {
-		service.GetSession().RaiseError(ErrorOriginNotEmpty)
 		return
 	}
 	message.Origin = service.GetGuard().Me()
